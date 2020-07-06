@@ -2,6 +2,7 @@ NAME := camera-services
 OWNER := byuoitav
 PKG := github.com/${OWNER}/${NAME}
 DOCKER_URL := docker.pkg.github.com
+DOCKER_PKG := ${DOCKER_URL}/${OWNER}/${NAME}
 
 # version:
 # use the git tag, if this commit
@@ -49,18 +50,18 @@ docker: clean build
 ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Building dev container with tag ${COMMIT_HASH}
 
-	@echo Building container ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${COMMIT_HASH}
-	@docker build -f dockerfile --build-arg NAME=${NAME}-linux-amd64 -t ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${COMMIT_HASH} dist
+	@echo Building container ${DOCKER_PKG}/visca-dev:${COMMIT_HASH}
+	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_PKG}/visca-dev:${COMMIT_HASH} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Building dev container with tag ${TAG}
 
-	@echo Building container ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${TAG}
-	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${TAG} dist
+	@echo Building container ${DOCKER_PKG}/visca-dev:${TAG}
+	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_PKG}/visca-dev:${TAG} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Building prd container with tag ${TAG}
 
-	@echo Building container ${DOCKER_URL}/${OWNER}/${NAME}/visca:${TAG}
-	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_URL}/${OWNER}/${NAME}/visca:${TAG} dist
+	@echo Building container ${DOCKER_PKG}/visca:${TAG}
+	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_PKG}/visca:${TAG} dist
 endif
 
 deploy: docker
@@ -70,18 +71,18 @@ deploy: docker
 ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Pushing dev container with tag ${COMMIT_HASH}
 
-	@echo Pushing container ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${COMMIT_HASH}
-	@docker push ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${COMMIT_HASH}
+	@echo Pushing container ${DOCKER_PKG}/visca-dev:${COMMIT_HASH}
+	@docker push ${DOCKER_PKG}/visca-dev:${COMMIT_HASH}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Pushing dev container with tag ${TAG}
 
-	@echo Pushing container ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${TAG}
-	@docker push ${DOCKER_URL}/${OWNER}/${NAME}/visca-dev:${TAG}
+	@echo Pushing container ${DOCKER_PKG}/visca-dev:${TAG}
+	@docker push ${DOCKER_PKG}/visca-dev:${TAG}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Pushing prd container with tag ${TAG}
 
-	@echo Pushing container ${DOCKER_URL}/${OWNER}/${NAME}/visca:${TAG}
-	@docker push ${DOCKER_URL}/${OWNER}/${NAME}/visca:${TAG}
+	@echo Pushing container ${DOCKER_PKG}/visca:${TAG}
+	@docker push ${DOCKER_PKG}/visca:${TAG}
 endif
 
 clean:
