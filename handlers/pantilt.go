@@ -96,7 +96,7 @@ func (h *Handlers) PanRight(c *gin.Context) {
 
 	log.Info("Panning right")
 
-	if err := cam.PanLeft(ctx, 0x0b); err != nil {
+	if err := cam.PanRight(ctx, 0x0b); err != nil {
 		log.Warn("unable to pan right", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
