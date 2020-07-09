@@ -133,17 +133,19 @@ func main() {
 	})
 
 	api := r.Group("/v1/:address", handlers.RequestID, handlers.Log, handlers.Camera)
-	api.GET("pantilt/up", handlers.Publish("TiltUp"), handlers.TiltUp)
-	api.GET("pantilt/down", handlers.Publish("TiltDown"), handlers.TiltDown)
-	api.GET("pantilt/left", handlers.Publish("PanLeft"), handlers.PanLeft)
-	api.GET("pantilt/right", handlers.Publish("PanRight"), handlers.PanRight)
-	api.GET("pantilt/stop", handlers.Publish("PanTiltStop"), handlers.PanTiltStop)
+	api.GET("/pantilt/up", handlers.Publish("TiltUp"), handlers.TiltUp)
+	api.GET("/pantilt/down", handlers.Publish("TiltDown"), handlers.TiltDown)
+	api.GET("/pantilt/left", handlers.Publish("PanLeft"), handlers.PanLeft)
+	api.GET("/pantilt/right", handlers.Publish("PanRight"), handlers.PanRight)
+	api.GET("/pantilt/stop", handlers.Publish("PanTiltStop"), handlers.PanTiltStop)
 
-	api.GET("zoom/in", handlers.Publish("ZoomIn"), handlers.ZoomIn)
-	api.GET("zoom/out", handlers.Publish("ZoomOut"), handlers.ZoomOut)
-	api.GET("zoom/stop", handlers.Publish("ZoomStop"), handlers.ZoomStop)
+	api.GET("/zoom/in", handlers.Publish("ZoomIn"), handlers.ZoomIn)
+	api.GET("/zoom/out", handlers.Publish("ZoomOut"), handlers.ZoomOut)
+	api.GET("/zoom/stop", handlers.Publish("ZoomStop"), handlers.ZoomStop)
 
-	api.GET("memory/recall/:channel", handlers.Publish("MemoryRecall"), handlers.MemoryRecall)
+	api.GET("/memory/recall/:channel", handlers.Publish("MemoryRecall"), handlers.MemoryRecall)
+
+	api.GET("/stream", handlers.Publish("Stream"), handlers.Stream)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

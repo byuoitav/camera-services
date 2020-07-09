@@ -2,6 +2,7 @@ package cameraservices
 
 import (
 	"context"
+	"image"
 )
 
 type NewCameraFunc func(context.Context, string) (Camera, error)
@@ -16,4 +17,5 @@ type Camera interface {
 	ZoomWide(context.Context) error
 	ZoomStop(context.Context) error
 	MemoryRecall(context.Context, byte) error
+	Stream(context.Context) (chan image.Image, error)
 }
