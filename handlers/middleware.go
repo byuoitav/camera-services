@@ -16,7 +16,8 @@ const (
 )
 
 const (
-	_hRequestID = "X-Request-ID"
+	_hRequestID   = "X-Request-ID"
+	_hContentType = "Content-Type"
 )
 
 func (h *Handlers) RequestID(c *gin.Context) {
