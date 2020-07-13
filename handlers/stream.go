@@ -42,7 +42,10 @@ func (h *Handlers) Stream(c *gin.Context) {
 	// write the normal http headers
 	c.Writer.Header().Add(_hContentType, "multipart/x-mixed-replace;boundary="+_mjpegBoundary)
 
-	defer c.Writer.WriteString("\r\n--" + _mjpegBoundary + "--")
+	defer func() {
+		_, _ = c.Writer.WriteString("\r\n--" + _mjpegBoundary + "--")
+	}()
+
 	defer log.Info("Done streaming")
 
 	buf := &bytes.Buffer{}
@@ -57,8 +60,15 @@ func (h *Handlers) Stream(c *gin.Context) {
 			}
 
 			// write header for this frame
-			c.Writer.WriteString(fmt.Sprintf(_mjpegFrameHeaderf, buf.Len()))
-			c.Writer.Write(buf.Bytes())
+			if _, err := c.Writer.WriteString(fmt.Sprintf(_mjpegFrameHeaderf, buf.Len())); err != nil {
+				log.Warn("unable to write frame header", zap.Error(err))
+				return
+			}
+
+			if _, err := c.Writer.Write(buf.Bytes()); err != nil {
+				log.Warn("unable to write frame", zap.Error(err))
+				return
+			}
 		case err := <-errs:
 			log.Warn("unable to get the next image", zap.Error(err))
 			return
