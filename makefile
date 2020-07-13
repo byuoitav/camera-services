@@ -41,7 +41,7 @@ build: deps
 
 	@echo
 	@echo Building for linux-amd64...
-	@cd cmd/visca/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/visca-linux-amd64
+	@cd cmd/aver/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/aver-linux-amd64
 
 	@echo
 	@echo Build output is located in ./dist/.
@@ -50,18 +50,18 @@ docker: clean build
 ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Building dev container with tag ${COMMIT_HASH}
 
-	@echo Building container ${DOCKER_PKG}/visca-dev:${COMMIT_HASH}
-	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_PKG}/visca-dev:${COMMIT_HASH} dist
+	@echo Building container ${DOCKER_PKG}/aver-dev:${COMMIT_HASH}
+	@docker build -f dockerfile --build-arg NAME=aver-linux-amd64 -t ${DOCKER_PKG}/aver-dev:${COMMIT_HASH} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Building dev container with tag ${TAG}
 
-	@echo Building container ${DOCKER_PKG}/visca-dev:${TAG}
-	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_PKG}/visca-dev:${TAG} dist
+	@echo Building container ${DOCKER_PKG}/aver-dev:${TAG}
+	@docker build -f dockerfile --build-arg NAME=aver-linux-amd64 -t ${DOCKER_PKG}/aver-dev:${TAG} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Building prd container with tag ${TAG}
 
-	@echo Building container ${DOCKER_PKG}/visca:${TAG}
-	@docker build -f dockerfile --build-arg NAME=visca-linux-amd64 -t ${DOCKER_PKG}/visca:${TAG} dist
+	@echo Building container ${DOCKER_PKG}/aver:${TAG}
+	@docker build -f dockerfile --build-arg NAME=aver-linux-amd64 -t ${DOCKER_PKG}/aver:${TAG} dist
 endif
 
 deploy: docker
@@ -71,18 +71,18 @@ deploy: docker
 ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Pushing dev container with tag ${COMMIT_HASH}
 
-	@echo Pushing container ${DOCKER_PKG}/visca-dev:${COMMIT_HASH}
-	@docker push ${DOCKER_PKG}/visca-dev:${COMMIT_HASH}
+	@echo Pushing container ${DOCKER_PKG}/aver-dev:${COMMIT_HASH}
+	@docker push ${DOCKER_PKG}/aver-dev:${COMMIT_HASH}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Pushing dev container with tag ${TAG}
 
-	@echo Pushing container ${DOCKER_PKG}/visca-dev:${TAG}
-	@docker push ${DOCKER_PKG}/visca-dev:${TAG}
+	@echo Pushing container ${DOCKER_PKG}/aver-dev:${TAG}
+	@docker push ${DOCKER_PKG}/aver-dev:${TAG}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Pushing prd container with tag ${TAG}
 
-	@echo Pushing container ${DOCKER_PKG}/visca:${TAG}
-	@docker push ${DOCKER_PKG}/visca:${TAG}
+	@echo Pushing container ${DOCKER_PKG}/aver:${TAG}
+	@docker push ${DOCKER_PKG}/aver:${TAG}
 endif
 
 clean:
