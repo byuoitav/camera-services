@@ -17,5 +17,5 @@ type Camera interface {
 	ZoomWide(context.Context) error
 	ZoomStop(context.Context) error
 	MemoryRecall(context.Context, byte) error
-	Stream(context.Context) (chan image.Image, error)
+	Stream(context.Context) (chan image.Image, chan error, error)
 }
