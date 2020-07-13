@@ -1,0 +1,168 @@
+<div>
+    <button mat-flat-button class="exit-button" (click)="exitRoom()">Exit Room</button>
+</div>
+<div class="body-container">
+    <mat-tab-group>
+      <!-- tabs of cameras -->
+      <mat-tab label="ITB 1101 Camera 1" style="height: 100%;">
+        <div class="body-container">
+          <div class="movement-container">
+            <div class="d-pad-container">
+              <nav class="d-pad">
+                <a class="up"></a>
+                <a class="right"></a>
+                <a class="down"></a>
+                <a class="left"></a>
+              </nav>
+            </div>
+  
+            <div class="zoom">
+              <button mat-flat-button>
+                <mat-icon>zoom_in</mat-icon>
+                <div>In</div>
+              </button>
+  
+              <button mat-flat-button>
+                <mat-icon>zoom_out</mat-icon>
+                <div>Out</div>
+              </button>
+            </div>
+          </div>
+  
+          <div class="camera-container">
+            <img *ngIf="timeout<60"src="" class="feed">
+            <div *ngIf="timeout>59" class="preview-paused">
+              <div style="display: table-cell; vertical-align: middle;">PREVIEW PAUSED</div>
+            </div>
+          </div>
+  
+          <div class="presets-container">
+            <h2>Presets</h2>
+            <mat-divider class="divider"></mat-divider>
+  
+            <mat-grid-list class="presets" cols="2" [rowHeight]="rowHeight">
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Front</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Front Whiteboards</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Right Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="ITB 1101 Camera 2" style="height: 100%;">
+        <div class="body-container">
+          <div class="movement-container">
+            <div class="d-pad-container">
+              <nav class="d-pad">
+                <a class="up"></a>
+                <a class="right"></a>
+                <a class="down"></a>
+                <a class="left"></a>
+              </nav>
+            </div>
+  
+            <div class="zoom">
+              <button mat-flat-button>
+                <mat-icon>zoom_in</mat-icon>
+                <div>In</div>
+              </button>
+  
+              <button mat-flat-button>
+                <mat-icon>zoom_out</mat-icon>
+                <div>Out</div>
+              </button>
+            </div>
+          </div>
+  
+          <div class="camera-container">
+            <img *ngIf="timeout<60"src="" class="feed">
+            <div *ngIf="timeout>59" class="preview-paused">
+              <div style="display: table-cell; vertical-align: middle;">PREVIEW PAUSED</div>
+            </div>
+          </div>
+  
+          <div class="presets-container">
+            <h2>Presets</h2>
+            <mat-divider class="divider"></mat-divider>
+  
+            <mat-grid-list class="presets" cols="2" [rowHeight]="rowHeight">
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Front</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Front Whiteboards</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Right Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+  
+              <mat-grid-tile class="preset">
+                <button mat-flat-button>Left Whiteboard</button>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
