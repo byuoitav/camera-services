@@ -3,6 +3,6 @@ MAINTAINER Daniel Randall <danny_randall@byu.edu>
 
 ARG NAME
 
-COPY ${NAME} /camera-service
+COPY ${NAME} /app
 
-ENTRYPOINT ["/camera-service"]
+ENTRYPOINT ["/app"]

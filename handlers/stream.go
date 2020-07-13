@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"image/jpeg"
 	"net/http"
 	"time"
 
@@ -11,14 +14,15 @@ import (
 )
 
 const (
-	_mjpegBoundary = "MJPEG_BOUNDARY"
+	_mjpegBoundary     = "mjpeg_boundary"
+	_mjpegFrameHeaderf = "\r\n--" + _mjpegBoundary + "\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n"
 )
 
 func (h *Handlers) Stream(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Minute)
 	defer cancel()
 
 	log := h.Logger
@@ -28,16 +32,39 @@ func (h *Handlers) Stream(c *gin.Context) {
 
 	log.Info("Starting a stream")
 
-	_, err := cam.Stream(ctx)
+	images, errs, err := cam.Stream(ctx)
 	if err != nil {
-		log.Warn("unable to stream", zap.Error(err))
+		log.Warn("unable to start stream", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// add the stream headers
+	// write the normal http headers
 	c.Writer.Header().Add(_hContentType, "multipart/x-mixed-replace;boundary="+_mjpegBoundary)
 
-	log.Info("Done streaming")
-	c.Status(http.StatusOK)
+	defer c.Writer.WriteString("\r\n--" + _mjpegBoundary + "--")
+	defer log.Info("Done streaming")
+
+	buf := &bytes.Buffer{}
+	for {
+		select {
+		case image := <-images:
+			buf.Reset()
+
+			if err := jpeg.Encode(buf, image, nil); err != nil {
+				log.Warn("unable to encode image", zap.Error(err))
+				continue
+			}
+
+			// write header for this frame
+			c.Writer.WriteString(fmt.Sprintf(_mjpegFrameHeaderf, buf.Len()))
+			c.Writer.Write(buf.Bytes())
+		case err := <-errs:
+			log.Warn("unable to get the next image", zap.Error(err))
+			return
+		case <-ctx.Done():
+			log.Info("Ending stream", zap.String("reason", (ctx.Err().Error())))
+			return
+		}
+	}
 }
