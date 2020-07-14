@@ -5,10 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -35,14 +37,10 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 		ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
 		defer cancel()
 
-		h.Logger.Info("reverse lookup", zap.String("addr", addr), zap.String("resolver", fmt.Sprintf("%+v", h.Resolver)))
-
 		addrs, err := h.Resolver.LookupHost(ctx, addr)
 		if err != nil {
 			return nil, fmt.Errorf("unable to reverse lookup ip: %w", err)
 		}
-
-		h.Logger.Info("got", zap.String("addrs", fmt.Sprintf("%+v", addrs)))
 
 		if len(addrs) == 0 {
 			return nil, errors.New("no camera IP addresses found")
@@ -57,4 +55,16 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 	}
 
 	return ip, nil
+}
+
+func (h *Handlers) Lookup(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+
+	camIP, err := h.getCameraIP(ctx, c.Param("address"))
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+	}
+
+	c.String(http.StatusOK, camIP.String())
 }

@@ -172,6 +172,8 @@ func main() {
 
 	pro520.GET("/stream", handlers.Publish("Stream"), handlers.Stream)
 
+	r.GET("/v1/lookup/:address", handlers.Log, handlers.Lookup)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatal("unable to bind listener", zap.Error(err))
