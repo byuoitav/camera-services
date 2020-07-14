@@ -20,33 +20,36 @@ type Handlers struct {
 }
 
 func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
-	host := addr
 	var err error
 
-	if strings.Contains(host, ":") {
-		host, _, err = net.SplitHostPort(host)
+	if strings.Contains(addr, ":") {
+		addr, _, err = net.SplitHostPort(addr)
 		if err != nil {
 			return nil, fmt.Errorf("unable to split host/port: %w", err)
 		}
 	}
 
 	// figure out if it's an ip or not
-	ip := net.ParseIP(host)
+	ip := net.ParseIP(addr)
 	if ip == nil {
 		ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
 		defer cancel()
 
-		addrs, err := h.Resolver.LookupHost(ctx, host)
+		h.Logger.Info("reverse lookup", zap.String("addr", addr), zap.String("resolver", fmt.Sprintf("%+v", h.Resolver)))
+
+		addrs, err := h.Resolver.LookupHost(ctx, addr)
 		if err != nil {
 			return nil, fmt.Errorf("unable to reverse lookup ip: %w", err)
 		}
+
+		h.Logger.Info("got", zap.String("addrs", fmt.Sprintf("%+v", addrs)))
 
 		if len(addrs) == 0 {
 			return nil, errors.New("no camera IP addresses found")
 		}
 
-		for _, addr := range addrs {
-			ip = net.ParseIP(addr)
+		for i := range addrs {
+			ip = net.ParseIP(addrs[i])
 			if ip != nil {
 				break
 			}
