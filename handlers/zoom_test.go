@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"image"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -53,6 +54,11 @@ func (t *goodTestCamera) MemoryRecall(ctx context.Context, cmd byte) error {
 	return nil
 }
 
+// TODO test with this. just added so that the tests will build
+func (t *goodTestCamera) Stream(ctx context.Context) (chan image.Image, chan error, error) {
+	return nil, nil, nil
+}
+
 func (t *badTestCamera) TiltUp(ctx context.Context, cmd byte) error {
 	return errors.New("tilt up error")
 }
@@ -87,6 +93,11 @@ func (t *badTestCamera) ZoomStop(ctx context.Context) error {
 
 func (t *badTestCamera) MemoryRecall(ctx context.Context, cmd byte) error {
 	return errors.New("memory recall error")
+}
+
+// TODO test with this. just added so that the tests will build
+func (t *badTestCamera) Stream(ctx context.Context) (chan image.Image, chan error, error) {
+	return nil, nil, nil
 }
 
 func SetLogger() (*zap.Logger, error) {
