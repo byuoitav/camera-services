@@ -88,8 +88,12 @@ func main() {
 		log.Fatal("--name is required. use --help for more details")
 	}
 
-	resolver := &net.Resolver{}
+	resolver := &net.Resolver{
+		PreferGo: true,
+	}
 	if len(dnsAddr) > 0 {
+		log.Info("Using custom DNS resolver", zap.String("addr", dnsAddr))
+
 		resolver.Dial = func(ctx context.Context, network, address string) (net.Conn, error) {
 			dialer := &net.Dialer{}
 			return dialer.DialContext(ctx, "udp", dnsAddr)
