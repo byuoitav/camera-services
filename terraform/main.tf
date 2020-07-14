@@ -29,33 +29,54 @@ data "aws_ssm_parameter" "dns_addr" {
   name = "/env/visca-service/dns-addr"
 }
 
-module "dev" {
+data "aws_ssm_parameter" "dev_event_url" {
+  name = "/env/camera-services/event-url"
+}
+
+data "aws_ssm_parameter" "dev_dns_addr" {
+  name = "/env/camera-services/dns-addr"
+}
+
+data "aws_ssm_parameter" "aver_username" {
+  name = "/env/camera-services/aver/username"
+}
+
+data "aws_ssm_parameter" "aver_password" {
+  name = "/env/camera-services/aver/password"
+}
+
+module "aver_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
   // required
-  name           = "visca-service-dev"
-  image          = "docker.pkg.github.com/byuoitav/visca-service/visca-service-dev"
-  image_version  = "dcb4b9d"
+  name           = "camera-services-aver-dev"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
+  image_version  = "f2a66c2"
   container_port = 8080
-  repo_url       = "https://github.com/byuoitav/visca-service"
+  repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
-  public_urls       = ["visca-dev.av.byu.edu"]
-  container_env     = {}
+  public_urls       = ["aver-dev.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
   container_args = [
     "--port", "8080",
-    "--log-level", "0", // set log level to info
-    "--name", "k8s-visca-service-dev",
-    "--event-url", data.aws_ssm_parameter.event_url.value,
-    "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
+    "--log-level", "info",
+    "--name", "k8s-camera-services-aver-dev",
+    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+    "--cam-username", data.aws_ssm_parameter.aver_username.value,
+    "--cam-password", data.aws_ssm_parameter.aver_password.value,
   ]
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
   }
+  health_check = false
 }
 
-module "prd" {
+module "visca_prd" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
   // required
@@ -79,4 +100,5 @@ module "prd" {
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
   }
+  health_check = false
 }
