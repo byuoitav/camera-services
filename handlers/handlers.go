@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
 	"go.uber.org/zap"
@@ -32,6 +33,9 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 	// figure out if it's an ip or not
 	ip := net.ParseIP(host)
 	if ip == nil {
+		ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
+		defer cancel()
+
 		addrs, err := h.Resolver.LookupHost(ctx, host)
 		if err != nil {
 			return nil, fmt.Errorf("unable to reverse lookup ip: %w", err)
