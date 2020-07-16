@@ -1,12 +1,16 @@
-package control
+package cameraservices
 
 import "context"
 
-type ConfigService interface {
-	Cameras(ctx context.Context, room string) ([]Camera, error)
+type ControlKeyService interface {
+	RoomAndControlGroup(ctx context.Context, key string) (string, string, error)
 }
 
-type Camera struct {
+type ConfigService interface {
+	Cameras(ctx context.Context, room string) ([]CameraConfig, error)
+}
+
+type CameraConfig struct {
 	DisplayName string `json:"displayName"`
 
 	TiltUp      string `json:"tiltUp"`
