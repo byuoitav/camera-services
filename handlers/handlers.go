@@ -15,7 +15,6 @@ import (
 type Handlers struct {
 	CreateCamera   cameraservices.NewCameraFunc
 	EventPublisher cameraservices.EventPublisher
-	Resolver       *net.Resolver
 	Logger         *zap.Logger
 }
 
@@ -32,10 +31,10 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 	// figure out if it's an ip or not
 	ip := net.ParseIP(addr)
 	if ip == nil {
-		ctx, cancel := context.WithTimeout(ctx, 1000*time.Millisecond)
+		ctx, cancel := context.WithTimeout(ctx, 750*time.Millisecond)
 		defer cancel()
 
-		addrs, err := h.Resolver.LookupHost(ctx, addr)
+		addrs, err := net.DefaultResolver.LookupHost(ctx, addr)
 		if err != nil {
 			return nil, fmt.Errorf("unable to reverse lookup ip: %w", err)
 		}

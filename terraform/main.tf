@@ -33,6 +33,10 @@ data "aws_ssm_parameter" "dev_event_url" {
   name = "/env/camera-services/event-url"
 }
 
+data "aws_ssm_parameter" "dev_dns_addr" {
+  name = "/env/camera-services/dns-addr"
+}
+
 data "aws_ssm_parameter" "aver_username" {
   name = "/env/camera-services/aver/username"
 }
@@ -47,7 +51,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "87991ac"
+  image_version  = "b796169"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -62,6 +66,7 @@ module "aver_dev" {
     "--log-level", "info",
     "--name", "k8s-camera-services-aver-dev",
     "--event-url", data.aws_ssm_parameter.dev_event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
     "--cam-username", data.aws_ssm_parameter.aver_username.value,
     "--cam-password", data.aws_ssm_parameter.aver_password.value,
   ]
