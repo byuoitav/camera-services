@@ -9,10 +9,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/byuoitav/auth/wso2"
 	"github.com/byuoitav/camera-services/cmd/control/couch"
 	"github.com/byuoitav/camera-services/cmd/control/keys"
 	"github.com/byuoitav/camera-services/handlers"
+	"github.com/byuoitav/common/v2/auth"
 	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -89,6 +92,25 @@ func main() {
 	} else {
 		dbAddr = "https://" + dbAddr
 	}
+
+	client := wso2.Client{
+		CallbackURL:  os.Getenv("CALLBACK_URL"),
+		ClientID:     os.Getenv("CLIENT_ID"),
+		ClientSecret: os.Getenv("CLIENT_SECRET"),
+		GatewayURL:   os.Getenv("GATEWAY_URL"),
+	}
+	writeconfig := router.Group(
+		"",
+		auth.CheckHeaderBasedAuth,
+		gin.WrapMiddleware(client.AuthCodeMiddleware),
+		auth.AuthorizeRequest("write-config", "configuration", func(c echo.Context) string { return "all" }),
+	)
+	readconfig := router.Group(
+		"",
+		auth.CheckHeaderBasedAuth,
+		gin.WrapMiddleware(client.AuthCodeMiddleware),
+		auth.AuthorizeRequest("read-config", "configuration", func(c echo.Context) string { return "all" }),
+	)
 
 	var csOpts []couch.Option
 	if dbUsername != "" {

@@ -20,15 +20,14 @@ export class RoomResolver implements Resolve<Config>{
         state: RouterStateSnapshot
     ): Observable<Config> | Observable<never> {
         const key = route.paramMap.get("key");
-        console.log("in resolve")
         return this.http.get<Config>("http://localhost:8080/key/" + key).pipe(       
             catchError(err => {
                 console.log("error", err)
-                this.router.navigate(["/login"], {
-                    queryParams: {
-                        error: err.reason
-                    },
-                    queryParamsHandling: "merge"
+                this.router.navigate([""], {
+                    // queryParams: {
+                    //     error: err.reason
+                    // },
+                    // queryParamsHandling: "merge"
                 })
 
                 const dialogs = this.dialog.openDialogs.filter(dialog => {

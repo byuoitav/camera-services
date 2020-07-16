@@ -9,15 +9,16 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { MatIconModule } from "@angular/material/icon";
 import { MatGridListModule } from "@angular/material/grid-list";
 import { MatDividerModule } from "@angular/material/divider";
-import { CameraFeedComponent } from './camera-feed/camera-feed.component';
+import { CameraFeedComponent } from './components/camera-feed/camera-feed.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './components/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ErrorDialog } from './dialogs/error/error.dialog';
 import { MatDialogModule } from '@angular/material/dialog';
+import { NumpadDialog } from './dialogs/numpad/numpad.dialog';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     AppComponent,
     CameraFeedComponent,
     LoginComponent,
-    ErrorDialog
+    ErrorDialog,
+    NumpadDialog
   ],
   imports: [
     BrowserModule,
@@ -45,6 +47,10 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatDialogModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ErrorDialog,
+    NumpadDialog
+  ]
 })
 export class AppModule {}

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, NavigationStart, NavigationEnd } from '@angular/router';
+import { Router, NavigationStart, NavigationEnd, NavigationCancel } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -13,12 +13,12 @@ export class AppComponent{
   constructor(private router: Router) {
     let vh = window.innerHeight * 0.01;
 
-    document.documentElement.style.setProperty("--vh", `${vh}px`);
+    // document.documentElement.style.setProperty("--vh", `${vh}px`);
 
-    window.addEventListener("resize", () => {
-      let vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    });
+    // window.addEventListener("resize", () => {
+    //   let vh = window.innerHeight * 0.01;
+    //   document.documentElement.style.setProperty("--vh", `${vh}px`);
+    // });
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
@@ -30,6 +30,9 @@ export class AppComponent{
         if (event.url.includes("/key/")) {
           this.loading = false;
         }
+      }
+      if (event instanceof NavigationCancel) {
+        this.loading = false;
       }
     });
 

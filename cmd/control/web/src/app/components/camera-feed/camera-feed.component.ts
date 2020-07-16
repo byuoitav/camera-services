@@ -1,6 +1,6 @@
 import { Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute } from "@angular/router";
-import { Config, Camera, CameraPreset } from '../../objects/objects';
+import { Config, Camera, CameraPreset } from '../../../objects/objects';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
