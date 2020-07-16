@@ -6,10 +6,6 @@ type ConfigService interface {
 	Cameras(ctx context.Context, room string) ([]Camera, error)
 }
 
-type ControlKeyService interface {
-	RoomAndControlGroup(ctx context.Context, key string) (string, string, error)
-}
-
 type Camera struct {
 	DisplayName string `json:"displayName"`
 

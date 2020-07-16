@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/byuoitav/camera-services/cmd/control/couch"
-	"github.com/byuoitav/camera-services/cmd/control/keys"
 	"github.com/byuoitav/camera-services/handlers"
+	"github.com/byuoitav/camera-services/keys"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
@@ -94,7 +94,7 @@ func main() {
 	if dbUsername != "" {
 		csOpts = append(csOpts, couch.WithBasicAuth(dbUsername, dbPassword))
 	}
-	fmt.Printf("db addr: %s\n", dbAddr)
+
 	cs, err := couch.New(ctx, dbAddr, csOpts...)
 	if err != nil {
 		log.Fatal("unable to create config service", zap.Error(err))
