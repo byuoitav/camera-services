@@ -51,6 +51,8 @@ func (h *Handlers) Publish(action string) gin.HandlerFunc {
 		c.Next()
 
 		go func(status int) {
+			info.Duration = time.Since(info.Timestamp)
+
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
 

@@ -48,7 +48,7 @@ func (p *Publisher) Publish(ctx context.Context, info cameraservices.RequestInfo
 		Timestamp:        info.Timestamp,
 		User:             info.SourceIP.String(),
 		Key:              info.Action,
-		Value:            "success",
+		Value:            info.Duration.String(),
 		Tags: []string{
 			"cameraControl",
 		},
@@ -76,8 +76,10 @@ func (p *Publisher) Error(ctx context.Context, err cameraservices.RequestError) 
 		},
 		Data: struct {
 			CameraIP string `json:"cameraIP"`
+			Duration string `json:"duration"`
 		}{
 			CameraIP: err.CameraIP.String(),
+			Duration: err.Duration.String(),
 		},
 	}
 
