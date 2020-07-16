@@ -11,8 +11,8 @@ import (
 
 	"github.com/byuoitav/auth/wso2"
 	"github.com/byuoitav/camera-services/cmd/control/couch"
-	"github.com/byuoitav/camera-services/cmd/control/keys"
 	"github.com/byuoitav/camera-services/handlers"
+	"github.com/byuoitav/camera-services/keys"
 	"github.com/byuoitav/common/v2/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo"

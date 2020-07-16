@@ -12,9 +12,9 @@ type ControlKeyService struct {
 	Address string
 }
 
-type RoomAndControlGroupResponse struct {
-	RoomID           string `json:"RoomID"`
-	ControlGroupName string `json:"PresetName"`
+type roomControlGroupResponse struct {
+	Room         string `json:"RoomID"`
+	ControlGroup string `json:"PresetName"`
 }
 
 func (c *ControlKeyService) RoomAndControlGroup(ctx context.Context, key string) (string, string, error) {
@@ -30,8 +30,9 @@ func (c *ControlKeyService) RoomAndControlGroup(ctx context.Context, key string)
 		return "", "", fmt.Errorf("unable to make request: %w", err)
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode/100 != 2 {
-		return "", "", fmt.Errorf("The preset was not found for this control key")
+		return "", "", fmt.Errorf("invalid control key")
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -39,15 +40,10 @@ func (c *ControlKeyService) RoomAndControlGroup(ctx context.Context, key string)
 		return "", "", fmt.Errorf("unable to read response: %w", err)
 	}
 
-	// if strings.Contains(string(body), "The preset was not found for this control key") {
-	// 	return "", "", fmt.Errorf("%s", body)
-	// }
-
-	fmt.Printf("body: %s", body)
-	var room RoomAndControlGroupResponse
+	var room roomControlGroupResponse
 	if err := json.Unmarshal(body, &room); err != nil {
 		return "", "", fmt.Errorf("unable to parse response: %w", err)
 	}
 
-	return room.RoomID, room.ControlGroupName, nil
+	return room.Room, room.ControlGroup, nil
 }

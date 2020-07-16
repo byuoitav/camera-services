@@ -58,7 +58,7 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 
 type ControlHandlers struct {
 	ConfigService     control.ConfigService
-	ControlKeyService control.ControlKeyService
+	ControlKeyService cameraservices.ControlKeyService
 }
 
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
