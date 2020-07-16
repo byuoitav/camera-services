@@ -16,6 +16,7 @@ type RequestInfo struct {
 	Timestamp time.Time
 	SourceIP  net.IP
 	CameraIP  net.IP
+	Duration  time.Duration
 }
 
 type RequestError struct {
