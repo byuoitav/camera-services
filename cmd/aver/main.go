@@ -15,6 +15,7 @@ import (
 	"github.com/byuoitav/camera-services/event"
 	"github.com/byuoitav/camera-services/handlers"
 	"github.com/byuoitav/visca"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
@@ -137,6 +138,7 @@ func main() {
 
 	r := gin.New()
 	r.Use(gin.Recovery())
+	r.Use(cors.Default())
 
 	debug := r.Group("/debug")
 	debug.GET("/healthz", func(c *gin.Context) {
@@ -171,8 +173,6 @@ func main() {
 	pro520.GET("/memory/recall/:channel", handlers.Publish("MemoryRecall"), handlers.MemoryRecall)
 
 	pro520.GET("/stream", handlers.Publish("Stream"), handlers.Stream)
-
-	r.GET("/v1/lookup/:address", handlers.Log, handlers.Lookup)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
