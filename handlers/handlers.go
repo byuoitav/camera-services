@@ -10,7 +10,6 @@ import (
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
-	control "github.com/byuoitav/camera-services/cmd/control/data"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -57,7 +56,7 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 }
 
 type ControlHandlers struct {
-	ConfigService     control.ConfigService
+	ConfigService     cameraservices.ConfigService
 	ControlKeyService cameraservices.ControlKeyService
 }
 
