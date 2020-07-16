@@ -8,7 +8,6 @@ import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 })
 export class AppComponent{
 
-  title = "dragonfruit";
   loading = false;
 
   constructor(private router: Router) {

@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { CameraFeedComponent } from './camera-feed/camera-feed.component';
 import { LoginComponent } from './login/login.component';
+import { RoomResolver } from '../services/room.resolver';
 
 
 const routes: Routes = [
@@ -21,7 +22,15 @@ const routes: Routes = [
       },
       {
         path: "key/:key",
-        component: CameraFeedComponent
+        resolve: {
+          uiConfig : RoomResolver
+        },
+        children: [
+          {
+            path: "",
+            component: CameraFeedComponent
+          }
+        ]
       }
     ]
   }

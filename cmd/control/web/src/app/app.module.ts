@@ -15,13 +15,17 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { LoginComponent } from './login/login.component';
+import { HttpClientModule } from '@angular/common/http';
+import { ErrorDialog } from './dialogs/error/error.dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     CameraFeedComponent,
-    LoginComponent
+    LoginComponent,
+    ErrorDialog
   ],
   imports: [
     BrowserModule,
@@ -36,7 +40,9 @@ import { LoginComponent } from './login/login.component';
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
-    MatBottomSheetModule
+    MatBottomSheetModule,
+    HttpClientModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
