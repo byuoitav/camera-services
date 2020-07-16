@@ -15,6 +15,7 @@ import (
 	"github.com/byuoitav/camera-services/keys"
 	"github.com/byuoitav/common/v2/auth"
 	"github.com/gin-gonic/gin"
+	adapter "github.com/gwatts/gin-adapter"
 	"github.com/labstack/echo"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
@@ -32,6 +33,11 @@ func main() {
 		dbInsecure bool
 
 		keyServiceAddr string
+
+		callbackURL  string
+		clientID     string
+		clientSecret string
+		gatewayURL   string
 	)
 
 	pflag.CommandLine.IntVarP(&port, "port", "P", 8080, "port to run the server on")
@@ -41,6 +47,11 @@ func main() {
 	pflag.StringVar(&dbPassword, "db-password", "", "database password")
 	pflag.BoolVar(&dbInsecure, "db-insecure", false, "don't use SSL in database connection")
 	pflag.StringVar(&keyServiceAddr, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+	pflag.StringVar(&callbackURL, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+	pflag.StringVar(&clientID, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+	pflag.StringVar(&clientSecret, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+	pflag.StringVar(&gatewayURL, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+
 	pflag.Parse()
 
 	var level zapcore.Level
@@ -99,18 +110,6 @@ func main() {
 		ClientSecret: os.Getenv("CLIENT_SECRET"),
 		GatewayURL:   os.Getenv("GATEWAY_URL"),
 	}
-	writeconfig := router.Group(
-		"",
-		auth.CheckHeaderBasedAuth,
-		gin.WrapMiddleware(client.AuthCodeMiddleware),
-		auth.AuthorizeRequest("write-config", "configuration", func(c echo.Context) string { return "all" }),
-	)
-	readconfig := router.Group(
-		"",
-		auth.CheckHeaderBasedAuth,
-		gin.WrapMiddleware(client.AuthCodeMiddleware),
-		auth.AuthorizeRequest("read-config", "configuration", func(c echo.Context) string { return "all" }),
-	)
 
 	var csOpts []couch.Option
 	if dbUsername != "" {
@@ -133,6 +132,19 @@ func main() {
 	r.Use(gin.Recovery())
 
 	r.GET("/key/:key", handlers.GetCameras)
+
+	writeconfig := router.Group(
+		"",
+		auth.CheckHeaderBasedAuth,
+		r.Use(adapter.Wrap(client.AuthCodeMiddleware)),
+		auth.AuthorizeRequest("write-config", "configuration", func(c echo.Context) string { return "all" }),
+	)
+	readconfig := router.Group(
+		"",
+		auth.CheckHeaderBasedAuth,
+		r.Use(adapter.Wrap(client.AuthCodeMiddleware)),
+		auth.AuthorizeRequest("read-config", "configuration", func(c echo.Context) string { return "all" }),
+	)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
