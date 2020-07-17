@@ -25,6 +25,10 @@ data "aws_ssm_parameter" "gateway_url" {
   name = "/env/gateway-url"
 }
 
+data "aws_ssm_parameter" "opa_url" {
+  name = "/env/opa-url"
+}
+
 data "aws_ssm_parameter" "prd_db_addr" {
   name = "/env/couch-new-address"
 }
@@ -69,6 +73,10 @@ data "aws_ssm_parameter" "control_client_secret" {
   name = "/env/camera-services/control/client-secret"
 }
 
+data "aws_ssm_parameter" "control_opa_token" {
+  name = "/env/camera-services/control/opa-token"
+}
+
 module "aver_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
@@ -106,7 +114,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "eb90525"
+  image_version  = "8af6786"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -127,6 +135,8 @@ module "control_dev" {
     "--client-id", data.aws_ssm_parameter.control_client_id.value,
     "--client-secret", data.aws_ssm_parameter.control_client_secret.value,
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
+    "--opa-url", data.aws_ssm_parameter.opa_url.value,
+    "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
   ]
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
