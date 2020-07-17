@@ -12,7 +12,7 @@ import (
 )
 
 type Service struct {
-	DisableAuth bool
+	disableAuth bool
 	opaAddress  string
 	opaToken    string
 	log         *zap.Logger
@@ -39,7 +39,7 @@ type requestData struct {
 
 func New(d bool, logger *zap.Logger, addr, token string) Service {
 	return Service{
-		DisableAuth: d,
+		disableAuth: d,
 		opaAddress:  addr,
 		opaToken:    token,
 		log:         logger,
@@ -99,7 +99,7 @@ func (s *Service) Authorize(c *gin.Context) {
 	if oRes.Result.Allow {
 		c.String(http.StatusOK, "Authorized")
 		return
-	} else {
-		c.String(http.StatusForbidden, "Unauthorized")
 	}
+
+	c.String(http.StatusForbidden, "Unauthorized")
 }

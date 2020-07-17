@@ -285,7 +285,6 @@ $d-pad-arrow-move: 35%;
   }
 
   .d-pad-container {
-    overflow: hidden;
     text-align: center;
     height: 50vh;
     width: 30vh;
@@ -304,7 +303,6 @@ $d-pad-arrow-move: 35%;
     width: 200px;
     height: 200px;
     border-radius: 48%;
-    overflow: hidden;
   
     &:before {
       content: '';
@@ -462,7 +460,6 @@ $d-pad-arrow-move: 35%;
     width: 17.5vh;
     height: 23vw;
     border-radius: 48%;
-    overflow: hidden;
   
     &:before {
       content: '';
@@ -613,7 +610,6 @@ $d-pad-arrow-move: 35%;
     width: 12vw;
     height: 17vh;
     border-radius: 48%;
-    overflow: hidden;
   
     &:before {
       content: '';
@@ -660,6 +656,10 @@ $d-pad-arrow-move: 35%;
   .camera-container {
     height: 0px;
     width: 0px;
+  }
+
+  .preview-paused {
+    font-size: 0em;
   }
 
   .movement-container {
@@ -756,7 +756,6 @@ $d-pad-arrow-move: 35%;
     width: 100%;
     height: 100%;
     border-radius: 48%;
-    overflow: hidden;
   
     &:before {
       content: '';
@@ -901,7 +900,6 @@ $d-pad-arrow-move: 35%;
     width: 100%;
     height: 100%;
     border-radius: 48%;
-    overflow: hidden;
   
     &:before {
       content: '';
