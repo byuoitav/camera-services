@@ -143,7 +143,7 @@ func main() {
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 	r.Use(adapter.Wrap(client.AuthCodeMiddleware))
-	if !service.DisableAuth {
+	if !disableAuth {
 		if opaURL == "" {
 			log.Fatal("no OPA address given")
 		}
