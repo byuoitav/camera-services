@@ -4,11 +4,12 @@ go 1.14
 
 require (
 	github.com/byuoitav/auth v0.1.2
-	github.com/byuoitav/visca v0.1.0
 	github.com/flimzy/diff v0.1.7 // indirect
 	github.com/flimzy/testy v0.1.17 // indirect
-	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
+	github.com/byuoitav/aver v0.1.0
+	github.com/byuoitav/visca v0.1.0
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-kivik/couchdb v2.0.0+incompatible
 	github.com/go-kivik/kivik v2.0.0+incompatible

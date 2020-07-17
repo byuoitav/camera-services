@@ -17,25 +17,26 @@ import (
 type Handlers struct {
 	CreateCamera   cameraservices.NewCameraFunc
 	EventPublisher cameraservices.EventPublisher
-	Resolver       *net.Resolver
 	Logger         *zap.Logger
 }
 
 func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
-	host := addr
 	var err error
 
-	if strings.Contains(host, ":") {
-		host, _, err = net.SplitHostPort(host)
+	if strings.Contains(addr, ":") {
+		addr, _, err = net.SplitHostPort(addr)
 		if err != nil {
 			return nil, fmt.Errorf("unable to split host/port: %w", err)
 		}
 	}
 
 	// figure out if it's an ip or not
-	ip := net.ParseIP(host)
+	ip := net.ParseIP(addr)
 	if ip == nil {
-		addrs, err := h.Resolver.LookupHost(ctx, host)
+		ctx, cancel := context.WithTimeout(ctx, 750*time.Millisecond)
+		defer cancel()
+
+		addrs, err := net.DefaultResolver.LookupHost(ctx, addr)
 		if err != nil {
 			return nil, fmt.Errorf("unable to reverse lookup ip: %w", err)
 		}
@@ -44,8 +45,8 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 			return nil, errors.New("no camera IP addresses found")
 		}
 
-		for _, addr := range addrs {
-			ip = net.ParseIP(addr)
+		for i := range addrs {
+			ip = net.ParseIP(addrs[i])
 			if ip != nil {
 				break
 			}

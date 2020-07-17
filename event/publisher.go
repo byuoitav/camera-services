@@ -48,7 +48,7 @@ func (p *Publisher) Publish(ctx context.Context, info cameraservices.RequestInfo
 		Timestamp:        info.Timestamp,
 		User:             info.SourceIP.String(),
 		Key:              info.Action,
-		Value:            "success",
+		Value:            info.Duration.String(),
 		Tags: []string{
 			"cameraControl",
 		},
@@ -76,8 +76,10 @@ func (p *Publisher) Error(ctx context.Context, err cameraservices.RequestError) 
 		},
 		Data: struct {
 			CameraIP string `json:"cameraIP"`
+			Duration string `json:"duration"`
 		}{
 			CameraIP: err.CameraIP.String(),
+			Duration: err.Duration.String(),
 		},
 	}
 
@@ -86,22 +88,24 @@ func (p *Publisher) Error(ctx context.Context, err cameraservices.RequestError) 
 }
 
 func (p *Publisher) handleIPs(ctx context.Context, info cameraservices.RequestInfo, event event) event {
+	ctx, cancel := context.WithTimeout(ctx, 750*time.Second)
+	defer cancel()
+
 	// lookup hostname for source
 	if info.SourceIP != nil {
 		sources, _ := p.Resolver.LookupAddr(ctx, info.SourceIP.String())
-		for _, source := range sources {
-			trimmed := strings.TrimSuffix(source, ".byu.edu.")
-			split := strings.SplitN(trimmed, "-", 3)
-			if len(split) == 3 {
-				event.User = trimmed
-			}
+		if len(sources) > 0 {
+			event.User = sources[0]
 		}
 	}
 
+	// lookup camera ip for building/room/device info
 	if info.CameraIP != nil {
-		cameras, _ := p.Resolver.LookupAddr(ctx, info.CameraIP.String())
-		for _, camera := range cameras {
-			trimmed := strings.TrimSuffix(camera, ".byu.edu.")
+		event.TargetDevice.DeviceID = info.CameraIP.String()
+
+		cameras, err := p.Resolver.LookupAddr(ctx, info.CameraIP.String())
+		if err == nil && len(cameras) > 0 {
+			trimmed := strings.TrimSuffix(cameras[0], ".byu.edu.")
 			split := strings.SplitN(trimmed, "-", 3)
 			if len(split) == 3 {
 				event.TargetDevice.BuildingID = split[0]
