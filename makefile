@@ -41,6 +41,7 @@ deps:
 
 build: deps
 	@mkdir -p dist
+	@mkdir -p dist/control
 
 	@echo
 	@echo Building aver for linux-amd64...
@@ -52,7 +53,7 @@ build: deps
 
 	@echo
 	@echo Building control frontend...
-	@cd cmd/control/web/ && npm run-script build && mv ./dist/web ../../dist/control/web && rmdir ./dist
+	@cd cmd/control/web/ && npm run-script build && ls -la && mv ./dist/web ../../../dist/control/web && rmdir ./dist
 
 	@echo
 	@echo Build output is located in ./dist/.
@@ -99,3 +100,4 @@ endif
 clean:
 	@go clean
 	@rm -rf dist/
+	@rm -rf cmd/control/web/dist
