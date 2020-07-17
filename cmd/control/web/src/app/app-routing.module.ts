@@ -1,9 +1,9 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
-import { CameraFeedComponent } from './components/camera-feed/camera-feed.component';
-import { LoginComponent } from './components/login/login.component';
-import { RoomResolver } from '../services/room.resolver';
+import {NgModule} from '@angular/core';
+import {Routes, RouterModule} from '@angular/router';
+import {AppComponent} from './app.component';
+import {CameraFeedComponent} from './components/camera-feed/camera-feed.component';
+import {LoginComponent} from './components/login/login.component';
+import {RoomResolver} from '../services/room.resolver';
 
 
 const routes: Routes = [
@@ -23,7 +23,7 @@ const routes: Routes = [
       {
         path: "key/:key",
         resolve: {
-          uiConfig : RoomResolver
+          uiConfig: RoomResolver
         },
         children: [
           {

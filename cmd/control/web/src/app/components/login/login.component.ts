@@ -1,7 +1,7 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
-import { HttpClient } from "@angular/common/http";
-import { Camera } from '../../../objects/objects';
+import {Component, OnInit, EventEmitter} from '@angular/core';
+import {Router} from '@angular/router';
+import {HttpClient} from "@angular/common/http";
+import {Camera} from '../../../objects/objects';
 
 @Component({
   selector: 'app-login',
@@ -11,11 +11,11 @@ import { Camera } from '../../../objects/objects';
 export class LoginComponent implements OnInit {
   cameras: Camera[]
 
-  key= "";
+  key = "";
   keyboardEmitter: EventEmitter<string>;
 
-  
-  constructor(private router: Router, private http: HttpClient){}
+
+  constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit() {
     this.keyboardEmitter = new EventEmitter<string>();
@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
     }
     if (index >= 0 && index < 5) {
       const elementName = "codeKey" + (index + 1);
-      document.getElementById(elementName).focus(); 
+      document.getElementById(elementName).focus();
     }
   }
 
@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
   }
 
   goToCameraControl = async () => {
-    console.log("logging in with key", this.key);    
+    console.log("logging in with key", this.key);
     this.router.navigate(["/key/" + this.key]);
     this.key = "";
   }
