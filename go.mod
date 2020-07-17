@@ -3,13 +3,13 @@ module github.com/byuoitav/camera-services
 go 1.14
 
 require (
-	github.com/byuoitav/auth v0.1.2
-	github.com/flimzy/diff v0.1.7 // indirect
-	github.com/flimzy/testy v0.1.17 // indirect
-	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
+	github.com/byuoitav/auth v0.1.4
 	github.com/byuoitav/aver v0.1.0
 	github.com/byuoitav/visca v0.1.0
+	github.com/flimzy/diff v0.1.7 // indirect
+	github.com/flimzy/testy v0.1.17 // indirect
 	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-gonic/contrib v0.0.0-20191209060500-d6e26eeaa607
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-kivik/couchdb v2.0.0+incompatible
 	github.com/go-kivik/kivik v2.0.0+incompatible
@@ -19,20 +19,16 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20200209144316-f9cef593def5 // indirect
 	github.com/gwatts/gin-adapter v0.0.0-20170508204228-c44433c485ad
 	github.com/json-iterator/go v1.1.10 // indirect
-	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/segmentio/ksuid v1.0.3
 	github.com/spf13/pflag v1.0.5
-	github.com/valyala/fasttemplate v1.2.0 // indirect
 	gitlab.com/flimzy/testy v0.0.3 // indirect
 	go.uber.org/zap v1.15.0
-	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect
-	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
