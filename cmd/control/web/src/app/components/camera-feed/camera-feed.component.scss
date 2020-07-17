@@ -20,7 +20,6 @@ $d-pad-arrow-move: 35%;
 }
 
 .exit-button {
-    // background-color: #ddd;
     color: #990000;
     float: right;
 }
@@ -362,15 +361,12 @@ $d-pad-arrow-move: 35%;
   }
 
   .feed{
-    // max-width: 100%;
     width: 100%;
     height: 100%;
     display: flex;
   }
 
   .movement-container {
-    // height: 10%;
-    // width: 50%;
     position: relative;
   
     display: flex;
@@ -584,7 +580,6 @@ $d-pad-arrow-move: 35%;
   
   .preset {
     button {
-      // min-height: 90%;
       height: 80%;
       width: 80%;
       white-space: normal;
@@ -663,7 +658,6 @@ $d-pad-arrow-move: 35%;
   }
 
   .camera-container {
-    // position: absolute;
     height: 0px;
     width: 0px;
   }
@@ -744,7 +738,6 @@ $d-pad-arrow-move: 35%;
   }
 
   .d-pad-container {
-    // overflow: hidden;
     text-align: center;
     height: 65%;
     width: 50%;
@@ -890,7 +883,6 @@ $d-pad-arrow-move: 35%;
   }
 
   .d-pad-container {
-    // overflow: hidden;
     text-align: center;
     height: 80%;
     width: 45%;
