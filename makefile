@@ -36,12 +36,23 @@ deps:
 	@echo Downloading backend dependencies...
 	@go mod download
 
+	@echo Downloading control frontend dependencies...
+	@cd cmd/control/web/ && npm install
+
 build: deps
 	@mkdir -p dist
 
 	@echo
-	@echo Building for linux-amd64...
+	@echo Building aver for linux-amd64...
 	@cd cmd/aver/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/aver-linux-amd64
+
+	@echo
+	@echo Building control backend for linux-amd64...
+	@cd cmd/control/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/control-linux-amd64
+
+	@echo
+	@echo Building control frontend...
+	@cd cmd/control/web/ && npm run-script build && mv ./dist/web ../../dist/control/web && rmdir ./dist
 
 	@echo
 	@echo Build output is located in ./dist/.
