@@ -2,7 +2,7 @@
   <ng-container>
     <img src="../assets/logo.svg" class="logo" />
     <span style="margin-top: 5%;">Enter Control Key:</span>
-    <mat-form-field (click)="showNumpad()">
+    <mat-form-field>
         <input matInput inputmode="numeric" [(ngModel)]="key" style="opacity: 0; z-index: -1; position: absolute" maxlength="6" (keyup.enter)="goToCameraControl()" />
         <div class="room-code">
             <div class="code-char">{{ key[0] ? key[0] : " " }}</div>

@@ -63,7 +63,6 @@ type ControlHandlers struct {
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
-	c.Header("Access-Control-Allow-Origin", "*")
 
 	room, _, err := h.ControlKeyService.RoomAndControlGroup(ctx, c.Param("key"))
 	if err != nil {

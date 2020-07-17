@@ -18,7 +18,6 @@ import { LoginComponent } from './components/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ErrorDialog } from './dialogs/error/error.dialog';
 import { MatDialogModule } from '@angular/material/dialog';
-import { NumpadDialog } from './dialogs/numpad/numpad.dialog';
 
 
 @NgModule({
@@ -27,7 +26,6 @@ import { NumpadDialog } from './dialogs/numpad/numpad.dialog';
     CameraFeedComponent,
     LoginComponent,
     ErrorDialog,
-    NumpadDialog
   ],
   imports: [
     BrowserModule,
@@ -50,7 +48,6 @@ import { NumpadDialog } from './dialogs/numpad/numpad.dialog';
   bootstrap: [AppComponent],
   entryComponents: [
     ErrorDialog,
-    NumpadDialog
   ]
 })
 export class AppModule {}

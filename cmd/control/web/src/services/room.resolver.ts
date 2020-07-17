@@ -12,7 +12,6 @@ import { ErrorDialog } from "../app/dialogs/error/error.dialog";
     providedIn: "root"
 })
 export class RoomResolver implements Resolve<Config>{
-    // cgEvent: EventEmitter<Config>
     constructor(private router: Router, private http: HttpClient, private dialog: MatDialog) {}
 
     resolve(
@@ -20,15 +19,10 @@ export class RoomResolver implements Resolve<Config>{
         state: RouterStateSnapshot
     ): Observable<Config> | Observable<never> {
         const key = route.paramMap.get("key");
-        return this.http.get<Config>("http://localhost:8080/key/" + key).pipe(       
+        return this.http.get<Config>("http://10.0.7.53:8080/key/" + key).pipe(       
             catchError(err => {
                 console.log("error", err)
-                this.router.navigate([""], {
-                    // queryParams: {
-                    //     error: err.reason
-                    // },
-                    // queryParamsHandling: "merge"
-                })
+                this.router.navigate([""], {})
 
                 const dialogs = this.dialog.openDialogs.filter(dialog => {
                     return dialog.componentInstance instanceof ErrorDialog

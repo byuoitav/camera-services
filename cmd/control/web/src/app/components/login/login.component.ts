@@ -1,9 +1,7 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { Router, NavigationStart, NavigationError } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpClient } from "@angular/common/http";
 import { Camera } from '../../../objects/objects';
-import { NumpadDialog } from '../../dialogs/numpad/numpad.dialog';
 
 @Component({
   selector: 'app-login',
@@ -17,18 +15,7 @@ export class LoginComponent implements OnInit {
   keyboardEmitter: EventEmitter<string>;
 
   
-  constructor(private router: Router, private http: HttpClient, private bottomSheet: MatBottomSheet){
-    // this.router.events.subscribe(event => {
-    //   switch (true) {
-    //     case event instanceof NavigationStart:
-    //       this.loggingIn = true;
-    //       break;
-    //     case event instanceof NavigationError:
-    //       this.loggingIn = false;
-    //       break;
-    //   }
-    // })
-  }
+  constructor(private router: Router, private http: HttpClient){}
 
   ngOnInit() {
     this.keyboardEmitter = new EventEmitter<string>();
@@ -62,13 +49,6 @@ export class LoginComponent implements OnInit {
     }
 
     return "";
-  }
-
-  showNumpad() {
-    console.log("trying to show numpad")
-    this.bottomSheet.open(NumpadDialog, {
-      data: this.keyboardEmitter,
-    });
   }
 
   goToCameraControl = async () => {

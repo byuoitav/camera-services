@@ -13,10 +13,9 @@ import (
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/handlers"
 	"github.com/byuoitav/camera-services/keys"
-	"github.com/byuoitav/common/v2/auth"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	adapter "github.com/gwatts/gin-adapter"
-	"github.com/labstack/echo"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -47,10 +46,10 @@ func main() {
 	pflag.StringVar(&dbPassword, "db-password", "", "database password")
 	pflag.BoolVar(&dbInsecure, "db-insecure", false, "don't use SSL in database connection")
 	pflag.StringVar(&keyServiceAddr, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
-	pflag.StringVar(&callbackURL, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
-	pflag.StringVar(&clientID, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
-	pflag.StringVar(&clientSecret, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
-	pflag.StringVar(&gatewayURL, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+	pflag.StringVar(&callbackURL, "callback-url", "", "wso2 callback url")
+	pflag.StringVar(&clientID, "client-id", "", "wso2 client ID")
+	pflag.StringVar(&clientSecret, "client-secret", "", "wso2 client secret")
+	pflag.StringVar(&gatewayURL, "gateway-url", "", "ws02 gateway url")
 
 	pflag.Parse()
 
@@ -129,22 +128,16 @@ func main() {
 	}
 
 	r := gin.New()
+	// r := gin.Default()
+	r.Use(cors.Default())
 	r.Use(gin.Recovery())
+	r.Use(func(c *gin.Context) {
+		client.AuthCodeMiddleware(c.Writer, c.Request)
+	})
+	r.Use(static.Serve("/", static.LocalFile("/web", false)))
+	// r.Use(gin.Wrap(client.AuthCodeMiddleware))
 
 	r.GET("/key/:key", handlers.GetCameras)
-
-	writeconfig := router.Group(
-		"",
-		auth.CheckHeaderBasedAuth,
-		r.Use(adapter.Wrap(client.AuthCodeMiddleware)),
-		auth.AuthorizeRequest("write-config", "configuration", func(c echo.Context) string { return "all" }),
-	)
-	readconfig := router.Group(
-		"",
-		auth.CheckHeaderBasedAuth,
-		r.Use(adapter.Wrap(client.AuthCodeMiddleware)),
-		auth.AuthorizeRequest("read-config", "configuration", func(c echo.Context) string { return "all" }),
-	)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
