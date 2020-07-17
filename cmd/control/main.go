@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/byuoitav/auth/wso2"
+	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/handlers"
 	"github.com/byuoitav/camera-services/keys"
@@ -38,6 +39,10 @@ func main() {
 		clientID     string
 		clientSecret string
 		gatewayURL   string
+
+		opaURL      string
+		opaToken    string
+		disableAuth bool
 	)
 
 	pflag.CommandLine.IntVarP(&port, "port", "P", 8080, "port to run the server on")
@@ -51,6 +56,9 @@ func main() {
 	pflag.StringVar(&clientID, "client-id", "", "wso2 client ID")
 	pflag.StringVar(&clientSecret, "client-secret", "", "wso2 client secret")
 	pflag.StringVar(&gatewayURL, "gateway-url", "https://api.byu.edu", "ws02 gateway url")
+	pflag.StringVar(&opaURL, "opa-url", "", "The URL of the OPA Authorization server")
+	pflag.StringVar(&opaToken, "opa-token", "", "The token to use for OPA")
+	pflag.BoolVar(&disableAuth, "disable-auth", false, "Disable all auth z/n checks")
 
 	pflag.Parse()
 
@@ -89,6 +97,7 @@ func main() {
 		fmt.Printf("unable to build logger: %s", err)
 		os.Exit(1)
 	}
+
 	defer func() {
 		_ = log.Sync()
 	}()
@@ -128,10 +137,19 @@ func main() {
 		},
 	}
 
+	service := cameraservices.New(disableAuth, log, opaURL, opaToken)
+
 	r := gin.New()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 	r.Use(adapter.Wrap(client.AuthCodeMiddleware))
+	if !service.DisableAuth {
+		if opaURL == "" {
+			log.Fatal("no OPA address given")
+		}
+
+		r.Use(service.Authorize)
+	}
 
 	r.Use(static.Serve("/", static.LocalFile("/web", false)))
 
