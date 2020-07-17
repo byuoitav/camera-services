@@ -7,15 +7,16 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/byuoitav/auth/wso2"
-	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/handlers"
 	"github.com/byuoitav/camera-services/keys"
+	"github.com/byuoitav/camera-services/opa"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	adapter "github.com/gwatts/gin-adapter"
 	"github.com/spf13/pflag"
@@ -113,13 +114,6 @@ func main() {
 		dbAddr = "https://" + dbAddr
 	}
 
-	client := wso2.Client{
-		CallbackURL:  callbackURL,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		GatewayURL:   gatewayURL,
-	}
-
 	var csOpts []couch.Option
 	if dbUsername != "" {
 		csOpts = append(csOpts, couch.WithBasicAuth(dbUsername, dbPassword))
@@ -137,21 +131,37 @@ func main() {
 		},
 	}
 
-	service := cameraservices.New(disableAuth, log, opaURL, opaToken)
+	wso2 := wso2.Client{
+		CallbackURL:  callbackURL,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		GatewayURL:   gatewayURL,
+	}
+
+	auth := opa.Client{
+		DisableAuth: disableAuth,
+		Address:     opaURL,
+		Token:       opaToken,
+		Logger:      log,
+	}
 
 	r := gin.New()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
-	r.Use(adapter.Wrap(client.AuthCodeMiddleware))
-	if !disableAuth {
-		if opaURL == "" {
-			log.Fatal("no OPA address given")
+	r.Use(adapter.Wrap(wso2.AuthCodeMiddleware))
+	r.Use(auth.Authorize)
+
+	r.NoRoute(func(c *gin.Context) {
+		dir, file := path.Split(c.Request.RequestURI)
+
+		if file == "" || filepath.Ext(file) == "" {
+			c.File("/web/index.html")
+		} else {
+			c.File("/web/" + path.Join(dir, file))
 		}
+	})
 
-		r.Use(service.Authorize)
-	}
-
-	r.Use(static.Serve("/", static.LocalFile("/web", true)))
+	//r.NoRoute(static.Serve("/", static.LocalFile("/web", true)))
 
 	api := r.Group("/api/v1/")
 	api.GET("/key/:key", handlers.GetCameras)
