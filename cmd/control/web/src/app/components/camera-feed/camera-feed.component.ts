@@ -1,7 +1,7 @@
-import { Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter } from '@angular/core';
-import { Router, ActivatedRoute } from "@angular/router";
-import { Config, Camera, CameraPreset } from '../../../objects/objects';
-import { HttpClient } from '@angular/common/http';
+import {Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter} from '@angular/core';
+import {Router, ActivatedRoute} from "@angular/router";
+import {Config, Camera, CameraPreset} from '../../../objects/objects';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-camera-feed',
@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class CameraFeedComponent implements OnInit {
   rowHeight = "4:1.75"
-  timeout = 0  
+  timeout = 0
   cameras: Config
   constructor(
     private router: Router,

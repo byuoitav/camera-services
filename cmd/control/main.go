@@ -133,19 +133,10 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(adapter.Wrap(client.AuthCodeMiddleware))
 
-	//r.NoRoute(func(c *gin.Context) {
-	//	dir, file := path.Split(c.Request.RequestURI)
-
-	//	if file == "" || filepath.Ext(file) == "" {
-	//		c.File("/web/index.html")
-	//	} else {
-	//		c.File("/web/" + path.Join(dir, file))
-	//	}
-	//})
-
 	r.Use(static.Serve("/", static.LocalFile("/web", true)))
 
-	r.GET("/key/:key", handlers.GetCameras)
+	api := r.Group("/api/v1/")
+	api.GET("/key/:key", handlers.GetCameras)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
