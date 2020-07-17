@@ -115,7 +115,7 @@ func main() {
 	if dbUsername != "" {
 		csOpts = append(csOpts, couch.WithBasicAuth(dbUsername, dbPassword))
 	}
-	fmt.Printf("db addr: %s\n", dbAddr)
+
 	cs, err := couch.New(ctx, dbAddr, csOpts...)
 	if err != nil {
 		log.Fatal("unable to create config service", zap.Error(err))
@@ -133,7 +133,17 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(adapter.Wrap(client.AuthCodeMiddleware))
 
-	r.Use(static.Serve("/", static.LocalFile("/web", false)))
+	//r.NoRoute(func(c *gin.Context) {
+	//	dir, file := path.Split(c.Request.RequestURI)
+
+	//	if file == "" || filepath.Ext(file) == "" {
+	//		c.File("/web/index.html")
+	//	} else {
+	//		c.File("/web/" + path.Join(dir, file))
+	//	}
+	//})
+
+	r.Use(static.Serve("/", static.LocalFile("/web", true)))
 
 	r.GET("/key/:key", handlers.GetCameras)
 

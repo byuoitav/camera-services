@@ -21,6 +21,22 @@ provider "kubernetes" {
   host = data.aws_ssm_parameter.eks_cluster_endpoint.value
 }
 
+data "aws_ssm_parameter" "gateway_url" {
+  name = "/env/gateway-url"
+}
+
+data "aws_ssm_parameter" "prd_db_addr" {
+  name = "/env/couch-new-address"
+}
+
+data "aws_ssm_parameter" "prd_db_username" {
+  name = "/env/couch-username"
+}
+
+data "aws_ssm_parameter" "prd_db_password" {
+  name = "/env/couch-password"
+}
+
 data "aws_ssm_parameter" "event_url" {
   name = "/env/visca-service/event-url"
 }
@@ -43,6 +59,14 @@ data "aws_ssm_parameter" "aver_username" {
 
 data "aws_ssm_parameter" "aver_password" {
   name = "/env/camera-services/aver/password"
+}
+
+data "aws_ssm_parameter" "control_client_id" {
+  name = "/env/camera-services/control/client-id"
+}
+
+data "aws_ssm_parameter" "control_client_secret" {
+  name = "/env/camera-services/control/client-secret"
 }
 
 module "aver_dev" {
@@ -69,6 +93,40 @@ module "aver_dev" {
     "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
     "--cam-username", data.aws_ssm_parameter.aver_username.value,
     "--cam-password", data.aws_ssm_parameter.aver_password.value,
+  ]
+  ingress_annotations = {
+    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
+  }
+  health_check = false
+}
+
+module "control_dev" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-control-dev"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
+  image_version  = "181d38d"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  public_urls       = ["cameras-dev.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--log-level", "info",
+    "--db-address", data.aws_ssm_parameter.prd_db_addr.value,
+    "--db-username", data.aws_ssm_parameter.prd_db_username.value,
+    "--db-password", data.aws_ssm_parameter.prd_db_password.value,
+    "--key-service", "control-keys",
+    "--callback-url", "https://cameras-dev.av.byu.edu",
+    "--client-id", data.aws_ssm_parameter.control_client_id.value,
+    "--client-secret", data.aws_ssm_parameter.control_client_secret.value,
+    "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
   ]
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
