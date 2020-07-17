@@ -16,6 +16,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	adapter "github.com/gwatts/gin-adapter"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -49,7 +50,7 @@ func main() {
 	pflag.StringVar(&callbackURL, "callback-url", "", "wso2 callback url")
 	pflag.StringVar(&clientID, "client-id", "", "wso2 client ID")
 	pflag.StringVar(&clientSecret, "client-secret", "", "wso2 client secret")
-	pflag.StringVar(&gatewayURL, "gateway-url", "", "ws02 gateway url")
+	pflag.StringVar(&gatewayURL, "gateway-url", "https://api.byu.edu", "ws02 gateway url")
 
 	pflag.Parse()
 
@@ -104,10 +105,10 @@ func main() {
 	}
 
 	client := wso2.Client{
-		CallbackURL:  os.Getenv("CALLBACK_URL"),
-		ClientID:     os.Getenv("CLIENT_ID"),
-		ClientSecret: os.Getenv("CLIENT_SECRET"),
-		GatewayURL:   os.Getenv("GATEWAY_URL"),
+		CallbackURL:  callbackURL,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		GatewayURL:   gatewayURL,
 	}
 
 	var csOpts []couch.Option
@@ -128,14 +129,11 @@ func main() {
 	}
 
 	r := gin.New()
-	// r := gin.Default()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
-	r.Use(func(c *gin.Context) {
-		client.AuthCodeMiddleware(c.Writer, c.Request)
-	})
+	r.Use(adapter.Wrap(client.AuthCodeMiddleware))
+
 	r.Use(static.Serve("/", static.LocalFile("/web", false)))
-	// r.Use(gin.Wrap(client.AuthCodeMiddleware))
 
 	r.GET("/key/:key", handlers.GetCameras)
 
