@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -44,6 +45,8 @@ func main() {
 		opaURL      string
 		opaToken    string
 		disableAuth bool
+
+		cameraProxy string
 	)
 
 	pflag.CommandLine.IntVarP(&port, "port", "P", 8080, "port to run the server on")
@@ -53,13 +56,14 @@ func main() {
 	pflag.StringVar(&dbPassword, "db-password", "", "database password")
 	pflag.BoolVar(&dbInsecure, "db-insecure", false, "don't use SSL in database connection")
 	pflag.StringVar(&keyServiceAddr, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
-	pflag.StringVar(&callbackURL, "callback-url", "", "wso2 callback url")
+	pflag.StringVar(&callbackURL, "callback-url", "http://localhost:8080", "wso2 callback url")
 	pflag.StringVar(&clientID, "client-id", "", "wso2 client ID")
 	pflag.StringVar(&clientSecret, "client-secret", "", "wso2 client secret")
 	pflag.StringVar(&gatewayURL, "gateway-url", "https://api.byu.edu", "ws02 gateway url")
 	pflag.StringVar(&opaURL, "opa-url", "", "The URL of the OPA Authorization server")
 	pflag.StringVar(&opaToken, "opa-token", "", "The token to use for OPA")
 	pflag.BoolVar(&disableAuth, "disable-auth", false, "Disable all auth z/n checks")
+	pflag.StringVar(&cameraProxy, "camera-proxy", "", "base url to proxy camera control requests through")
 
 	pflag.Parse()
 
@@ -103,6 +107,17 @@ func main() {
 		_ = log.Sync()
 	}()
 
+	// validate flags
+	cameraProxyURL, err := url.Parse(cameraProxy)
+	if err != nil {
+		log.Fatal("unable to parse camera proxy url", zap.Error(err))
+	}
+
+	myURL, err := url.Parse(callbackURL)
+	if err != nil {
+		log.Fatal("unable to parse my url", zap.Error(err))
+	}
+
 	// context for setup
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -129,6 +144,8 @@ func main() {
 		ControlKeyService: &keys.ControlKeyService{
 			Address: keyServiceAddr,
 		},
+		CameraControlProxy: cameraProxyURL,
+		Me:                 myURL,
 	}
 
 	wso2 := wso2.Client{
@@ -148,8 +165,11 @@ func main() {
 	r := gin.New()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
-	r.Use(adapter.Wrap(wso2.AuthCodeMiddleware))
-	r.Use(auth.Authorize)
+
+	if !disableAuth {
+		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware))
+		r.Use(auth.Authorize)
+	}
 
 	r.NoRoute(func(c *gin.Context) {
 		dir, file := path.Split(c.Request.RequestURI)
@@ -161,10 +181,10 @@ func main() {
 		}
 	})
 
-	//r.NoRoute(static.Serve("/", static.LocalFile("/web", true)))
-
 	api := r.Group("/api/v1/")
 	api.GET("/key/:key", handlers.GetCameras)
+
+	r.GET("/proxy/*uri", handlers.Proxy)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

@@ -114,7 +114,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "8af6786"
+  image_version  = "b55630f"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -137,6 +137,7 @@ module "control_dev" {
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
     "--opa-url", data.aws_ssm_parameter.opa_url.value,
     "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
+    "--camera-proxy", "http://camera-services-aver-dev",
   ]
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
