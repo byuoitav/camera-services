@@ -47,7 +47,6 @@ export class CameraFeedComponent implements OnInit {
   }
 
   tiltUp = (cam: Camera) => {
-    console.log(cam)
     this.timeout = 0
     console.log("tilting up", cam.tiltUp);
     if (!cam.tiltUp) {
