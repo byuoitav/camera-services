@@ -202,7 +202,7 @@ $d-pad-arrow-move: 35%;
   }
 
 //Desktop
-@media only screen and (min-width: 1400px) {
+@media only screen and (min-width: 1100px) {
   .camera-container {
       position: absolute;
       height: 100%;
@@ -220,7 +220,7 @@ $d-pad-arrow-move: 35%;
 
   .zoom {
     position: relative;
-    margin-top: 10%;
+    margin-top: 8vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -673,7 +673,7 @@ $d-pad-arrow-move: 35%;
   }
 
   .zoom {
-    margin-top: 3vh;
+    margin-top: -1vh;
     position: relative;
     display: flex;
     flex-direction: column;

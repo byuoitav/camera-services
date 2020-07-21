@@ -30,7 +30,7 @@
           </div>
   
           <div class="camera-container">
-            <img *ngIf="timeout<60" [src]="cam?.stream" class="feed">
+            <img *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
             <div *ngIf="timeout>59" class="preview-paused">
               <div style="display: table-cell; vertical-align: middle;">PREVIEW PAUSED</div>
             </div>

@@ -66,3 +66,16 @@
         margin: 25px;
     }
   }
+
+.input-field .cdk-mouse-focused {
+  background: rgba(255, 0, 0, 0.5);
+}
+.input-field .cdk-keyboard-focused {
+  background: rgba(255, 0, 0, 0.5);
+}
+.input-field .cdk-touch-focused {
+  background: rgba(255, 0, 0, 0.5);
+}
+.input-field .cdk-program-focused {
+  background: rgba(255, 0, 0, 0.5);
+}
