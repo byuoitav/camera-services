@@ -26,7 +26,7 @@ func (w responseSaver) WriteString(s string) (int, error) {
 	return w.ResponseWriter.WriteString(s)
 }
 
-func (h *Handlers) Publish(action string) gin.HandlerFunc {
+func (h *CameraController) Publish(action string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		info := cameraservices.RequestInfo{
 			Action:    action + c.Param("channel"),

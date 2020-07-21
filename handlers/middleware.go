@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -20,7 +19,11 @@ const (
 	_hContentType = "Content-Type"
 )
 
-func (h *Handlers) RequestID(c *gin.Context) {
+type Middleware struct {
+	Logger *zap.Logger
+}
+
+func (m *Middleware) RequestID(c *gin.Context) {
 	var id string
 	if c.GetHeader(_hRequestID) != "" {
 		id = c.GetHeader(_hRequestID)
@@ -38,41 +41,9 @@ func (h *Handlers) RequestID(c *gin.Context) {
 	c.Next()
 }
 
-func (h *Handlers) Camera(c *gin.Context) {
-	addr := c.Param("address")
-	if addr == "" {
-		c.String(http.StatusBadRequest, "must include camera address")
-		c.Abort()
-		return
-	}
-
+func (m *Middleware) Log(c *gin.Context) {
 	id := c.GetString(_cRequestID)
-	log := h.Logger
-	if len(id) > 0 {
-		log = log.With(zap.String("requestID", id))
-	}
-
-	log.Debug("Getting camera", zap.String("address", addr))
-
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
-	defer cancel()
-
-	cam, err := h.CreateCamera(ctx, addr)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "unable to create camera %s", err)
-		c.Abort()
-		return
-	}
-
-	log.Debug("Got camera")
-
-	c.Set(_cCamera, cam)
-	c.Next()
-}
-
-func (h *Handlers) Log(c *gin.Context) {
-	id := c.GetString(_cRequestID)
-	log := h.Logger
+	log := m.Logger
 	if len(id) > 0 {
 		log = log.With(zap.String("requestID", id))
 	}

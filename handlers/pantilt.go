@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h *Handlers) TiltUp(c *gin.Context) {
+func (h *CameraController) TiltUp(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
@@ -24,7 +24,7 @@ func (h *Handlers) TiltUp(c *gin.Context) {
 
 	log.Info("Tilting up")
 
-	if err := cam.TiltUp(ctx, 0x0e); err != nil {
+	if err := cam.TiltUp(ctx); err != nil {
 		log.Warn("unable to tilt up", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -34,7 +34,7 @@ func (h *Handlers) TiltUp(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handlers) TiltDown(c *gin.Context) {
+func (h *CameraController) TiltDown(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
@@ -48,7 +48,7 @@ func (h *Handlers) TiltDown(c *gin.Context) {
 
 	log.Info("Tilting down")
 
-	if err := cam.TiltDown(ctx, 0x0e); err != nil {
+	if err := cam.TiltDown(ctx); err != nil {
 		log.Warn("unable to tilt down", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -58,7 +58,7 @@ func (h *Handlers) TiltDown(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handlers) PanLeft(c *gin.Context) {
+func (h *CameraController) PanLeft(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
@@ -72,7 +72,7 @@ func (h *Handlers) PanLeft(c *gin.Context) {
 
 	log.Info("Panning left")
 
-	if err := cam.PanLeft(ctx, 0x0b); err != nil {
+	if err := cam.PanLeft(ctx); err != nil {
 		log.Warn("unable to pan left", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -82,7 +82,7 @@ func (h *Handlers) PanLeft(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handlers) PanRight(c *gin.Context) {
+func (h *CameraController) PanRight(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
@@ -96,7 +96,7 @@ func (h *Handlers) PanRight(c *gin.Context) {
 
 	log.Info("Panning right")
 
-	if err := cam.PanRight(ctx, 0x0b); err != nil {
+	if err := cam.PanRight(ctx); err != nil {
 		log.Warn("unable to pan right", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -106,7 +106,7 @@ func (h *Handlers) PanRight(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handlers) PanTiltStop(c *gin.Context) {
+func (h *CameraController) PanTiltStop(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 

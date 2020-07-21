@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
@@ -11,15 +10,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h *Handlers) MemoryRecall(c *gin.Context) {
+func (h *CameraController) GoToPreset(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
-
-	channel, err := strconv.Atoi(c.Param("channel"))
-	if err != nil {
-		c.String(http.StatusBadRequest, "invalid channel: %s", err)
-		return
-	}
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
@@ -29,14 +22,15 @@ func (h *Handlers) MemoryRecall(c *gin.Context) {
 		log = log.With(zap.String("requestID", id))
 	}
 
-	log.Info("Recalling memory", zap.Int("channel", channel))
+	preset := c.Param("preset")
+	log.Info("Going to preset", zap.String("preset", preset))
 
-	if err := cam.MemoryRecall(ctx, byte(channel)); err != nil {
-		log.Warn("unable to recall memory", zap.Error(err))
+	if err := cam.GoToPreset(ctx, preset); err != nil {
+		log.Warn("unable to go to preset", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Info("Recalled memory")
+	log.Info("Went to preset")
 	c.Status(http.StatusOK)
 }
