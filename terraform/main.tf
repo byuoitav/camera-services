@@ -83,7 +83,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "893e0a3"
+  image_version  = "0ed44e2"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -108,13 +108,42 @@ module "aver_dev" {
   health_check = false
 }
 
+module "axis_dev" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-axis-dev"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
+  image_version  = "0ed44e2"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  public_urls       = ["axis-dev.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--log-level", "info",
+    "--name", "k8s-camera-services-axis-dev",
+    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+  ]
+  ingress_annotations = {
+    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
+  }
+  health_check = false
+}
+
 module "control_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "9baaa83"
+  image_version  = "0ed44e2"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -137,7 +166,8 @@ module "control_dev" {
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
     "--opa-url", data.aws_ssm_parameter.opa_url.value,
     "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
-    "--camera-proxy", "http://camera-services-aver-dev",
+    "--aver-proxy", "http://camera-services-aver-dev",
+    "--axis-proxy", "http://camera-services-axis-dev",
   ]
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"

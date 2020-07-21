@@ -24,7 +24,7 @@ func TestTiltUpPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -49,7 +49,7 @@ func TestTiltUpFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -80,7 +80,7 @@ func TestTiltDownPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -105,7 +105,7 @@ func TestTiltDownFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -136,7 +136,7 @@ func TestPanLeftPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -161,7 +161,7 @@ func TestPanLeftFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -192,7 +192,7 @@ func TestPanRightPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -217,7 +217,7 @@ func TestPanRightFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -248,7 +248,7 @@ func TestPanTiltStopPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -273,7 +273,7 @@ func TestPanTiltStopFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 

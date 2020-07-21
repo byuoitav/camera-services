@@ -9,44 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TestMemoryRecallNoChannel(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-	resp := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(resp)
-	c.Request, _ = http.NewRequest(http.MethodGet, "", nil)
-	cam := goodTestCamera{}
-	c.Set(_cRequestID, "ID")
-	c.Set(_cCamera, &cam)
-	c.Params = gin.Params{
-		{
-			Key:   "channel",
-			Value: "channel",
-		},
-	}
-
-	log, err := SetLogger()
-	if err != nil {
-		t.Fatalf("unable to build logger: %s", err)
-	}
-
-	handler := Handlers{
-		Logger: log,
-	}
-
-	handler.MemoryRecall(c)
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("error reading response body: %s", err)
-	}
-
-	if string(body) != "invalid channel: strconv.Atoi: parsing \"channel\": invalid syntax" {
-		t.Fatalf("incorrect error generated: %s", string(body))
-	}
-
-}
-
-func TestMemoryRecallFail(t *testing.T) {
+func TestGoToPresetFail(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	resp := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(resp)
@@ -56,7 +19,7 @@ func TestMemoryRecallFail(t *testing.T) {
 	c.Set(_cRequestID, "ID")
 	c.Params = gin.Params{
 		{
-			Key:   "channel",
+			Key:   "preset",
 			Value: "1",
 		},
 	}
@@ -66,18 +29,18 @@ func TestMemoryRecallFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
-	handler.MemoryRecall(c)
+	handler.GoToPreset(c)
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("error reading response body: %s", err)
 	}
 
-	if string(body) != "memory recall error" {
+	if string(body) != "go to preset error" {
 		t.Fatalf("incorrect error generated: %s", string(body))
 	}
 }
@@ -102,11 +65,11 @@ func TestMemoryRecallPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
-	handler.MemoryRecall(c)
+	handler.GoToPreset(c)
 	if resp.Result().StatusCode/100 != 2 {
 		t.Fatalf("wrong response status code received: %d", resp.Result().StatusCode)
 	}
