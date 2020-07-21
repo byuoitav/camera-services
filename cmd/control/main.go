@@ -46,7 +46,8 @@ func main() {
 		opaToken    string
 		disableAuth bool
 
-		cameraProxy string
+		averProxy string
+		axisProxy string
 	)
 
 	pflag.CommandLine.IntVarP(&port, "port", "P", 8080, "port to run the server on")
@@ -63,7 +64,8 @@ func main() {
 	pflag.StringVar(&opaURL, "opa-url", "", "The URL of the OPA Authorization server")
 	pflag.StringVar(&opaToken, "opa-token", "", "The token to use for OPA")
 	pflag.BoolVar(&disableAuth, "disable-auth", false, "Disable all auth z/n checks")
-	pflag.StringVar(&cameraProxy, "camera-proxy", "", "base url to proxy camera control requests through")
+	pflag.StringVar(&averProxy, "aver-proxy", "", "base url to proxy camera control requests through")
+	pflag.StringVar(&axisProxy, "axis-proxy", "", "base url to proxy camera control requests through")
 
 	pflag.Parse()
 
@@ -108,9 +110,14 @@ func main() {
 	}()
 
 	// validate flags
-	cameraProxyURL, err := url.Parse(cameraProxy)
+	averProxyURL, err := url.Parse(averProxy)
 	if err != nil {
-		log.Fatal("unable to parse camera proxy url", zap.Error(err))
+		log.Fatal("unable to parse aver proxy url", zap.Error(err))
+	}
+
+	axisProxyURL, err := url.Parse(axisProxy)
+	if err != nil {
+		log.Fatal("unable to parse axis proxy url", zap.Error(err))
 	}
 
 	myURL, err := url.Parse(callbackURL)
@@ -148,9 +155,8 @@ func main() {
 		ControlKeyService: &keys.ControlKeyService{
 			Address: keyServiceAddr,
 		},
-		CameraControlProxy: cameraProxyURL,
-		Me:                 myURL,
-		Logger:             log,
+		Me:     myURL,
+		Logger: log,
 	}
 
 	wso2 := wso2.Client{
@@ -189,7 +195,8 @@ func main() {
 	api := r.Group("/api/v1/")
 	api.GET("/key/:key", handlers.GetCameras)
 
-	r.GET("/proxy/*uri", middleware.RequestID, middleware.Log, handlers.Proxy)
+	r.GET("/proxy/aver/*uri", middleware.RequestID, middleware.Log, handlers.Proxy(averProxyURL))
+	r.GET("/proxy/axis/*uri", middleware.RequestID, middleware.Log, handlers.Proxy(axisProxyURL))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
