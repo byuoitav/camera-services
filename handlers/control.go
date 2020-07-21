@@ -99,8 +99,14 @@ func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
 			Director: func(req *http.Request) {
 				req.URL.Scheme = to.Scheme
 				req.URL.Host = to.Host
-				req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy/aver")
-				req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy/axis")
+
+				switch {
+				case strings.HasPrefix(req.URL.Path, "/proxy/aver"):
+					req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy/aver")
+				case strings.HasPrefix(req.URL.Path, "/proxy/axis"):
+					req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy/axis")
+				}
+
 				req.Header.Set(_hRequestID, id)
 
 				log.Debug("Forwarding request to", zap.String("url", req.URL.String()))
