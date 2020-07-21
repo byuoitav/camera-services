@@ -5,20 +5,22 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-type Handlers struct {
+type CameraController struct {
 	CreateCamera   cameraservices.NewCameraFunc
 	EventPublisher cameraservices.EventPublisher
 	Logger         *zap.Logger
 }
 
-func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
+func (h *CameraController) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
 	var err error
 
 	if strings.Contains(addr, ":") {
@@ -52,4 +54,36 @@ func (h *Handlers) getCameraIP(ctx context.Context, addr string) (net.IP, error)
 	}
 
 	return ip, nil
+}
+
+func (h *CameraController) CameraMiddleware(c *gin.Context) {
+	addr := c.Param("address")
+	if addr == "" {
+		c.String(http.StatusBadRequest, "must include camera address")
+		c.Abort()
+		return
+	}
+
+	id := c.GetString(_cRequestID)
+	log := h.Logger
+	if len(id) > 0 {
+		log = log.With(zap.String("requestID", id))
+	}
+
+	log.Debug("Getting camera", zap.String("address", addr))
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
+	defer cancel()
+
+	cam, err := h.CreateCamera(ctx, addr)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "unable to create camera %s", err)
+		c.Abort()
+		return
+	}
+
+	log.Debug("Got camera")
+
+	c.Set(_cCamera, cam)
+	c.Next()
 }
