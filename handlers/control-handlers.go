@@ -11,6 +11,7 @@ import (
 
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type ControlHandlers struct {
@@ -18,6 +19,7 @@ type ControlHandlers struct {
 	ControlKeyService  cameraservices.ControlKeyService
 	Me                 *url.URL
 	CameraControlProxy *url.URL
+	Logger             *zap.Logger
 }
 
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
@@ -69,18 +71,26 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 }
 
 func (h *ControlHandlers) Proxy(c *gin.Context) {
+	id := c.GetString(_cRequestID)
+
+	log := h.Logger
+	if len(id) > 0 {
+		log = log.With(zap.String("requestID", id))
+	}
+
 	proxy := httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.URL.Scheme = h.CameraControlProxy.Scheme
 			req.URL.Host = h.CameraControlProxy.Host
 			req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy")
 
-			fmt.Printf("forwarding request to: %s\n", req.URL)
+			log.Debug("Forwarding request to", zap.String("url", req.URL.String()))
 		},
 		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
 			// log?
+			log.Warn("error proxying request", zap.Error(err))
 			rw.WriteHeader(http.StatusBadGateway)
-			rw.Write([]byte(fmt.Sprintf("unable to proxy request: %s", err)))
+			_, _ = rw.Write([]byte(fmt.Sprintf("unable to proxy request: %s", err)))
 		},
 	}
 

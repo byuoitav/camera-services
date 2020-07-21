@@ -139,6 +139,10 @@ func main() {
 		log.Fatal("unable to create config service", zap.Error(err))
 	}
 
+	h := handlers.Handlers{
+		Logger: log,
+	}
+
 	handlers := handlers.ControlHandlers{
 		ConfigService: cs,
 		ControlKeyService: &keys.ControlKeyService{
@@ -184,7 +188,7 @@ func main() {
 	api := r.Group("/api/v1/")
 	api.GET("/key/:key", handlers.GetCameras)
 
-	r.GET("/proxy/*uri", handlers.Proxy)
+	r.GET("/proxy/*uri", h.RequestID, h.Log, handlers.Proxy)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
