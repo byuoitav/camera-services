@@ -100,7 +100,10 @@ func main() {
 	}
 
 	cameras := &sync.Map{}
-	handlers := handlers.Handlers{
+	middleware := handlers.Middleware{
+		Logger: log,
+	}
+	handlers := handlers.CameraController{
 		Logger: log,
 		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
 		CreateCamera: func(ctx context.Context, addr string) (cameraservices.Camera, error) {
@@ -156,7 +159,7 @@ func main() {
 		c.String(http.StatusOK, config.Level.String())
 	})
 
-	pro520 := r.Group("/v1/Pro520/:address", handlers.RequestID, handlers.Log, handlers.Camera)
+	pro520 := r.Group("/v1/Pro520/:address", middleware.RequestID, middleware.Log, handlers.CameraMiddleware)
 	pro520.GET("/pantilt/up", handlers.Publish("TiltUp"), handlers.TiltUp)
 	pro520.GET("/pantilt/down", handlers.Publish("TiltDown"), handlers.TiltDown)
 	pro520.GET("/pantilt/left", handlers.Publish("PanLeft"), handlers.PanLeft)
@@ -167,7 +170,7 @@ func main() {
 	pro520.GET("/zoom/out", handlers.Publish("ZoomOut"), handlers.ZoomOut)
 	pro520.GET("/zoom/stop", handlers.Publish("ZoomStop"), handlers.ZoomStop)
 
-	pro520.GET("/memory/recall/:channel", handlers.Publish("MemoryRecall"), handlers.MemoryRecall)
+	pro520.GET("/preset/:preset", handlers.Publish("GoToPreset"), handlers.GoToPreset)
 
 	pro520.GET("/stream", handlers.Publish("Stream"), handlers.Stream)
 

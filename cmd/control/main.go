@@ -139,7 +139,7 @@ func main() {
 		log.Fatal("unable to create config service", zap.Error(err))
 	}
 
-	h := handlers.Handlers{
+	middleware := handlers.Middleware{
 		Logger: log,
 	}
 
@@ -189,7 +189,7 @@ func main() {
 	api := r.Group("/api/v1/")
 	api.GET("/key/:key", handlers.GetCameras)
 
-	r.GET("/proxy/*uri", h.RequestID, h.Log, handlers.Proxy)
+	r.GET("/proxy/*uri", middleware.RequestID, middleware.Log, handlers.Proxy)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
