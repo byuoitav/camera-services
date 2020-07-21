@@ -4,8 +4,7 @@ go 1.14
 
 require (
 	github.com/byuoitav/auth v0.1.4
-	github.com/byuoitav/aver v0.1.0
-	github.com/byuoitav/visca v0.1.0
+	github.com/byuoitav/aver v0.1.1
 	github.com/flimzy/diff v0.1.7 // indirect
 	github.com/flimzy/testy v0.1.17 // indirect
 	github.com/gin-contrib/cors v1.3.1
@@ -32,3 +31,5 @@ require (
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
+
+replace github.com/byuoitav/axis => ../axis

@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetCameraIP(t *testing.T) {
-	handler := Handlers{}
+	handler := CameraController{}
 	ip, err := handler.getCameraIP(context.TODO(), "10:10")
 	if err != nil {
 		t.Fatalf("returned an error: %s", err)

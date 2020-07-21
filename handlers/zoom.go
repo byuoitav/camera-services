@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (h *Handlers) ZoomIn(c *gin.Context) {
+func (h *CameraController) ZoomIn(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
@@ -24,7 +24,7 @@ func (h *Handlers) ZoomIn(c *gin.Context) {
 
 	log.Info("Zooming in")
 
-	if err := cam.ZoomTele(ctx); err != nil {
+	if err := cam.ZoomIn(ctx); err != nil {
 		log.Warn("unable to zoom in", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -34,7 +34,7 @@ func (h *Handlers) ZoomIn(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handlers) ZoomOut(c *gin.Context) {
+func (h *CameraController) ZoomOut(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
@@ -48,7 +48,7 @@ func (h *Handlers) ZoomOut(c *gin.Context) {
 
 	log.Info("Zooming out")
 
-	if err := cam.ZoomWide(ctx); err != nil {
+	if err := cam.ZoomOut(ctx); err != nil {
 		log.Warn("unable to zoom out", zap.Error(err))
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -58,7 +58,7 @@ func (h *Handlers) ZoomOut(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *Handlers) ZoomStop(c *gin.Context) {
+func (h *CameraController) ZoomStop(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 

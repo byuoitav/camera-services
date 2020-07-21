@@ -18,7 +18,7 @@ const (
 	_mjpegFrameHeaderf = "\r\n--" + _mjpegBoundary + "\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n"
 )
 
-func (h *Handlers) Stream(c *gin.Context) {
+func (h *CameraController) Stream(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
