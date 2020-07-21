@@ -18,19 +18,19 @@ import (
 type goodTestCamera struct{}
 type badTestCamera struct{}
 
-func (t *goodTestCamera) TiltUp(ctx context.Context, cmd byte) error {
+func (t *goodTestCamera) TiltUp(ctx context.Context) error {
 	return nil
 }
 
-func (t *goodTestCamera) TiltDown(ctx context.Context, cmd byte) error {
+func (t *goodTestCamera) TiltDown(ctx context.Context) error {
 	return nil
 }
 
-func (t *goodTestCamera) PanLeft(ctx context.Context, cmd byte) error {
+func (t *goodTestCamera) PanLeft(ctx context.Context) error {
 	return nil
 }
 
-func (t *goodTestCamera) PanRight(ctx context.Context, cmd byte) error {
+func (t *goodTestCamera) PanRight(ctx context.Context) error {
 	return nil
 }
 
@@ -38,11 +38,11 @@ func (t *goodTestCamera) PanTiltStop(ctx context.Context) error {
 	return nil
 }
 
-func (t *goodTestCamera) ZoomTele(ctx context.Context) error {
+func (t *goodTestCamera) ZoomIn(ctx context.Context) error {
 	return nil
 }
 
-func (t *goodTestCamera) ZoomWide(ctx context.Context) error {
+func (t *goodTestCamera) ZoomOut(ctx context.Context) error {
 	return nil
 }
 
@@ -50,7 +50,7 @@ func (t *goodTestCamera) ZoomStop(ctx context.Context) error {
 	return nil
 }
 
-func (t *goodTestCamera) MemoryRecall(ctx context.Context, cmd byte) error {
+func (t *goodTestCamera) GoToPreset(ctx context.Context, preset string) error {
 	return nil
 }
 
@@ -59,19 +59,19 @@ func (t *goodTestCamera) Stream(ctx context.Context) (chan image.Image, chan err
 	return nil, nil, nil
 }
 
-func (t *badTestCamera) TiltUp(ctx context.Context, cmd byte) error {
+func (t *badTestCamera) TiltUp(ctx context.Context) error {
 	return errors.New("tilt up error")
 }
 
-func (t *badTestCamera) TiltDown(ctx context.Context, cmd byte) error {
+func (t *badTestCamera) TiltDown(ctx context.Context) error {
 	return errors.New("tilt down error")
 }
 
-func (t *badTestCamera) PanLeft(ctx context.Context, cmd byte) error {
+func (t *badTestCamera) PanLeft(ctx context.Context) error {
 	return errors.New("pan left error")
 }
 
-func (t *badTestCamera) PanRight(ctx context.Context, cmd byte) error {
+func (t *badTestCamera) PanRight(ctx context.Context) error {
 	return errors.New("pan right error")
 }
 
@@ -79,11 +79,11 @@ func (t *badTestCamera) PanTiltStop(ctx context.Context) error {
 	return errors.New("pan tilt stop error")
 }
 
-func (t *badTestCamera) ZoomTele(ctx context.Context) error {
+func (t *badTestCamera) ZoomIn(ctx context.Context) error {
 	return errors.New("no zoom in")
 }
 
-func (t *badTestCamera) ZoomWide(ctx context.Context) error {
+func (t *badTestCamera) ZoomOut(ctx context.Context) error {
 	return errors.New("no zoom out")
 }
 
@@ -91,8 +91,8 @@ func (t *badTestCamera) ZoomStop(ctx context.Context) error {
 	return errors.New("no zoom stop")
 }
 
-func (t *badTestCamera) MemoryRecall(ctx context.Context, cmd byte) error {
-	return errors.New("memory recall error")
+func (t *badTestCamera) GoToPreset(ctx context.Context, preset string) error {
+	return errors.New("go to preset error")
 }
 
 // TODO test with this. just added so that the tests will build
@@ -148,7 +148,7 @@ func TestZoomInPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -172,7 +172,7 @@ func TestZoomInFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -203,7 +203,7 @@ func TestZoomOutPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -227,7 +227,7 @@ func TestZoomOutFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -258,7 +258,7 @@ func TestZoomStopPass(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 
@@ -282,7 +282,7 @@ func TestZoomStopFail(t *testing.T) {
 		t.Fatalf("unable to build logger: %s", err)
 	}
 
-	handler := Handlers{
+	handler := CameraController{
 		Logger: log,
 	}
 

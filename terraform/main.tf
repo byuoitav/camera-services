@@ -108,6 +108,35 @@ module "aver_dev" {
   health_check = false
 }
 
+module "axis_dev" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-axis-dev"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
+  image_version  = "893e0a3"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  public_urls       = ["axis-dev.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--log-level", "info",
+    "--name", "k8s-camera-services-axis-dev",
+    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+  ]
+  ingress_annotations = {
+    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
+  }
+  health_check = false
+}
+
 module "control_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
