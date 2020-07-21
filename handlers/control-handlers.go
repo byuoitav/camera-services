@@ -78,16 +78,26 @@ func (h *ControlHandlers) Proxy(c *gin.Context) {
 		log = log.With(zap.String("requestID", id))
 	}
 
+	defer func() {
+		if err := recover(); err != nil {
+			if err == http.ErrAbortHandler {
+				return
+			}
+
+			panic(err)
+		}
+	}()
+
 	proxy := httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.URL.Scheme = h.CameraControlProxy.Scheme
 			req.URL.Host = h.CameraControlProxy.Host
 			req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy")
+			req.Header.Set(_hRequestID, id)
 
 			log.Debug("Forwarding request to", zap.String("url", req.URL.String()))
 		},
 		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
-			// log?
 			log.Warn("error proxying request", zap.Error(err))
 			rw.WriteHeader(http.StatusBadGateway)
 			_, _ = rw.Write([]byte(fmt.Sprintf("unable to proxy request: %s", err)))
