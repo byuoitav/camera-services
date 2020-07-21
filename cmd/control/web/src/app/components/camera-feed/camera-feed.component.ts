@@ -175,7 +175,7 @@ export class CameraFeedComponent implements OnInit {
     if (this.timeout >= 60) {
       return ""
     }
-    if (window.innerWidth > 800 && window.innerHeight > 750) {
+    if (window.innerWidth > 750 && window.innerHeight > 750) {
       console.log(cam.stream)
       return cam.stream
     }
