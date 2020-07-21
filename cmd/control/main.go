@@ -150,6 +150,7 @@ func main() {
 		},
 		CameraControlProxy: cameraProxyURL,
 		Me:                 myURL,
+		Logger:             log,
 	}
 
 	wso2 := wso2.Client{
