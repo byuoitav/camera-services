@@ -48,9 +48,9 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		url.Host = h.Me.Host
 
 		switch {
-		case strings.Contains(url.String(), "aver"):
+		case strings.Contains(u, "aver"):
 			url.Path = "/proxy/aver" + url.Path
-		case strings.Contains(url.String(), "axis"):
+		case strings.Contains(u, "axis"):
 			url.Path = "/proxy/axis" + url.Path
 		}
 
