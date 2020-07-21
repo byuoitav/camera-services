@@ -1,7 +1,7 @@
-import {Component, OnInit, EventEmitter} from '@angular/core';
+import {Component, OnInit, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef, NgZone, AfterViewInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {HttpClient} from "@angular/common/http";
 import {Camera} from '../../../objects/objects';
+
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,7 @@ export class LoginComponent implements OnInit {
   keyboardEmitter: EventEmitter<string>;
 
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.keyboardEmitter = new EventEmitter<string>();

@@ -12,6 +12,7 @@ export class Camera {
     zoomStop: string;
   
     memoryRecall: string;
+    stream: string;
   
     presets: CameraPreset[];
 }

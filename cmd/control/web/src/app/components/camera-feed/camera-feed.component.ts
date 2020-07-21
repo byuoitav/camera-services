@@ -34,7 +34,7 @@ export class CameraFeedComponent implements OnInit {
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
-    if (window.innerWidth >= 1024 && window.innerHeight >= 768 && window.innerHeight <= 1024) {
+    if (window.innerWidth >= 1024 && window.innerHeight >= 768 && window.innerHeight <= 1056) {
       this.rowHeight = "4:2.5"
     } else {
       this.rowHeight = "4:1.75"
@@ -47,6 +47,7 @@ export class CameraFeedComponent implements OnInit {
   }
 
   tiltUp = (cam: Camera) => {
+    console.log(cam)
     this.timeout = 0
     console.log("tilting up", cam.tiltUp);
     if (!cam.tiltUp) {
@@ -103,7 +104,6 @@ export class CameraFeedComponent implements OnInit {
   }
 
   panTiltStop = (cam: Camera) => {
-    this.timeout = 0
     console.log("stopping pan", cam.panTiltStop);
     if (!cam.panTiltStop) {
       return;
@@ -145,7 +145,6 @@ export class CameraFeedComponent implements OnInit {
   }
 
   zoomStop = (cam: Camera) => {
-    this.timeout = 0
     console.log("stopping zoom", cam.zoomStop);
     if (!cam.zoomStop) {
       return;
@@ -171,5 +170,17 @@ export class CameraFeedComponent implements OnInit {
       console.warn("err", err);
     });
   }
+
+  getStreamURL = (cam: Camera) => {
+    if (this.timeout >= 60) {
+      return ""
+    }
+    if (window.innerWidth > 800 && window.innerHeight > 750) {
+      console.log(cam.stream)
+      return cam.stream
+    }
+
+    return ""
+  } 
 }
 
