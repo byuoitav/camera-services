@@ -15,11 +15,10 @@ import (
 )
 
 type ControlHandlers struct {
-	ConfigService      cameraservices.ConfigService
-	ControlKeyService  cameraservices.ControlKeyService
-	Me                 *url.URL
-	CameraControlProxy *url.URL
-	Logger             *zap.Logger
+	ConfigService     cameraservices.ConfigService
+	ControlKeyService cameraservices.ControlKeyService
+	Me                *url.URL
+	Logger            *zap.Logger
 }
 
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
@@ -47,7 +46,14 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 
 		url.Scheme = h.Me.Scheme
 		url.Host = h.Me.Host
-		url.Path = "/proxy" + url.Path
+
+		switch {
+		case strings.Contains(url.String(), "aver"):
+			url.Path = "/proxy/aver" + url.Path
+		case strings.Contains(url.String(), "axis"):
+			url.Path = "/proxy/axis" + url.Path
+		}
+
 		return url.String()
 	}
 
@@ -70,39 +76,42 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 	c.JSON(http.StatusOK, cameras)
 }
 
-func (h *ControlHandlers) Proxy(c *gin.Context) {
-	id := c.GetString(_cRequestID)
+func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.GetString(_cRequestID)
 
-	log := h.Logger
-	if len(id) > 0 {
-		log = log.With(zap.String("requestID", id))
-	}
-
-	defer func() {
-		if err := recover(); err != nil {
-			if err == http.ErrAbortHandler {
-				return
-			}
-
-			panic(err)
+		log := h.Logger
+		if len(id) > 0 {
+			log = log.With(zap.String("requestID", id))
 		}
-	}()
 
-	proxy := httputil.ReverseProxy{
-		Director: func(req *http.Request) {
-			req.URL.Scheme = h.CameraControlProxy.Scheme
-			req.URL.Host = h.CameraControlProxy.Host
-			req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy")
-			req.Header.Set(_hRequestID, id)
+		defer func() {
+			if err := recover(); err != nil {
+				if err == http.ErrAbortHandler {
+					return
+				}
 
-			log.Debug("Forwarding request to", zap.String("url", req.URL.String()))
-		},
-		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
-			log.Warn("error proxying request", zap.Error(err))
-			rw.WriteHeader(http.StatusBadGateway)
-			_, _ = rw.Write([]byte(fmt.Sprintf("unable to proxy request: %s", err)))
-		},
+				panic(err)
+			}
+		}()
+
+		proxy := httputil.ReverseProxy{
+			Director: func(req *http.Request) {
+				req.URL.Scheme = to.Scheme
+				req.URL.Host = to.Host
+				req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy/aver")
+				req.URL.Path = strings.TrimPrefix(c.Request.URL.Path, "/proxy/axis")
+				req.Header.Set(_hRequestID, id)
+
+				log.Debug("Forwarding request to", zap.String("url", req.URL.String()))
+			},
+			ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
+				log.Warn("error proxying request", zap.Error(err))
+				rw.WriteHeader(http.StatusBadGateway)
+				_, _ = rw.Write([]byte(fmt.Sprintf("unable to proxy request: %s", err)))
+			},
+		}
+
+		proxy.ServeHTTP(c.Writer, c.Request)
 	}
-
-	proxy.ServeHTTP(c.Writer, c.Request)
 }
