@@ -12,6 +12,10 @@ export class CameraFeedComponent implements OnInit {
   rowHeight = "4:1.75"
   timeout = 0
   cameras: Config
+
+  tilting = false
+  zooming = false
+
   constructor(
     private router: Router,
     private http: HttpClient,
@@ -47,6 +51,7 @@ export class CameraFeedComponent implements OnInit {
   }
 
   tiltUp = (cam: Camera) => {
+    this.tilting = true
     this.timeout = 0
     console.log("tilting up", cam.tiltUp);
     if (!cam.tiltUp) {
@@ -61,6 +66,7 @@ export class CameraFeedComponent implements OnInit {
   }
 
   tiltDown = (cam: Camera) => {
+    this.tilting = true
     this.timeout = 0
     console.log("tilting down", cam.tiltDown);
     if (!cam.tiltDown) {
@@ -75,6 +81,7 @@ export class CameraFeedComponent implements OnInit {
   }
 
   panLeft = (cam: Camera) => {
+    this.tilting = true
     this.timeout = 0
     console.log("panning left", cam.panLeft);
     if (!cam.panLeft) {
@@ -89,6 +96,7 @@ export class CameraFeedComponent implements OnInit {
   }
 
   panRight = (cam: Camera) => {
+    this.tilting = true
     this.timeout = 0
     console.log("panning right", cam.panRight);
     if (!cam.panRight) {
@@ -103,6 +111,10 @@ export class CameraFeedComponent implements OnInit {
   }
 
   panTiltStop = (cam: Camera) => {
+    if (!this.tilting) {
+      return
+    }
+
     console.log("stopping pan", cam.panTiltStop);
     if (!cam.panTiltStop) {
       return;
@@ -113,9 +125,11 @@ export class CameraFeedComponent implements OnInit {
     }, err => {
       console.warn("err", err);
     });
+    this.tilting = false
   }
 
   zoomIn = (cam: Camera) => {
+    this.zooming = true
     this.timeout = 0
     console.log("zooming in", cam.zoomIn);
     if (!cam.zoomIn) {
@@ -130,6 +144,7 @@ export class CameraFeedComponent implements OnInit {
   }
 
   zoomOut = (cam: Camera) => {
+    this.zooming = true
     this.timeout = 0
     console.log("zooming out", cam.zoomOut);
     if (!cam.zoomOut) {
@@ -144,6 +159,9 @@ export class CameraFeedComponent implements OnInit {
   }
 
   zoomStop = (cam: Camera) => {
+    if (!this.zooming) {
+      return
+    }
     console.log("stopping zoom", cam.zoomStop);
     if (!cam.zoomStop) {
       return;
@@ -154,6 +172,7 @@ export class CameraFeedComponent implements OnInit {
     }, err => {
       console.warn("err", err);
     });
+    this.zooming = true
   }
 
   selectPreset = (preset: CameraPreset) => {
