@@ -23,7 +23,6 @@ export class CameraFeedComponent implements OnInit {
   ) {
     this.route.data.subscribe(data => {
       this.cameras = data.uiConfig;
-      console.log("component data", this.cameras)
     })
   }
   ngOnInit() {
