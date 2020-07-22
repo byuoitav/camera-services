@@ -46,13 +46,18 @@ func (h *CameraController) Stream(c *gin.Context) {
 		_, _ = c.Writer.WriteString("\r\n--" + _mjpegBoundary + "--")
 	}()
 
-	defer log.Info("Done streaming")
+	frames := 0
+	numErrs := 0
+	start := time.Now()
+
+	defer log.Info("Done streaming", zap.Float64("avgFps", float64(frames)/time.Since(start).Seconds()))
 
 	buf := &bytes.Buffer{}
 	for {
 		select {
 		case image := <-images:
 			buf.Reset()
+			numErrs = 0
 
 			if err := jpeg.Encode(buf, image, nil); err != nil {
 				log.Warn("unable to encode image", zap.Error(err))
@@ -69,9 +74,16 @@ func (h *CameraController) Stream(c *gin.Context) {
 				log.Warn("unable to write frame", zap.Error(err))
 				return
 			}
+
+			frames++
 		case err := <-errs:
+			numErrs++
 			log.Warn("unable to get the next image", zap.Error(err))
-			return
+
+			if numErrs >= 3 {
+				log.Warn("Ending stream", zap.String("reason", "exceeded consecutive error count"))
+				return
+			}
 		case <-ctx.Done():
 			log.Info("Ending stream", zap.String("reason", (ctx.Err().Error())))
 			return
