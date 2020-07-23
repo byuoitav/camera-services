@@ -40,7 +40,6 @@ export class RoomResolver implements Resolve<Config>{
         return Observable.throw(err)
       }),
       tap(data => {
-        console.log("resolver data", data)
       }),
     )
   }
