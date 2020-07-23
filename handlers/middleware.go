@@ -15,8 +15,9 @@ const (
 )
 
 const (
-	_hRequestID   = "X-Request-ID"
-	_hContentType = "Content-Type"
+	_hRequestID     = "X-Request-ID"
+	_hContentType   = "Content-Type"
+	_hContentLength = "Content-Length"
 )
 
 type Middleware struct {
