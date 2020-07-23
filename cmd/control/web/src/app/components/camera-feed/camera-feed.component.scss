@@ -12,6 +12,7 @@ $d-pad-arrow-shift: 5px;
 $d-pad-arrow-move: 35%;
 
 .body-container {
+  -webkit-user-select: none;
   display: flex;
   position: relative;
   height: 90vh;
