@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/byuoitav/auth v0.1.4
 	github.com/byuoitav/aver v0.1.1
-	github.com/byuoitav/axis v0.2.0
+	github.com/byuoitav/axis v0.2.1
 	github.com/byuoitav/visca v0.1.0
 	github.com/flimzy/diff v0.1.7 // indirect
 	github.com/flimzy/testy v0.1.17 // indirect

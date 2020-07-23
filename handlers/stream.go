@@ -15,11 +15,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	_mjpegBoundary     = "mjpeg_boundary"
-	_mjpegFrameHeaderf = "\r\n--" + _mjpegBoundary + "\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n"
-)
-
 func (h *CameraController) Stream(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
@@ -50,10 +45,12 @@ func (h *CameraController) Stream(c *gin.Context) {
 
 	frames := 0
 	numErrs := 0
+	avgFrameSize := 0
 	start := time.Now()
 
 	defer func() {
-		log.Info("Done streaming", zap.Float64("avgFps", float64(frames)/time.Since(start).Seconds()))
+		avgFps := float64(frames) / time.Since(start).Seconds()
+		log.Info("Done streaming", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize))
 	}()
 
 	buf := &bytes.Buffer{}
@@ -85,6 +82,12 @@ func (h *CameraController) Stream(c *gin.Context) {
 
 			if flusher, ok := c.Writer.(http.Flusher); ok {
 				flusher.Flush()
+			}
+
+			if avgFrameSize == 0 {
+				avgFrameSize = buf.Len()
+			} else {
+				avgFrameSize = (avgFrameSize + buf.Len()) / 2
 			}
 
 			numErrs = 0

@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/byuoitav/axis"
 	cameraservices "github.com/byuoitav/camera-services"
@@ -106,8 +105,8 @@ func main() {
 			}
 
 			cam := &axis.P5414E{
-				Address:            addr,
-				StreamMaxFrequency: 70 * time.Millisecond, // ~8 fps
+				Address:       addr,
+				StreamProfile: "control",
 			}
 
 			cameras.Store(addr, cam)
