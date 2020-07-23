@@ -3,19 +3,16 @@ package handlers
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"image/jpeg"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
+	"strconv"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-)
-
-const (
-	_mjpegBoundary     = "mjpeg_boundary"
-	_mjpegFrameHeaderf = "\r\n--" + _mjpegBoundary + "\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n"
 )
 
 func (h *CameraController) Stream(c *gin.Context) {
@@ -39,53 +36,72 @@ func (h *CameraController) Stream(c *gin.Context) {
 		return
 	}
 
-	// write the normal http headers
-	c.Writer.Header().Add(_hContentType, "multipart/x-mixed-replace;boundary="+_mjpegBoundary)
+	m := multipart.NewWriter(c.Writer)
 
-	defer func() {
-		_, _ = c.Writer.WriteString("\r\n--" + _mjpegBoundary + "--")
-	}()
+	// write the headers
+	c.Writer.Header().Set(_hContentType, "multipart/x-mixed-replace; boundary="+m.Boundary())
+
+	defer m.Close()
 
 	frames := 0
 	numErrs := 0
+	avgFrameSize := 0
 	start := time.Now()
 
-	defer log.Info("Done streaming", zap.Float64("avgFps", float64(frames)/time.Since(start).Seconds()))
+	defer func() {
+		avgFps := float64(frames) / time.Since(start).Seconds()
+		log.Info("Done streaming", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize))
+	}()
 
 	buf := &bytes.Buffer{}
+	header := textproto.MIMEHeader{}
+
 	for {
 		select {
 		case image := <-images:
 			buf.Reset()
-			numErrs = 0
 
 			if err := jpeg.Encode(buf, image, nil); err != nil {
 				log.Warn("unable to encode image", zap.Error(err))
-				continue
-			}
-
-			// write header for this frame
-			if _, err := c.Writer.WriteString(fmt.Sprintf(_mjpegFrameHeaderf, buf.Len())); err != nil {
-				log.Warn("unable to write frame header", zap.Error(err))
 				return
 			}
 
-			if _, err := c.Writer.Write(buf.Bytes()); err != nil {
-				log.Warn("unable to write frame", zap.Error(err))
+			header.Set(_hContentType, "image/jpeg")
+			header.Set(_hContentLength, strconv.Itoa(buf.Len()))
+
+			part, err := m.CreatePart(header)
+			if err != nil {
+				log.Warn("unable to create part", zap.Error(err))
 				return
 			}
 
+			if _, err := part.Write(buf.Bytes()); err != nil {
+				log.Warn("unable to write part", zap.Error(err))
+				return
+			}
+
+			if flusher, ok := c.Writer.(http.Flusher); ok {
+				flusher.Flush()
+			}
+
+			if avgFrameSize == 0 {
+				avgFrameSize = buf.Len()
+			} else {
+				avgFrameSize = (avgFrameSize + buf.Len()) / 2
+			}
+
+			numErrs = 0
 			frames++
 		case err := <-errs:
 			numErrs++
 			log.Warn("unable to get the next image", zap.Error(err))
 
 			if numErrs >= 3 {
-				log.Warn("Ending stream", zap.String("reason", "exceeded consecutive error count"))
+				log.Warn("ending stream", zap.String("reason", "exceeded consecutive error count"))
 				return
 			}
 		case <-ctx.Done():
-			log.Info("Ending stream", zap.String("reason", (ctx.Err().Error())))
+			log.Info("ending stream", zap.String("reason", (ctx.Err().Error())))
 			return
 		}
 	}

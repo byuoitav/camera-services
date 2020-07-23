@@ -83,7 +83,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "0ed44e2"
+  image_version  = "b58f42c"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -114,7 +114,7 @@ module "axis_dev" {
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "0ed44e2"
+  image_version  = "b58f42c"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -143,7 +143,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "d444401"
+  image_version  = "b58f42c"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 

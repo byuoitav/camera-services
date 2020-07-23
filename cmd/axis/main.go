@@ -105,7 +105,8 @@ func main() {
 			}
 
 			cam := &axis.P5414E{
-				Address: addr,
+				Address:       addr,
+				StreamProfile: "control",
 			}
 
 			cameras.Store(addr, cam)
