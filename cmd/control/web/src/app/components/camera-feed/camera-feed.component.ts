@@ -2,6 +2,7 @@ import {Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter, On
 import {Router, ActivatedRoute} from "@angular/router";
 import {Config, Camera, CameraPreset} from '../../../objects/objects';
 import {HttpClient} from '@angular/common/http';
+import { stringify } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-camera-feed',
@@ -25,6 +26,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
   ) {
     this.route.data.subscribe(data => {
       this.cameras = data.uiConfig;
+      let title = this.cameras[0].displayName;
+      let splitted = title.split(" ");
+      title = splitted[0]+ " " + splitted[1];
+      document.title = title + " Camera Control";
     })
   }
   ngOnInit() {

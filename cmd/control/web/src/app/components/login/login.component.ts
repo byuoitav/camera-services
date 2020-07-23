@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.key = s;
       }
     });
+    document.title = "BYU Camera Control";
   }
 
   ngAfterViewInit() {
