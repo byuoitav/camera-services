@@ -1,6 +1,6 @@
-<div>
+<!-- <div>
     <button mat-flat-button class="exit-button" (click)="exitRoom()">Exit Room</button>
-</div>
+</div> -->
 <div class="body-container">
     <mat-tab-group>
       <!-- tabs of cameras -->
@@ -30,9 +30,10 @@
           </div>
   
           <div class="camera-container">
-            <img *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
-            <div *ngIf="timeout>59" class="preview-paused">
-              <div style="display: table-cell; vertical-align: middle;">PREVIEW PAUSED</div>
+            <img #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
+            <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
+              <div >PREVIEW PAUSED</div>
+              <div class="unpause-text">Click to unpause</div>
             </div>
           </div>
   
