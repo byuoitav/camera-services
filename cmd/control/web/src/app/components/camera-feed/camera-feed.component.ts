@@ -200,7 +200,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
       return ""
     }
     // if (window.innerWidth > 750 && window.innerHeight > 750) {
-      console.log(cam.stream)
+      // console.log(cam.stream)
       return cam.stream
     // }
 

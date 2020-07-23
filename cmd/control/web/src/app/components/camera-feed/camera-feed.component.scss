@@ -4,10 +4,10 @@ $d-pad-fg: #ddd;
 $d-pad-fg-hover: #eee;
 $d-pad-bg: #ffffff;
 $arrowColor: #777;
-$tri-sml-a: 13px;
-$tri-sml-b: 19px;
-$tri-lrg-a: 13px;
-$tri-lrg-b: 19px;
+$tri-sml-a: 1.5vh;
+$tri-sml-b: 1.5vh;
+$tri-lrg-a: 1.5vh;
+$tri-lrg-b: 1.5vh;
 $d-pad-arrow-shift: 5px;
 $d-pad-arrow-move: 35%;
 
@@ -240,7 +240,9 @@ $d-pad-arrow-move: 35%;
     background-color: #ddd;
     text-align: center;
     justify-content: center;
-    width: 4vw;
+    height: 7vh;
+    min-width: 5vw;
+    line-height: 2.5;
     font-size: 1.3vh;
 
     mat-icon {

@@ -1,6 +1,7 @@
 import {Component, OnInit, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef, NgZone, AfterViewInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {Camera} from '../../../objects/objects';
+import { ɵINTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-browser-dynamic';
 
 
 @Component({
@@ -8,12 +9,13 @@ import {Camera} from '../../../objects/objects';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
   cameras: Camera[]
 
   key = "";
   keyboardEmitter: EventEmitter<string>;
 
+  @ViewChild('form') form:ElementRef;
 
   constructor(private router: Router) {}
 
@@ -28,19 +30,16 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  codeKeyUp(event, index) {
-    console.log(event);
-    if (event.key === "Backspace") {
-      if (index > 0) {
-        const elementName = "codeKey" + (index + 1);
-        document.getElementById(elementName).focus();
-      }
-      return;
-    }
-    if (index >= 0 && index < 5) {
-      const elementName = "codeKey" + (index + 1);
-      document.getElementById(elementName).focus();
-    }
+  ngAfterViewInit() {
+    this.form.nativeElement.focus();
+  }
+
+  _focus() {
+    this.form.nativeElement.focus();
+  }
+
+  hasFocus() {
+    return document.hasFocus();
   }
 
   getCodeChar = (index: number): string => {

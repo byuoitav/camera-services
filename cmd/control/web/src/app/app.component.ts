@@ -13,13 +13,6 @@ export class AppComponent {
   constructor(private router: Router) {
     let vh = window.innerHeight * 0.01;
 
-    // document.documentElement.style.setProperty("--vh", `${vh}px`);
-
-    // window.addEventListener("resize", () => {
-    //   let vh = window.innerHeight * 0.01;
-    //   document.documentElement.style.setProperty("--vh", `${vh}px`);
-    // });
-
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         if (event.url.includes("/key/")) {
