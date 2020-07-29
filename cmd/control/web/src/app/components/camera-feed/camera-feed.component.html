@@ -1,11 +1,12 @@
 <!-- <div>
     <button mat-flat-button class="exit-button" (click)="exitRoom()">Exit Room</button>
 </div> -->
-<div class="body-container">
-    <mat-tab-group>
-      <!-- tabs of cameras -->
-      <mat-tab *ngFor="let cam of cameras" [label]="cam?.displayName" style="height: 100%;">
-        <div class="body-container" (pointercancel)="panTiltStop(cam); zoomStop(cam)" (pointerup)="panTiltStop(cam); zoomStop(cam)">
+<div style="justify-content: center;">
+  <mat-tab-group>
+    <!-- tabs of cameras -->
+    <mat-tab *ngFor="let cam of cameras" [label]="cam?.displayName" style="height: 100%;">
+      <div class="body-container" (pointercancel)="panTiltStop(cam); zoomStop(cam)" (pointerup)="panTiltStop(cam); zoomStop(cam)">
+        <div class="outer-container">
           <div class="movement-container">
             <div class="d-pad-container">
               <nav class="d-pad">
@@ -15,40 +16,43 @@
                 <a class="left" (pointerdown)="panLeft(cam)" (pointerup)="panTiltStop(cam)"></a>
               </nav>
             </div>
-  
+
             <div class="zoom">
               <button mat-flat-button (pointerdown)="zoomIn(cam)" (pointerup)="zoomStop(cam)">
                 <mat-icon>zoom_in</mat-icon>
                 <div>In</div>
               </button>
-  
+
               <button mat-flat-button (pointerdown)="zoomOut(cam)" (pointerup)="zoomStop(cam)">
                 <mat-icon>zoom_out</mat-icon>
                 <div>Out</div>
               </button>
             </div>
           </div>
-  
-          <div class="camera-container">
-            <img #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
-            <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
-              <div >PREVIEW PAUSED</div>
-              <div class="unpause-text">Click to unpause</div>
-            </div>
-          </div>
-  
+
           <div  class="presets-container">
             <h2>Presets</h2>
 
             <mat-divider class="divider"></mat-divider>
 
-            <mat-grid-list class="presets" cols="2" [rowHeight]="rowHeight">
+            <mat-grid-list class="presets" cols="2" rowHeight="4:1.75">
               <mat-grid-tile *ngFor="let preset of cam?.presets" class="preset">
                 <button mat-flat-button (click)="selectPreset(preset)">{{preset?.displayName}}</button>
               </mat-grid-tile>
             </mat-grid-list>
           </div>
         </div>
-      </mat-tab>
-    </mat-tab-group>
-  </div>
+
+      <!-- <div class="aspect-ratio"> -->
+        <div class="camera-container">
+          <img #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
+          <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
+            <div >PREVIEW PAUSED</div>
+            <div class="unpause-text">Click to unpause</div>
+          </div>
+        </div>
+      <!-- </div> -->
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
