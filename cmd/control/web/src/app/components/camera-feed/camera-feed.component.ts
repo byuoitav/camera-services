@@ -46,16 +46,6 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     this.img.nativeElement.src = "";
   }
 
-
-  @HostListener("window:resize", ["$event"])
-  onResize(event) {
-    if (window.innerWidth >= 1024 && window.innerHeight >= 768 && window.innerHeight <= 1056) {
-      this.rowHeight = "4:2.5"
-    } else {
-      this.rowHeight = "4:1.75"
-    }
-  }
-
   exitRoom() {
     console.log("exiting room")
     this.router.navigate([""])
