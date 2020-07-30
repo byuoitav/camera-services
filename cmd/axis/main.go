@@ -96,15 +96,41 @@ func main() {
 	middleware := handlers.Middleware{
 		Logger: log,
 	}
-	handlers := handlers.CameraController{
+	p5414EHandlers := handlers.CameraController{
 		Logger: log,
 		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
 		CreateCamera: func(ctx context.Context, addr string) (cameraservices.Camera, error) {
 			if cam, ok := cameras.Load(addr); ok {
-				return cam.(*axis.P5414E), nil
+				if c, ok := cam.(*axis.P5414E); ok {
+					return c, nil
+				}
 			}
 
 			cam := &axis.P5414E{
+				Address:       addr,
+				StreamProfile: "control",
+			}
+
+			cameras.Store(addr, cam)
+			return cam, nil
+		},
+		EventPublisher: &event.Publisher{
+			GeneratingSystem: name,
+			URL:              eventURL,
+			Resolver:         resolver,
+		},
+	}
+	v5915Handlers := handlers.CameraController{
+		Logger: log,
+		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
+		CreateCamera: func(ctx context.Context, addr string) (cameraservices.Camera, error) {
+			if cam, ok := cameras.Load(addr); ok {
+				if c, ok := cam.(*axis.V5915); ok {
+					return c, nil
+				}
+			}
+
+			cam := &axis.V5915{
 				Address:       addr,
 				StreamProfile: "control",
 			}
@@ -142,17 +168,29 @@ func main() {
 		c.String(http.StatusOK, config.Level.String())
 	})
 
-	p5414E := r.Group("/v1/P5414-E/:address", middleware.RequestID, middleware.Log, handlers.CameraMiddleware)
-	p5414E.GET("/pantilt/up", handlers.Publish("TiltUp"), handlers.TiltUp)
-	p5414E.GET("/pantilt/down", handlers.Publish("TiltDown"), handlers.TiltDown)
-	p5414E.GET("/pantilt/left", handlers.Publish("PanLeft"), handlers.PanLeft)
-	p5414E.GET("/pantilt/right", handlers.Publish("PanRight"), handlers.PanRight)
-	p5414E.GET("/pantilt/stop", handlers.Publish("PanTiltStop"), handlers.PanTiltStop)
-	p5414E.GET("/zoom/in", handlers.Publish("ZoomIn"), handlers.ZoomIn)
-	p5414E.GET("/zoom/out", handlers.Publish("ZoomOut"), handlers.ZoomOut)
-	p5414E.GET("/zoom/stop", handlers.Publish("ZoomStop"), handlers.ZoomStop)
-	p5414E.GET("/preset/:preset", handlers.Publish("GoToPreset"), handlers.GoToPreset)
-	p5414E.GET("/stream", handlers.Publish("Stream"), handlers.Stream)
+	p5414E := r.Group("/v1/P5414-E/:address", middleware.RequestID, middleware.Log, p5414EHandlers.CameraMiddleware)
+	p5414E.GET("/pantilt/up", p5414EHandlers.Publish("TiltUp"), p5414EHandlers.TiltUp)
+	p5414E.GET("/pantilt/down", p5414EHandlers.Publish("TiltDown"), p5414EHandlers.TiltDown)
+	p5414E.GET("/pantilt/left", p5414EHandlers.Publish("PanLeft"), p5414EHandlers.PanLeft)
+	p5414E.GET("/pantilt/right", p5414EHandlers.Publish("PanRight"), p5414EHandlers.PanRight)
+	p5414E.GET("/pantilt/stop", p5414EHandlers.Publish("PanTiltStop"), p5414EHandlers.PanTiltStop)
+	p5414E.GET("/zoom/in", p5414EHandlers.Publish("ZoomIn"), p5414EHandlers.ZoomIn)
+	p5414E.GET("/zoom/out", p5414EHandlers.Publish("ZoomOut"), p5414EHandlers.ZoomOut)
+	p5414E.GET("/zoom/stop", p5414EHandlers.Publish("ZoomStop"), p5414EHandlers.ZoomStop)
+	p5414E.GET("/preset/:preset", p5414EHandlers.Publish("GoToPreset"), p5414EHandlers.GoToPreset)
+	p5414E.GET("/stream", p5414EHandlers.Publish("Stream"), p5414EHandlers.Stream)
+
+	v5915 := r.Group("/v1/V5915/:address", middleware.RequestID, middleware.Log, v5915Handlers.CameraMiddleware)
+	v5915.GET("/pantilt/up", v5915Handlers.Publish("TiltUp"), v5915Handlers.TiltUp)
+	v5915.GET("/pantilt/down", v5915Handlers.Publish("TiltDown"), v5915Handlers.TiltDown)
+	v5915.GET("/pantilt/left", v5915Handlers.Publish("PanLeft"), v5915Handlers.PanLeft)
+	v5915.GET("/pantilt/right", v5915Handlers.Publish("PanRight"), v5915Handlers.PanRight)
+	v5915.GET("/pantilt/stop", v5915Handlers.Publish("PanTiltStop"), v5915Handlers.PanTiltStop)
+	v5915.GET("/zoom/in", v5915Handlers.Publish("ZoomIn"), v5915Handlers.ZoomIn)
+	v5915.GET("/zoom/out", v5915Handlers.Publish("ZoomOut"), v5915Handlers.ZoomOut)
+	v5915.GET("/zoom/stop", v5915Handlers.Publish("ZoomStop"), v5915Handlers.ZoomStop)
+	v5915.GET("/preset/:preset", v5915Handlers.Publish("GoToPreset"), v5915Handlers.GoToPreset)
+	v5915.GET("/stream", v5915Handlers.Publish("Stream"), v5915Handlers.Stream)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
