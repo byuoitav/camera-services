@@ -83,7 +83,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "fc20b6e"
+  image_version  = "be8cb3e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -112,13 +112,14 @@ module "aver" {
   // required
   name           = "camera-services-aver"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "fc20b6e"
+  image_version  = "be8cb3e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["aver.av.byu.edu"]
+  private           = true
   container_env = {
     "GIN_MODE" = "release"
   }
@@ -140,7 +141,7 @@ module "axis_dev" {
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "fc20b6e"
+  image_version  = "be8cb3e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -167,13 +168,14 @@ module "axis" {
   // required
   name           = "camera-services-axis"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "fc20b6e"
+  image_version  = "be8cb3e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["axis.av.byu.edu"]
+  private           = true
   container_env = {
     "GIN_MODE" = "release"
   }
@@ -193,7 +195,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "7a46887"
+  image_version  = "be8cb3e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
