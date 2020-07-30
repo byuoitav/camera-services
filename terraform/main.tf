@@ -65,6 +65,14 @@ data "aws_ssm_parameter" "aver_password" {
   name = "/env/camera-services/aver/password"
 }
 
+data "aws_ssm_parameter" "dev_control_client_id" {
+  name = "/env/camera-services/control/dev-client-id"
+}
+
+data "aws_ssm_parameter" "dev_control_client_secret" {
+  name = "/env/camera-services/control/dev-client-secret"
+}
+
 data "aws_ssm_parameter" "control_client_id" {
   name = "/env/camera-services/control/client-id"
 }
@@ -83,13 +91,14 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "b58f42c"
+  image_version  = "fc20b6e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["aver-dev.av.byu.edu"]
+  private           = true
   container_env = {
     "GIN_MODE" = "release"
   }
@@ -108,19 +117,51 @@ module "aver_dev" {
   health_check = false
 }
 
+module "aver" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-aver"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
+  image_version  = "fc20b6e"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  public_urls       = ["aver.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--log-level", "info",
+    "--name", "k8s-camera-services-aver",
+    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+    "--cam-username", data.aws_ssm_parameter.aver_username.value,
+    "--cam-password", data.aws_ssm_parameter.aver_password.value,
+  ]
+  ingress_annotations = {
+    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
+  }
+  health_check = false
+}
+
 module "axis_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "b58f42c"
+  image_version  = "fc20b6e"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["axis-dev.av.byu.edu"]
+  private           = true
   container_env = {
     "GIN_MODE" = "release"
   }
@@ -137,19 +178,49 @@ module "axis_dev" {
   health_check = false
 }
 
+module "axis" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-axis"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
+  image_version  = "fc20b6e"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  public_urls       = ["axis.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--log-level", "info",
+    "--name", "k8s-camera-services-axis",
+    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+  ]
+  ingress_annotations = {
+    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
+  }
+  health_check = false
+}
+
 module "control_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "b58f42c"
+  image_version  = "7a46887"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["cameras-dev.av.byu.edu"]
+  private           = true
   container_env = {
     "GIN_MODE" = "release"
   }
@@ -161,13 +232,51 @@ module "control_dev" {
     "--db-password", data.aws_ssm_parameter.prd_db_password.value,
     "--key-service", "control-keys",
     "--callback-url", "https://cameras-dev.av.byu.edu",
-    "--client-id", data.aws_ssm_parameter.control_client_id.value,
-    "--client-secret", data.aws_ssm_parameter.control_client_secret.value,
+    "--client-id", data.aws_ssm_parameter.dev_control_client_id.value,
+    "--client-secret", data.aws_ssm_parameter.dev_control_client_secret.value,
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
     "--opa-url", data.aws_ssm_parameter.opa_url.value,
     "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
     "--aver-proxy", "http://camera-services-aver-dev",
     "--axis-proxy", "http://camera-services-axis-dev",
+  ]
+  ingress_annotations = {
+    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
+  }
+  health_check = false
+}
+
+module "control" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-control"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
+  image_version  = "7a46887"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  public_urls       = ["cameras.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--log-level", "info",
+    "--db-address", data.aws_ssm_parameter.prd_db_addr.value,
+    "--db-username", data.aws_ssm_parameter.prd_db_username.value,
+    "--db-password", data.aws_ssm_parameter.prd_db_password.value,
+    "--key-service", "control-keys",
+    "--callback-url", "https://cameras.av.byu.edu",
+    "--client-id", data.aws_ssm_parameter.control_client_id.value,
+    "--client-secret", data.aws_ssm_parameter.control_client_secret.value,
+    "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
+    "--opa-url", data.aws_ssm_parameter.opa_url.value,
+    "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
+    "--aver-proxy", "http://camera-services-aver",
+    "--axis-proxy", "http://camera-services-axis",
   ]
   ingress_annotations = {
     // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
