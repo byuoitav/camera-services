@@ -29,6 +29,10 @@ data "aws_ssm_parameter" "opa_url" {
   name = "/env/opa-url"
 }
 
+data "aws_ssm_parameter" "control_opa_token" {
+  name = "/env/camera-services/control/opa-token"
+}
+
 data "aws_ssm_parameter" "prd_db_addr" {
   name = "/env/couch-new-address"
 }
@@ -42,18 +46,10 @@ data "aws_ssm_parameter" "prd_db_password" {
 }
 
 data "aws_ssm_parameter" "event_url" {
-  name = "/env/visca-service/event-url"
-}
-
-data "aws_ssm_parameter" "dns_addr" {
-  name = "/env/visca-service/dns-addr"
-}
-
-data "aws_ssm_parameter" "dev_event_url" {
   name = "/env/camera-services/event-url"
 }
 
-data "aws_ssm_parameter" "dev_dns_addr" {
+data "aws_ssm_parameter" "dns_addr" {
   name = "/env/camera-services/dns-addr"
 }
 
@@ -81,10 +77,6 @@ data "aws_ssm_parameter" "control_client_secret" {
   name = "/env/camera-services/control/client-secret"
 }
 
-data "aws_ssm_parameter" "control_opa_token" {
-  name = "/env/camera-services/control/opa-token"
-}
-
 module "aver_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
@@ -106,14 +98,11 @@ module "aver_dev" {
     "--port", "8080",
     "--log-level", "info",
     "--name", "k8s-camera-services-aver-dev",
-    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
-    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+    "--event-url", data.aws_ssm_parameter.event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
     "--cam-username", data.aws_ssm_parameter.aver_username.value,
     "--cam-password", data.aws_ssm_parameter.aver_password.value,
   ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
   health_check = false
 }
 
@@ -137,14 +126,11 @@ module "aver" {
     "--port", "8080",
     "--log-level", "info",
     "--name", "k8s-camera-services-aver",
-    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
-    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+    "--event-url", data.aws_ssm_parameter.event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
     "--cam-username", data.aws_ssm_parameter.aver_username.value,
     "--cam-password", data.aws_ssm_parameter.aver_password.value,
   ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
   health_check = false
 }
 
@@ -169,12 +155,9 @@ module "axis_dev" {
     "--port", "8080",
     "--log-level", "info",
     "--name", "k8s-camera-services-axis-dev",
-    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
-    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+    "--event-url", data.aws_ssm_parameter.event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
   ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
   health_check = false
 }
 
@@ -198,12 +181,9 @@ module "axis" {
     "--port", "8080",
     "--log-level", "info",
     "--name", "k8s-camera-services-axis",
-    "--event-url", data.aws_ssm_parameter.dev_event_url.value,
-    "--dns-addr", data.aws_ssm_parameter.dev_dns_addr.value,
+    "--event-url", data.aws_ssm_parameter.event_url.value,
+    "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
   ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
   health_check = false
 }
 
@@ -240,9 +220,6 @@ module "control_dev" {
     "--aver-proxy", "http://camera-services-aver-dev",
     "--axis-proxy", "http://camera-services-axis-dev",
   ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
   health_check = false
 }
 
@@ -278,35 +255,5 @@ module "control" {
     "--aver-proxy", "http://camera-services-aver",
     "--axis-proxy", "http://camera-services-axis",
   ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
-  health_check = false
-}
-
-module "visca_prd" {
-  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
-
-  // required
-  name           = "visca-service"
-  image          = "docker.pkg.github.com/byuoitav/visca-service/visca-service"
-  image_version  = "v0.1.0"
-  container_port = 8080
-  repo_url       = "https://github.com/byuoitav/visca-service"
-
-  // optional
-  image_pull_secret = "github-docker-registry"
-  public_urls       = ["visca.av.byu.edu"]
-  container_env     = {}
-  container_args = [
-    "--port", "8080",
-    "--log-level", "0", // set log level to info
-    "--name", "k8s-visca-service",
-    "--event-url", data.aws_ssm_parameter.event_url.value,
-    "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
-  ]
-  ingress_annotations = {
-    // "nginx.ingress.kubernetes.io/whitelist-source-range" = "128.187.0.0/16"
-  }
   health_check = false
 }
