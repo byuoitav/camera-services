@@ -35,7 +35,7 @@
 
             <mat-divider class="divider"></mat-divider>
 
-            <mat-grid-list class="presets" cols="2" rowHeight="4:1.75">
+            <mat-grid-list class="presets" cols="2" [rowHeight]="rowHeight">
               <mat-grid-tile *ngFor="let preset of cam?.presets" class="preset">
                 <button mat-flat-button (click)="selectPreset(preset)">{{preset?.displayName}}</button>
               </mat-grid-tile>

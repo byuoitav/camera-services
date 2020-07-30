@@ -4,8 +4,10 @@ $d-pad-fg: #ddd;
 $d-pad-fg-hover: #eee;
 $d-pad-bg: #ffffff;
 $arrowColor: #777;
-$tri-sml-a: 6px;
-$tri-sml-b: 12px;
+// $tri-sml-a: max(6px, 1vw);
+// $tri-sml-b: max(12px, 2vw);
+$tri-sml-a: 9px;
+$tri-sml-b: 15px;
 $tri-lrg-a: 13px;
 $tri-lrg-b: 19px;
 $d-pad-arrow-shift: 5px;
@@ -28,6 +30,11 @@ $d-pad-arrow-move: 35%;
     justify-content: center;
     align-self: center;
     align-content: center;
+  }
+
+  ::ng-deep .mat-tab-header {
+    width: 1280px;
+    align-self: center;
   }
 
   .outer-container {
@@ -128,6 +135,7 @@ $d-pad-arrow-move: 35%;
     }
 
     .presets {
+      margin-top: 10px;
       height: 100%;
       width: 100%;
       position: relative;
@@ -139,6 +147,7 @@ $d-pad-arrow-move: 35%;
       height: 70%;
       max-height: 50px;
       width: 80%;
+      // width: 87%;
       white-space: normal;
       line-height: 1.2;
       background-color: #ddd;
@@ -374,6 +383,11 @@ $d-pad-arrow-move: 35%;
     align-content: center;
   }
 
+  ::ng-deep .mat-tab-header {
+    width: 1024px;
+    align-self: center;
+  }
+
   .outer-container {
     display: flex;
     flex-direction: column;
@@ -461,6 +475,7 @@ $d-pad-arrow-move: 35%;
     }
 
     .presets {
+      margin-top: 10px;
       height: 100%;
       width: 100%;
       position: relative;
@@ -471,6 +486,7 @@ $d-pad-arrow-move: 35%;
     button {
       height: 40px;
       width: 100px;
+      // width: 115px;
       white-space: normal;
       line-height: 1.2;
       background-color: #ddd;
@@ -709,28 +725,32 @@ $d-pad-arrow-move: 35%;
     height: 100%;
   }
 
+  .body-container {
+    display: flex;
+    flex-direction: column-reverse;
+    min-height: 550px;
+    justify-content: flex-end;
+  }
+
   .camera-container {
-    top: 0;
-    position: absolute;
+    min-width: 350px;
+    position: relative;
     height: 56.25vw;
     width: 100vw;
     justify-content: center;
     flex-direction: column;
   }
 
-  .divider {
-    border-top-color: black;
-    width: 100%;
-    align-self: center;
-  }
-
   .feed {
+    min-width: 350px;
     height: 56.25vw;
     width: 100vw;
     display: flex;
+    position: relative;
   }
 
   .preview-paused {
+    min-width: 350px;
     font-size: 2.5em;
     height: 56.25vw;
     width: 100vw;
@@ -748,15 +768,17 @@ $d-pad-arrow-move: 35%;
   }
 
   .outer-container {
+    min-width: 350px;
     display: flex;
     flex-direction: column;
     width: 100vw;
   }
 
   .movement-container {
-    margin-top: 56.25vw;
+    min-width: 350px;
+    // margin-top: 56.25vw;
     min-height: unset;
-    height: 200px;
+    height: 22vh;
     width: 100%;
     position: relative;
   
@@ -770,7 +792,6 @@ $d-pad-arrow-move: 35%;
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     justify-content: space-evenly;
     // margin-top: 03vh;
     float: left;
@@ -781,8 +802,9 @@ $d-pad-arrow-move: 35%;
       text-align: center;
       justify-content: center;
       // min-height: 10vh;
-      height: 70px;
-      font-size: 90%; 
+      height: 8vh;
+      line-height: 2.5;
+      font-size: 1.5vh;
   
       mat-icon {
         padding-top: 5%;
@@ -795,7 +817,15 @@ $d-pad-arrow-move: 35%;
     }
   }
 
+  .divider {
+    border-top-color: black;
+    width: 100%;
+    align-self: center;
+    margin-top: 2%;
+  }
+
   .presets-container {
+    min-width: 350px;
     position: relative;
     height: 55%;
     width: 95%;
@@ -803,16 +833,19 @@ $d-pad-arrow-move: 35%;
   
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: space-evenly;
     
     h2 {
       width: 100%;
       height: 10%;
       text-align: center;
+      font-size: max(2.3vh, 2.3vw);
+      margin-bottom: 0px !important;
     }
   
     .presets {
+      margin-top: 2%;
       height: 100%;
       width: 100%;
       position: relative;
@@ -821,15 +854,17 @@ $d-pad-arrow-move: 35%;
   
   .preset {
     button {
-      height: 50px;
-      width: 90%;
+      height: 70%;
+      width: 85%;
+      // width: 90%;
       white-space: normal;
       line-height: unset;
       background-color: #ddd;
       justify-content: center;
       justify-content: space-evenly;
       text-align: center;
-      font-size: 90%;
+      font-size: max(2vh, 2vw);
+      // max-width: 200px;
     }
   }
 
@@ -837,8 +872,8 @@ $d-pad-arrow-move: 35%;
     text-align: center;
     height: 100%;
 
-    width: 50%;
-    // margin-top: 13%;
+    width: 20%;
+    display: flex;
     float: left;
     flex-direction: column;
     justify-content: center;
@@ -852,10 +887,12 @@ $d-pad-arrow-move: 35%;
   
   .d-pad {
     position: relative;
-    width: 150px;
-    height: 150px;
+    // width: 150px;
+    // height: 150px;
+    width: 15vh;
+    height: 15vh;
     border-radius: 48%;
-    margin-top: 30px;
+    // margin-top: 30px;
   
     &:before {
       content: '';
@@ -950,7 +987,7 @@ $d-pad-arrow-move: 35%;
       top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
-      border-width: 0 $tri-lrg-a $tri-lrg-b $tri-lrg-a;
+      border-width: 0 $tri-sml-a $tri-sml-b $tri-sml-a;
       border-color: transparent transparent $arrowColor transparent;
     }
     &:active:before {
@@ -978,7 +1015,7 @@ $d-pad-arrow-move: 35%;
       bottom: 40%;
       left: 50%;
       transform: translate(-50%, 50%);
-      border-width: $tri-lrg-b $tri-lrg-a 0px $tri-lrg-a;
+      border-width: $tri-sml-b $tri-sml-a 0px $tri-sml-a;
       border-color: $arrowColor transparent transparent transparent;
     }
     &:active:before {
@@ -1006,7 +1043,7 @@ $d-pad-arrow-move: 35%;
       left: 40%;
       top: 50%;
       transform: translate(-50%, -50%);
-      border-width: $tri-lrg-a $tri-lrg-b $tri-lrg-a 0;
+      border-width: $tri-sml-a $tri-sml-b $tri-sml-a 0;
       border-color: transparent $arrowColor transparent transparent;
     }
     &:active:before {
@@ -1034,7 +1071,7 @@ $d-pad-arrow-move: 35%;
       right: 40%;
       top: 50%;
       transform: translate(50%, -50%);
-      border-width: $tri-lrg-a 0 $tri-lrg-a $tri-lrg-b;
+      border-width: $tri-sml-a 0 $tri-sml-a $tri-sml-b;
       border-color: transparent transparent transparent $arrowColor;
     }
     &:active:before {
@@ -1044,8 +1081,8 @@ $d-pad-arrow-move: 35%;
   }
 }
 
-// //vertical ipad/vertical ipad pro
-@media only screen and (width: 1024px) and (height: 1366px), (width: 768px) and (height: 1024px) {
+// vertical ipad pro
+@media only screen and (width: 1024px) and (height: 1366px) {
   :host ::ng-deep .mat-tab-body-wrapper {
     height: 100%;
   }
