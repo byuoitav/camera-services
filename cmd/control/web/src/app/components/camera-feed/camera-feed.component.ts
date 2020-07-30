@@ -1,4 +1,4 @@
-import {Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter, OnDestroy} from '@angular/core';
+import {Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter, OnDestroy, AfterViewInit} from '@angular/core';
 import {Router, ActivatedRoute} from "@angular/router";
 import {Config, Camera, CameraPreset} from '../../../objects/objects';
 import {HttpClient} from '@angular/common/http';
@@ -11,6 +11,7 @@ import { stringify } from '@angular/compiler/src/util';
 })
 export class CameraFeedComponent implements OnInit, OnDestroy {
   rowHeight = "4:1.75"
+
   timeout = 0
   cameras: Config
 
@@ -33,6 +34,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     })
   }
   ngOnInit() {
+    if (window.innerWidth <= 1024) {
+      this.rowHeight = "4:1.25";
+    } 
     setInterval(() => {
       this.timeout++
       if (this.timeout == 5) {
@@ -44,6 +48,15 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     console.log("ending http request")
     this.img.nativeElement.src = "";
+  }
+
+  @HostListener("window:resize", ["$event"])
+  onResize(event) {
+    if (window.innerWidth > 1024) {
+      this.rowHeight = "4:1.75"
+    } else {
+      this.rowHeight = "4:1.25"
+    }
   }
 
   exitRoom() {
@@ -173,7 +186,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     }, err => {
       console.warn("err", err);
     });
-    this.zooming = true
+    this.zooming = false
   }
 
   selectPreset = (preset: CameraPreset) => {
@@ -194,12 +207,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     if (this.timeout >= 60) {
       return ""
     }
-    // if (window.innerWidth > 750 && window.innerHeight > 750) {
-      // console.log(cam.stream)
-      return cam.stream
-    // }
-
-    return ""
+    return cam.stream
   } 
 }
 
