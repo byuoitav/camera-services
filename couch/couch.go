@@ -90,6 +90,10 @@ func (c *configService) CameraPreset(ctx context.Context, camID, presetID string
 		return "", fmt.Errorf("unable to find: %w", err)
 	}
 
+	if !rows.Next() {
+		return "", fmt.Errorf("no matching documents found")
+	}
+
 	var config uiConfig
 	if err := rows.ScanDoc(&config); err != nil {
 		return "", fmt.Errorf("unable to scan doc: %w", err)

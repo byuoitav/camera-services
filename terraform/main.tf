@@ -95,7 +95,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "9cca408"
+  image_version  = "6788d03"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -153,7 +153,7 @@ module "axis_dev" {
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "9cca408"
+  image_version  = "6788d03"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -207,7 +207,7 @@ module "slack" {
   // required
   name           = "camera-services-slack"
   image          = "docker.pkg.github.com/byuoitav/camera-services/camera-slack-dev"
-  image_version  = "9cca408"
+  image_version  = "6788d03"
   container_port = 8080 // doesn't actually have a port...
   repo_url       = "https://github.com/byuoitav/camera-services"
 
