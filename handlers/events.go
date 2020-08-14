@@ -31,6 +31,7 @@ func (h *CameraController) Publish(action string) gin.HandlerFunc {
 		info := cameraservices.RequestInfo{
 			Action:    action + c.Param("channel"),
 			Timestamp: time.Now(),
+			Data:      make(map[string]interface{}),
 		}
 
 		id := c.GetString(_cRequestID)
