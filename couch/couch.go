@@ -3,6 +3,7 @@ package couch
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/go-kivik/kivik"
@@ -14,7 +15,7 @@ type configService struct {
 }
 
 // New creates a new ConfigService, created a couchdb client pointed at url.
-func New(ctx context.Context, url string, opts ...Option) (cameraservices.ConfigService, error) {
+func New(ctx context.Context, url string, opts ...Option) (*configService, error) {
 	client, err := kivik.New("couch", url)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build client: %w", err)
@@ -24,7 +25,7 @@ func New(ctx context.Context, url string, opts ...Option) (cameraservices.Config
 }
 
 // NewWithClient creates a new ConfigService using the given client.
-func NewWithClient(ctx context.Context, client *kivik.Client, opts ...Option) (cameraservices.ConfigService, error) {
+func NewWithClient(ctx context.Context, client *kivik.Client, opts ...Option) (*configService, error) {
 	options := options{
 		uiConfigDB: _defaultUIConfigDB,
 	}
@@ -60,4 +61,49 @@ func (c *configService) Cameras(ctx context.Context, room string) ([]cameraservi
 	}
 
 	return []cameraservices.CameraConfig{}, fmt.Errorf("no cameras found in %s", room)
+}
+
+func (c *configService) CameraPreset(ctx context.Context, camID, presetID string) (string, error) {
+	db := c.client.DB(ctx, c.uiConfigDB)
+	query := map[string]interface{}{
+		"selector": map[string]interface{}{
+			"presets": map[string]interface{}{
+				"$elemMatch": map[string]interface{}{
+					"cameras": map[string]interface{}{
+						"$elemMatch": map[string]interface{}{
+							"presets": map[string]interface{}{
+								"$elemMatch": map[string]interface{}{
+									"setPreset": map[string]interface{}{
+										"$regex": fmt.Sprintf(".*%s.*", camID),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	rows, err := db.Find(ctx, query)
+	if err != nil {
+		return "", fmt.Errorf("unable to find: %w", err)
+	}
+
+	var config uiConfig
+	if err := rows.ScanDoc(&config); err != nil {
+		return "", fmt.Errorf("unable to scan doc: %w", err)
+	}
+
+	for _, cg := range config.ControlGroups {
+		for _, cam := range cg.Cameras {
+			for _, preset := range cam.Presets {
+				if strings.Contains(preset.SetPreset, camID) && strings.HasSuffix(preset.SetPreset, presetID) {
+					return preset.DisplayName, nil
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("unable to find matching preset")
 }

@@ -52,6 +52,10 @@ build: deps
 	@cd cmd/axis/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/axis-linux-amd64
 
 	@echo
+	@echo Building slack for linux-amd64...
+	@cd cmd/slack/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/slack-linux-amd64
+
+	@echo
 	@echo Building control backend for linux-amd64...
 	@cd cmd/control/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/control-linux-amd64
 
@@ -72,6 +76,9 @@ ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Building container ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
 	@docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t ${DOCKER_PKG}/axis-dev:${COMMIT_HASH} dist
 
+	@echo Building container ${DOCKER_PKG}/slack-dev:${COMMIT_HASH}
+	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/slack-dev:${COMMIT_HASH} dist
+
 	@echo Building container ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control-dev:${COMMIT_HASH} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
@@ -83,6 +90,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Building container ${DOCKER_PKG}/axis-dev:${TAG}
 	@docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t ${DOCKER_PKG}/axis-dev:${TAG} dist
 
+	@echo Building container ${DOCKER_PKG}/slack-dev:${TAG}
+	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/slack-dev:${TAG} dist
+
 	@echo Building container ${DOCKER_PKG}/control-dev:${TAG}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control-dev:${TAG} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
@@ -93,6 +103,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 
 	@echo Building container ${DOCKER_PKG}/axis:${TAG}
 	@docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t ${DOCKER_PKG}/axis:${TAG} dist
+
+	@echo Building container ${DOCKER_PKG}/slack:${TAG}
+	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/slack:${TAG} dist
 
 	@echo Building container ${DOCKER_PKG}/control:${TAG}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control:${TAG} dist
@@ -111,6 +124,9 @@ ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Pushing container ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
 	@docker push ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
 
+	@echo Pushing container ${DOCKER_PKG}/slack-dev:${COMMIT_HASH}
+	@docker push ${DOCKER_PKG}/slack-dev:${COMMIT_HASH}
+
 	@echo Pushing container ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 	@docker push ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
@@ -122,6 +138,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Pushing container ${DOCKER_PKG}/axis-dev:${TAG}
 	@docker push ${DOCKER_PKG}/axis-dev:${TAG}
 
+	@echo Pushing container ${DOCKER_PKG}/slack-dev:${TAG}
+	@docker push ${DOCKER_PKG}/slack-dev:${TAG}
+
 	@echo Pushing container ${DOCKER_PKG}/control-dev:${TAG}
 	@docker push ${DOCKER_PKG}/control-dev:${TAG}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
@@ -132,6 +151,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 
 	@echo Pushing container ${DOCKER_PKG}/axis:${TAG}
 	@docker push ${DOCKER_PKG}/axis:${TAG}
+
+	@echo Pushing container ${DOCKER_PKG}/slack:${TAG}
+	@docker push ${DOCKER_PKG}/slack:${TAG}
 
 	@echo Pushing container ${DOCKER_PKG}/control:${TAG}
 	@docker push ${DOCKER_PKG}/control:${TAG}
