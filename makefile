@@ -76,8 +76,8 @@ ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Building container ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
 	@docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t ${DOCKER_PKG}/axis-dev:${COMMIT_HASH} dist
 
-	@echo Building container ${DOCKER_PKG}/slack-dev:${COMMIT_HASH}
-	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/slack-dev:${COMMIT_HASH} dist
+	@echo Building container ${DOCKER_PKG}/camera-slack-dev:${COMMIT_HASH}
+	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/camera-slack-dev:${COMMIT_HASH} dist
 
 	@echo Building container ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control-dev:${COMMIT_HASH} dist
@@ -90,8 +90,8 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Building container ${DOCKER_PKG}/axis-dev:${TAG}
 	@docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t ${DOCKER_PKG}/axis-dev:${TAG} dist
 
-	@echo Building container ${DOCKER_PKG}/slack-dev:${TAG}
-	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/slack-dev:${TAG} dist
+	@echo Building container ${DOCKER_PKG}/camera-slack-dev:${TAG}
+	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/camera-slack-dev:${TAG} dist
 
 	@echo Building container ${DOCKER_PKG}/control-dev:${TAG}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control-dev:${TAG} dist
@@ -104,8 +104,8 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Building container ${DOCKER_PKG}/axis:${TAG}
 	@docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t ${DOCKER_PKG}/axis:${TAG} dist
 
-	@echo Building container ${DOCKER_PKG}/slack:${TAG}
-	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/slack:${TAG} dist
+	@echo Building container ${DOCKER_PKG}/camera-slack:${TAG}
+	@docker build -f dockerfile --build-arg NAME=slack-linux-amd64 -t ${DOCKER_PKG}/camera-slack:${TAG} dist
 
 	@echo Building container ${DOCKER_PKG}/control:${TAG}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control:${TAG} dist
@@ -124,8 +124,8 @@ ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Pushing container ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
 	@docker push ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
 
-	@echo Pushing container ${DOCKER_PKG}/slack-dev:${COMMIT_HASH}
-	@docker push ${DOCKER_PKG}/slack-dev:${COMMIT_HASH}
+	@echo Pushing container ${DOCKER_PKG}/camera-slack-dev:${COMMIT_HASH}
+	@docker push ${DOCKER_PKG}/camera-slack-dev:${COMMIT_HASH}
 
 	@echo Pushing container ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 	@docker push ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
@@ -138,8 +138,8 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Pushing container ${DOCKER_PKG}/axis-dev:${TAG}
 	@docker push ${DOCKER_PKG}/axis-dev:${TAG}
 
-	@echo Pushing container ${DOCKER_PKG}/slack-dev:${TAG}
-	@docker push ${DOCKER_PKG}/slack-dev:${TAG}
+	@echo Pushing container ${DOCKER_PKG}/camera-slack-dev:${TAG}
+	@docker push ${DOCKER_PKG}/camera-slack-dev:${TAG}
 
 	@echo Pushing container ${DOCKER_PKG}/control-dev:${TAG}
 	@docker push ${DOCKER_PKG}/control-dev:${TAG}
@@ -152,8 +152,8 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Pushing container ${DOCKER_PKG}/axis:${TAG}
 	@docker push ${DOCKER_PKG}/axis:${TAG}
 
-	@echo Pushing container ${DOCKER_PKG}/slack:${TAG}
-	@docker push ${DOCKER_PKG}/slack:${TAG}
+	@echo Pushing container ${DOCKER_PKG}/camera-slack:${TAG}
+	@docker push ${DOCKER_PKG}/camera-slack:${TAG}
 
 	@echo Pushing container ${DOCKER_PKG}/control:${TAG}
 	@docker push ${DOCKER_PKG}/control:${TAG}

@@ -65,7 +65,7 @@ func main() {
 	pflag.StringVar(&d.slackChannelID, "channel-id", "", "slack channel id")
 	pflag.StringVar(&d.averUsername, "aver-username", "", "aver camera username")
 	pflag.StringVar(&d.averPassword, "aver-password", "", "aver camera password")
-	pflag.DurationVar(&d.snapshotDelay, "snapshotDelay", 5*time.Second, "snapshot delay (1m5s)")
+	pflag.DurationVar(&d.snapshotDelay, "snapshot-delay", 5*time.Second, "snapshot delay (1m5s)")
 	pflag.StringVar(&hubAddress, "hub-address", "", "event hub address")
 	pflag.Parse()
 
