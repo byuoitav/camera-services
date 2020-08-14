@@ -95,7 +95,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "be8cb3e"
+  image_version  = "9cca408"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -153,7 +153,7 @@ module "axis_dev" {
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "be8cb3e"
+  image_version  = "9cca408"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -207,7 +207,7 @@ module "slack" {
   // required
   name           = "camera-services-slack"
   image          = "docker.pkg.github.com/byuoitav/camera-services/camera-slack-dev"
-  image_version  = "be8cb3e"
+  image_version  = "9cca408"
   container_port = 8080 // doesn't actually have a port...
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -219,11 +219,11 @@ module "slack" {
     "--db-username", data.aws_ssm_parameter.prd_db_username.value,
     "--db-password", data.aws_ssm_parameter.prd_db_password.value,
     "--hub-address", data.aws_ssm_parameter.hub_address.value,
-    "--aver-username", data.aws_ssm_parameter.aver_username,
-    "--aver-password", data.aws_ssm_parameter.aver_password,
+    "--aver-username", data.aws_ssm_parameter.aver_username.value,
+    "--aver-password", data.aws_ssm_parameter.aver_password.value,
     "--snapshot-delay", "5s",
-    "--slack-token", data.aws_ssm_parameter.slack_token,
-    "--channel-id", data.aws_ssm_parameter.slack_channel,
+    "--slack-token", data.aws_ssm_parameter.slack_token.value,
+    "--channel-id", data.aws_ssm_parameter.slack_channel.value,
   ]
   health_check = false
 }
