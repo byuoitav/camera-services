@@ -43,6 +43,8 @@ type deviceInfo struct {
 }
 
 func (p *Publisher) Publish(ctx context.Context, info cameraservices.RequestInfo) error {
+	info.Data["cameraIP"] = info.CameraIP.String()
+
 	event := event{
 		GeneratingSystem: p.GeneratingSystem,
 		Timestamp:        info.Timestamp,
@@ -52,11 +54,7 @@ func (p *Publisher) Publish(ctx context.Context, info cameraservices.RequestInfo
 		Tags: []string{
 			"cameraControl",
 		},
-		Data: struct {
-			CameraIP string `json:"cameraIP"`
-		}{
-			CameraIP: info.CameraIP.String(),
-		},
+		Data: info.Data,
 	}
 
 	event = p.handleIPs(ctx, info, event)
@@ -64,6 +62,9 @@ func (p *Publisher) Publish(ctx context.Context, info cameraservices.RequestInfo
 }
 
 func (p *Publisher) Error(ctx context.Context, err cameraservices.RequestError) error {
+	err.Data["cameraIP"] = err.CameraIP.String()
+	err.Data["duration"] = err.Duration.String()
+
 	event := event{
 		GeneratingSystem: p.GeneratingSystem,
 		Timestamp:        err.Timestamp,
@@ -74,13 +75,7 @@ func (p *Publisher) Error(ctx context.Context, err cameraservices.RequestError) 
 			"cameraControl",
 			"error",
 		},
-		Data: struct {
-			CameraIP string `json:"cameraIP"`
-			Duration string `json:"duration"`
-		}{
-			CameraIP: err.CameraIP.String(),
-			Duration: err.Duration.String(),
-		},
+		Data: err.Data,
 	}
 
 	event = p.handleIPs(ctx, err.RequestInfo, event)

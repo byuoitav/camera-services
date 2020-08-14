@@ -4,9 +4,12 @@ go 1.14
 
 require (
 	github.com/byuoitav/auth v0.1.4
-	github.com/byuoitav/aver v0.1.1
+	github.com/byuoitav/aver v0.1.2
 	github.com/byuoitav/axis v0.3.0
+	github.com/byuoitav/central-event-system v0.0.0-20200121172633-64fd9d467249
+	github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271
 	github.com/byuoitav/visca v0.1.0
+	github.com/fatih/color v1.9.0 // indirect
 	github.com/flimzy/diff v0.1.7 // indirect
 	github.com/flimzy/testy v0.1.17 // indirect
 	github.com/gin-contrib/cors v1.3.1
@@ -19,8 +22,11 @@ require (
 	github.com/gopherjs/gopherjs v0.0.0-20200209144316-f9cef593def5 // indirect
 	github.com/gwatts/gin-adapter v0.0.0-20170508204228-c44433c485ad
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/labstack/echo v3.3.10+incompatible // indirect
+	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/nlopes/slack v0.6.0
 	github.com/otiai10/curr v0.0.0-20190513014714-f5a3d24e5776 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/segmentio/ksuid v1.0.3

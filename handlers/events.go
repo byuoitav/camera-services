@@ -41,6 +41,14 @@ func (h *CameraController) Publish(action string) gin.HandlerFunc {
 
 		info.SourceIP = net.ParseIP(c.ClientIP())
 
+		for _, param := range c.Params {
+			if param.Key == "address" {
+				continue
+			}
+
+			info.Data[param.Key] = param.Value
+		}
+
 		w := &responseSaver{
 			ResponseWriter: c.Writer,
 			body:           &bytes.Buffer{},
