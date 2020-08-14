@@ -77,6 +77,18 @@ data "aws_ssm_parameter" "control_client_secret" {
   name = "/env/camera-services/control/client-secret"
 }
 
+data "aws_ssm_parameter" "slack_token" {
+  name = "/env/camera-services/slack/slack-token"
+}
+
+data "aws_ssm_parameter" "slack_channel" {
+  name = "/env/camera-services/slack/slack-channel"
+}
+
+data "aws_ssm_parameter" "hub_address" {
+  name = "/env/hub-address"
+}
+
 module "aver_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
@@ -185,6 +197,33 @@ module "axis" {
     "--name", "k8s-camera-services-axis",
     "--event-url", data.aws_ssm_parameter.event_url.value,
     "--dns-addr", data.aws_ssm_parameter.dns_addr.value,
+  ]
+  health_check = false
+}
+
+module "slack" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-slack"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/camera-slack-dev"
+  image_version  = "be8cb3e"
+  container_port = 8080 // doesn't actually have a port...
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  container_env     = {}
+  container_args = [
+    "--db-address", data.aws_ssm_parameter.prd_db_addr.value,
+    "--db-username", data.aws_ssm_parameter.prd_db_username.value,
+    "--db-password", data.aws_ssm_parameter.prd_db_password.value,
+    "--hub-address", data.aws_ssm_parameter.hub_address.value,
+    "--aver-username", data.aws_ssm_parameter.aver_username,
+    "--aver-password", data.aws_ssm_parameter.aver_password,
+    "--snapshot-delay", "5s",
+    "--slack-token", data.aws_ssm_parameter.slack_token,
+    "--channel-id", data.aws_ssm_parameter.slack_channel,
   ]
   health_check = false
 }
