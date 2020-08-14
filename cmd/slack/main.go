@@ -156,7 +156,10 @@ func (d *data) HandleEvent(event events.Event) {
 		presetID, _ = v["preset"].(string)
 	}
 
-	preset, _ := d.configService.CameraPreset(ctx, event.TargetDevice.DeviceID, presetID)
+	preset, err := d.configService.CameraPreset(ctx, event.TargetDevice.DeviceID, presetID)
+	if err != nil {
+		log.Printf("[WARN] unable to get preset name for %q/%q: %s", event.TargetDevice.DeviceID, presetID, err)
+	}
 
 	time.Sleep(d.snapshotDelay)
 
@@ -166,7 +169,7 @@ func (d *data) HandleEvent(event events.Event) {
 		return
 	}
 
-	log.Printf("Successfully uploaded screenshot for %q", event.TargetDevice.DeviceID)
+	log.Printf("Successfully uploaded screenshot for %q/%q", event.TargetDevice.DeviceID, preset)
 }
 
 func (d *data) UploadSnapshot(ctx context.Context, cam Snapshotter, id, preset string) error {
