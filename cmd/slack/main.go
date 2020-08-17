@@ -17,12 +17,16 @@ import (
 	"github.com/byuoitav/central-event-system/hub/base"
 	"github.com/byuoitav/central-event-system/messenger"
 	"github.com/byuoitav/common/v2/events"
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 	"github.com/spf13/pflag"
 )
 
 type Snapshotter interface {
 	Snapshot(context.Context) (image.Image, error)
+}
+
+type Presetter interface {
+	Preset(ctx context.Context, preset string) (image.Image, error)
 }
 
 type ConfigService interface {
@@ -156,23 +160,23 @@ func (d *data) HandleEvent(event events.Event) {
 		presetID, _ = v["preset"].(string)
 	}
 
-	preset, err := d.configService.CameraPreset(ctx, event.TargetDevice.DeviceID, presetID)
+	presetName, err := d.configService.CameraPreset(ctx, event.TargetDevice.DeviceID, presetID)
 	if err != nil {
 		log.Printf("[WARN] unable to get preset name for %q/%q: %s", event.TargetDevice.DeviceID, presetID, err)
 	}
 
 	time.Sleep(d.snapshotDelay)
 
-	if err := d.UploadSnapshot(ctx, cam, event.TargetDevice.DeviceID, preset); err != nil {
+	if err := d.UploadSnapshot(ctx, cam, event.TargetDevice.DeviceID, presetID, presetName); err != nil {
 		log.Printf("[ERROR] unable to upload screenshot for %q: %s", event.TargetDevice.DeviceID, err)
 		fail()
 		return
 	}
 
-	log.Printf("Successfully uploaded screenshot for %q/%q", event.TargetDevice.DeviceID, preset)
+	log.Printf("Successfully uploaded screenshot for %q/%q", event.TargetDevice.DeviceID, presetName)
 }
 
-func (d *data) UploadSnapshot(ctx context.Context, cam Snapshotter, id, preset string) error {
+func (d *data) UploadSnapshot(ctx context.Context, cam Snapshotter, camID, presetID, presetName string) error {
 	snap, err := cam.Snapshot(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to take snapshot: %w", err)
@@ -183,17 +187,43 @@ func (d *data) UploadSnapshot(ctx context.Context, cam Snapshotter, id, preset s
 		return fmt.Errorf("unable to encode snapshot: %w", err)
 	}
 
-	now := time.Now()
+	refBuf := &bytes.Buffer{}
+	if p, ok := cam.(Presetter); ok {
+		ref, err := p.Preset(ctx, presetID)
+		if err != nil {
+			return fmt.Errorf("unable to get reference image: %w", err)
+		}
 
-	_, err = d.client.UploadFileContext(ctx, slack.FileUploadParameters{
+		if err := jpeg.Encode(refBuf, ref, nil); err != nil {
+			return fmt.Errorf("unable to encode reference image: %w", err)
+		}
+	}
+
+	// upload both of the images
+	now := time.Now().Format(time.RFC3339)
+	snapFile, err := d.client.UploadFileContext(ctx, slack.FileUploadParameters{
 		Filetype: "jpg",
-		Filename: fmt.Sprintf("%s_%s.jpg", id, now.Format(time.RFC3339)),
-		Title:    fmt.Sprintf("%s-%s snapshot @ %s", id, preset, now.Format(time.RFC3339)),
+		Filename: fmt.Sprintf("%s-snap-%s.jpg", camID, now),
+		Title:    fmt.Sprintf("%s-%s snapshot @ %s", camID, presetName, now),
 		Reader:   buf,
 		Channels: []string{d.slackChannelID},
 	})
 	if err != nil {
-		return fmt.Errorf("unable to post snapshot: %w", err)
+		return fmt.Errorf("unable to upload snapshot: %w", err)
+	}
+
+	if refBuf.Len() > 0 && len(snapFile.Shares.Private[d.slackChannelID]) > 0 {
+		_, err := d.client.UploadFileContext(ctx, slack.FileUploadParameters{
+			Filetype:        "jpg",
+			Filename:        fmt.Sprintf("%s-ref-%s.jpg", camID, now),
+			Title:           fmt.Sprintf("%s-%s reference @ %s", camID, presetName, now),
+			Reader:          refBuf,
+			Channels:        []string{d.slackChannelID},
+			ThreadTimestamp: snapFile.Shares.Private[d.slackChannelID][0].Ts,
+		})
+		if err != nil {
+			return fmt.Errorf("unable to upload reference image: %w", err)
+		}
 	}
 
 	return nil

@@ -95,7 +95,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "6788d03"
+  image_version  = "e4e4048"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -124,7 +124,7 @@ module "aver" {
   // required
   name           = "camera-services-aver"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "be8cb3e"
+  image_version  = "e4e4048"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -153,7 +153,7 @@ module "axis_dev" {
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "6788d03"
+  image_version  = "e4e4048"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -180,7 +180,7 @@ module "axis" {
   // required
   name           = "camera-services-axis"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "be8cb3e"
+  image_version  = "e4e4048"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -207,7 +207,7 @@ module "slack" {
   // required
   name           = "camera-services-slack"
   image          = "docker.pkg.github.com/byuoitav/camera-services/camera-slack-dev"
-  image_version  = "6788d03"
+  image_version  = "e4e4048"
   container_port = 8080 // doesn't actually have a port...
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -221,7 +221,7 @@ module "slack" {
     "--hub-address", data.aws_ssm_parameter.hub_address.value,
     "--aver-username", data.aws_ssm_parameter.aver_username.value,
     "--aver-password", data.aws_ssm_parameter.aver_password.value,
-    "--snapshot-delay", "5s",
+    "--snapshot-delay", "3s",
     "--slack-token", data.aws_ssm_parameter.slack_token.value,
     "--channel-id", data.aws_ssm_parameter.slack_channel.value,
   ]
@@ -234,7 +234,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "be8cb3e"
+  image_version  = "e4e4048"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
