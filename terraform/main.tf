@@ -207,7 +207,7 @@ module "slack" {
   // required
   name           = "camera-services-slack"
   image          = "docker.pkg.github.com/byuoitav/camera-services/camera-slack-dev"
-  image_version  = "e4e4048"
+  image_version  = "26c4c7c"
   container_port = 8080 // doesn't actually have a port...
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -295,6 +295,40 @@ module "control" {
     "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
     "--aver-proxy", "http://camera-services-aver",
     "--axis-proxy", "http://camera-services-axis",
+  ]
+  health_check = false
+}
+
+module "spyglass" {
+  source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
+
+  // required
+  name           = "camera-services-spyglass"
+  image          = "docker.pkg.github.com/byuoitav/camera-services/camera-spyglass-dev"
+  image_version  = "7a46887"
+  container_port = 8080
+  repo_url       = "https://github.com/byuoitav/camera-services"
+
+  // optional
+  image_pull_secret = "github-docker-registry"
+  private           = true
+  public_urls       = ["spyglass.av.byu.edu"]
+  container_env = {
+    "GIN_MODE" = "release"
+  }
+  container_args = [
+    "--port", "8080",
+    "--db-address", data.aws_ssm_parameter.prd_db_addr.value,
+    "--db-username", data.aws_ssm_parameter.prd_db_username.value,
+    "--db-password", data.aws_ssm_parameter.prd_db_password.value,
+    "--key-service", "control-keys",
+    // "--callback-url", "https://spyglass.av.byu.edu",
+    // "--client-id", data.aws_ssm_parameter.control_client_id.value,
+    // "--client-secret", data.aws_ssm_parameter.control_client_secret.value,
+    "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
+    // "--opa-url", data.aws_ssm_parameter.opa_url.value,
+    // "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
+    "--disable-auth"
   ]
   health_check = false
 }
