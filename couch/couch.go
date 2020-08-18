@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	cameraservices "github.com/byuoitav/camera-services"
-	"github.com/go-kivik/kivik"
+	"github.com/go-kivik/kivik/v3"
 )
 
 type configService struct {
@@ -110,4 +110,63 @@ func (c *configService) CameraPreset(ctx context.Context, camID, presetID string
 	}
 
 	return "", fmt.Errorf("unable to find matching preset")
+}
+
+func (c *configService) Rooms(ctx context.Context) ([]string, error) {
+	var rooms []string
+	db := c.client.DB(ctx, c.uiConfigDB)
+
+	query := map[string]interface{}{
+		"fields": []string{"_id"},
+		"limit":  2048,
+		"selector": map[string]interface{}{
+			"presets": map[string]interface{}{
+				"$elemMatch": map[string]interface{}{
+					"cameras": map[string]interface{}{
+						"$elemMatch": map[string]interface{}{
+							"displayName": map[string]interface{}{
+								"$regex": "..*",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	rows, err := db.Find(ctx, query)
+	if err != nil {
+		return rooms, fmt.Errorf("unable to find: %w", err)
+	}
+
+	for rows.Next() {
+		var config uiConfig
+		if err := rows.ScanDoc(&config); err != nil {
+			continue
+		}
+
+		// rows.ID() should work, but i can't figure out why it doesn't...
+		// rooms = append(rooms, rows.ID())
+		rooms = append(rooms, config.ID)
+	}
+
+	return rooms, nil
+}
+
+func (c *configService) ControlGroups(ctx context.Context, room string) ([]string, error) {
+	var config uiConfig
+	var groups []string
+
+	db := c.client.DB(ctx, c.uiConfigDB)
+	if err := db.Get(ctx, room).ScanDoc(&config); err != nil {
+		return groups, fmt.Errorf("unable to get/scan ui config: %w", err)
+	}
+
+	for _, cg := range config.ControlGroups {
+		if len(cg.Cameras) > 0 {
+			groups = append(groups, cg.ID)
+		}
+	}
+
+	return groups, nil
 }

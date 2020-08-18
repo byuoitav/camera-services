@@ -39,9 +39,13 @@ deps:
 	@echo Downloading control frontend dependencies...
 	@cd cmd/control/web/ && npm install
 
+	@echo Downloading spyglass frontend dependencies...
+	@cd cmd/spyglass/web/ && npm install
+
 build: deps
 	@mkdir -p dist
 	@mkdir -p dist/control
+	@mkdir -p dist/spyglass
 
 	@echo
 	@echo Building aver for linux-amd64...
@@ -64,6 +68,14 @@ build: deps
 	@cd cmd/control/web/ && npm run-script build && ls -la && mv ./dist/web ../../../dist/control/web && rmdir ./dist
 
 	@echo
+	@echo Building spyglass backend for linux-amd64...
+	@cd cmd/spyglass/ && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ../../dist/spyglass-linux-amd64
+
+	@echo
+	@echo Building spyglass frontend...
+	@cd cmd/spyglass/web/ && npm run-script build && ls -la && mv ./dist/web ../../../dist/spyglass/web && rmdir ./dist
+
+	@echo
 	@echo Build output is located in ./dist/.
 
 docker: clean build
@@ -81,6 +93,9 @@ ifeq (${COMMIT_HASH}, ${TAG})
 
 	@echo Building container ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control-dev:${COMMIT_HASH} dist
+
+	@echo Building container ${DOCKER_PKG}/spyglass-dev:${COMMIT_HASH}
+	@docker build -f dockerfile-spyglass --build-arg NAME=spyglass-linux-amd64 -t ${DOCKER_PKG}/camera-spyglass-dev:${COMMIT_HASH} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Building dev container with tag ${TAG}
 
@@ -95,6 +110,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 
 	@echo Building container ${DOCKER_PKG}/control-dev:${TAG}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control-dev:${TAG} dist
+
+	@echo Building container ${DOCKER_PKG}/spyglass-dev:${TAG}
+	@docker build -f dockerfile-spyglass --build-arg NAME=spyglass-linux-amd64 -t ${DOCKER_PKG}/camera-spyglass-dev:${TAG} dist
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Building prd container with tag ${TAG}
 
@@ -109,6 +127,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 
 	@echo Building container ${DOCKER_PKG}/control:${TAG}
 	@docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t ${DOCKER_PKG}/control:${TAG} dist
+
+	@echo Building container ${DOCKER_PKG}/spyglass:${TAG}
+	@docker build -f dockerfile-spyglass --build-arg NAME=spyglass-linux-amd64 -t ${DOCKER_PKG}/camera-spyglass:${TAG} dist
 endif
 
 deploy: docker
@@ -129,6 +150,9 @@ ifeq (${COMMIT_HASH}, ${TAG})
 
 	@echo Pushing container ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
 	@docker push ${DOCKER_PKG}/control-dev:${COMMIT_HASH}
+
+	@echo Pushing container ${DOCKER_PKG}/camera-spyglass-dev:${COMMIT_HASH}
+	@docker push ${DOCKER_PKG}/camera-spyglass-dev:${COMMIT_HASH}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 	@echo Pushing dev container with tag ${TAG}
 
@@ -143,6 +167,9 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${DEV_TAG_REGEX}),)
 
 	@echo Pushing container ${DOCKER_PKG}/control-dev:${TAG}
 	@docker push ${DOCKER_PKG}/control-dev:${TAG}
+
+	@echo Pushing container ${DOCKER_PKG}/camera-spyglass-dev:${TAG}
+	@docker push ${DOCKER_PKG}/camera-spyglass-dev:${TAG}
 else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 	@echo Pushing prd container with tag ${TAG}
 
@@ -157,9 +184,13 @@ else ifneq ($(shell echo ${TAG} | grep -x -E ${PRD_TAG_REGEX}),)
 
 	@echo Pushing container ${DOCKER_PKG}/control:${TAG}
 	@docker push ${DOCKER_PKG}/control:${TAG}
+
+	@echo Pushing container ${DOCKER_PKG}/camera-spyglass:${TAG}
+	@docker push ${DOCKER_PKG}/camera-spyglass:${TAG}
 endif
 
 clean:
 	@go clean
 	@rm -rf dist/
 	@rm -rf cmd/control/web/dist
+	@rm -rf cmd/spyglass/web/dist

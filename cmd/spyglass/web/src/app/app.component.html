@@ -1,0 +1,46 @@
+<mat-toolbar>
+	<mat-icon>camera</mat-icon>
+	<span style="margin-left: .5vw">Spyglass</span>
+</mat-toolbar>
+
+<div class="body">
+	<mat-vertical-stepper linear (selectionChange)="formStep($event)" class="stepper">
+		<mat-step [stepControl]="firstFormGroup">
+			<form [formGroup]="firstFormGroup">
+				<ng-template matStepLabel>Pick a room</ng-template>
+
+				<mat-form-field class="full-width" appearance="outline">
+					<mat-label>Room</mat-label>
+					<input type="text" matInput formControlName="room" [matAutocomplete]="auto">
+					<mat-autocomplete #auto="matAutocomplete">
+						<mat-option *ngFor="let opt of filteredRooms | async" [value]="opt">
+							{{opt}}
+						</mat-option>
+					</mat-autocomplete>
+				</mat-form-field>
+
+				<div>
+					<button mat-button matStepperNext>Next</button>
+				</div>
+			</form>
+		</mat-step>
+
+		<mat-step [stepControl]="secondFormGroup">
+			<form [formGroup]="secondFormGroup">
+				<ng-template matStepLabel>Pick a control group</ng-template>
+
+				<div class="controlGroups">
+					<button class="controlGroup" color="primary" *ngFor="let opt of controlGroups" mat-stroked-button
+						(click)="selectControlGroup(opt)">{{opt}}</button>
+				</div>
+
+				<div>
+					<button mat-button matStepperPrevious>Back</button>
+				</div>
+			</form>
+		</mat-step>
+	</mat-vertical-stepper>
+
+	<form class="form">
+	</form>
+</div>
