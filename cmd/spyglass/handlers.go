@@ -15,7 +15,6 @@ type Handlers struct {
 	ConfigService interface {
 		Rooms(context.Context) ([]string, error)
 		ControlGroups(context.Context, string) ([]string, error)
-		CameraPreset(context.Context, string, string) (string, error)
 	}
 
 	ControlKeyService interface {

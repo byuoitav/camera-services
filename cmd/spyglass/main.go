@@ -96,10 +96,11 @@ func main() {
 		ClientSecret: clientSecret,
 		GatewayURL:   gatewayURL,
 	}
+
 	auth := opa.Client{
-		DisableAuth: disableAuth,
-		Address:     opaURL,
-		Token:       opaToken,
+		Address:  opaURL,
+		Endpoint: "/v1/data/spyglass",
+		Token:    opaToken,
 	}
 
 	r := gin.New()
