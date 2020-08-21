@@ -167,10 +167,10 @@ func main() {
 	}
 
 	auth := opa.Client{
-		DisableAuth: disableAuth,
-		Address:     opaURL,
-		Token:       opaToken,
-		Logger:      log,
+		Address:  opaURL,
+		Endpoint: "/v1/data/cameras",
+		Token:    opaToken,
+		Logger:   log,
 	}
 
 	r := gin.New()

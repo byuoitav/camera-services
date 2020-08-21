@@ -14,9 +14,9 @@ import (
 )
 
 type Client struct {
-	DisableAuth bool
-	Address     string
-	Token       string
+	Address  string
+	Endpoint string
+	Token    string
 
 	Logger *zap.Logger
 }
@@ -66,7 +66,7 @@ func (client *Client) Authorize(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/v1/data/cameras", client.Address), bytes.NewReader(oReq))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s%s", client.Address, client.Endpoint), bytes.NewReader(oReq))
 	if err != nil {
 		client.Logger.Error("error trying to create request to OPA", zap.Error(err))
 		c.String(http.StatusInternalServerError, "error while contacting authorization server")
