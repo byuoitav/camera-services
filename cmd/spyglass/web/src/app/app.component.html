@@ -4,7 +4,7 @@
 </mat-toolbar>
 
 <div class="body">
-	<mat-vertical-stepper linear (selectionChange)="formStep($event)" class="stepper">
+	<mat-vertical-stepper linear #stepper (selectionChange)="formStep($event)" class="stepper">
 		<mat-step [stepControl]="firstFormGroup">
 			<form [formGroup]="firstFormGroup">
 				<ng-template matStepLabel>Pick a room</ng-template>
@@ -17,6 +17,7 @@
 							{{opt}}
 						</mat-option>
 					</mat-autocomplete>
+					<mat-error *ngIf="firstFormGroup.controls.room.errors?.invalidRoom">Invalid room</mat-error>
 				</mat-form-field>
 
 				<div>
@@ -29,18 +30,19 @@
 			<form [formGroup]="secondFormGroup">
 				<ng-template matStepLabel>Pick a control group</ng-template>
 
-				<div class="controlGroups">
-					<button class="controlGroup" color="primary" *ngFor="let opt of controlGroups" mat-stroked-button
-						(click)="selectControlGroup(opt)">{{opt}}</button>
-				</div>
+				<mat-action-list class="controlGroups">
+					<button *ngFor="let opt of controlGroups" mat-list-item (click)="selectControlGroup(opt)">
+						<span>{{opt}}</span>
+						<span class="spacer"></span>
+						<mat-icon>chevron_right</mat-icon>
+					</button>
+				</mat-action-list>
 
 				<div>
 					<button mat-button matStepperPrevious>Back</button>
+					<button mat-button (click)="stepper.reset()">Reset</button>
 				</div>
 			</form>
 		</mat-step>
 	</mat-vertical-stepper>
-
-	<form class="form">
-	</form>
 </div>

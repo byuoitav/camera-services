@@ -1,27 +1,37 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {FormGroup, FormBuilder, Validators} from "@angular/forms";
+import {FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn} from "@angular/forms";
 import {Observable, of} from "rxjs";
-import {tap, startWith, debounceTime, distinctUntilChanged, switchMap, map} from "rxjs/operators";
+import {tap, startWith, debounceTime, distinctUntilChanged, switchMap, map, catchError} from "rxjs/operators";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({providedIn: 'root'})
 export class APIService {
   constructor(private http: HttpClient) {}
 
   rooms = [];
-  presets = [];
 
   getRooms() {
     return this.rooms.length ?
       of(this.rooms) :
-      this.http.get<string[]>("/api/v1/rooms").pipe(tap(data => this.rooms = data));
+      this.http.get<string[]>("/api/v1/rooms").pipe(tap(data => {
+        this.rooms = data;
+      }));
   }
 
   getControlGroups(room: string) {
     return this.http.get<string[]>("/api/v1/rooms/" + encodeURIComponent(room) + "/controlGroups");
+  }
+
+  roomValidator(): AsyncValidatorFn {
+    return (ctrl: AbstractControl): Observable<ValidationErrors | null> => {
+      return this.getRooms().pipe(
+        map(rooms => {
+          return rooms.includes(ctrl.value) ? null : {invalidRoom: true};
+        }),
+        catchError(() => of({invalidRoom: true}))
+      );
+    }
   }
 }
 
@@ -38,12 +48,12 @@ export class AppComponent implements OnInit {
 
   constructor(private _api: APIService, private _formBuilder: FormBuilder) {
     this.firstFormGroup = this._formBuilder.group({
-      room: ['', Validators.required],
-    })
+      room: ['', [Validators.required], [this._api.roomValidator()]]
+    });
 
     this.secondFormGroup = this._formBuilder.group({
-      controlGroup: ['', Validators.required],
-    })
+      controlGroup: [''],
+    });
   }
 
   ngOnInit() {
@@ -74,7 +84,7 @@ export class AppComponent implements OnInit {
         const room = this.firstFormGroup.controls['room'].value;
         this._api.getControlGroups(room).subscribe(data => {
           this.controlGroups = data;
-        })
+        });
     }
   }
 
