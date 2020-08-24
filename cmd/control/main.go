@@ -159,12 +159,7 @@ func main() {
 		Logger: log,
 	}
 
-	wso2 := wso2.Client{
-		CallbackURL:  callbackURL,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		GatewayURL:   gatewayURL,
-	}
+	wso2 := wso2.New(clientID, clientSecret, gatewayURL, callbackURL)
 
 	auth := opa.Client{
 		Address:  opaURL,

@@ -16,7 +16,7 @@ module "spyglass" {
   // required
   name           = "camera-services-spyglass"
   image          = "docker.pkg.github.com/byuoitav/camera-services/camera-spyglass-dev"
-  image_version  = "91d7fd7"
+  image_version  = "32da8f0"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
