@@ -16,13 +16,12 @@ module "spyglass" {
   // required
   name           = "camera-services-spyglass"
   image          = "docker.pkg.github.com/byuoitav/camera-services/camera-spyglass-dev"
-  image_version  = "31b8b6f"
+  image_version  = "91d7fd7"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
-  private           = true
   public_urls       = ["spyglass.av.byu.edu"]
   container_env = {
     "GIN_MODE" = "release"
@@ -38,8 +37,7 @@ module "spyglass" {
     "--client-secret", data.aws_ssm_parameter.spyglass_client_secret.value,
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
     "--opa-url", data.aws_ssm_parameter.opa_url.value,
-    "--opa-token", data.aws_ssm_parameter.spyglass_opa_token.value,
-    "--disable-auth"
+    "--opa-token", data.aws_ssm_parameter.spyglass_opa_token.value
   ]
   health_check = false
 }
