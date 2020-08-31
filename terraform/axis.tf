@@ -38,6 +38,7 @@ module "axis" {
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["axis.av.byu.edu"]
+  replicas          = 2
   private           = true
   container_env = {
     "GIN_MODE" = "release"
