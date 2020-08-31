@@ -48,6 +48,7 @@ module "aver" {
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["aver.av.byu.edu"]
+  replicas          = 3
   private           = true
   container_env = {
     "GIN_MODE" = "release"

@@ -67,6 +67,7 @@ module "control" {
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["cameras.av.byu.edu"]
+  replicas          = 2
   container_env = {
     "GIN_MODE" = "release"
   }
