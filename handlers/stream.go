@@ -96,7 +96,9 @@ func (h *CameraController) Stream(c *gin.Context) {
 			numErrs++
 			log.Warn("unable to get the next image", zap.Error(err))
 
-			if numErrs >= 3 {
+			// we are averaging 8fps or so, so if we don't
+			// get a single frame for 3 seconds, we'll end it
+			if numErrs >= 24 {
 				log.Warn("ending stream", zap.String("reason", "exceeded consecutive error count"))
 				return
 			}
