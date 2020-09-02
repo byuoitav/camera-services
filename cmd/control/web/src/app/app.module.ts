@@ -19,7 +19,6 @@ import {HttpClientModule} from '@angular/common/http';
 import {ErrorDialog} from './dialogs/error/error.dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 
-
 @NgModule({
   declarations: [
     AppComponent,

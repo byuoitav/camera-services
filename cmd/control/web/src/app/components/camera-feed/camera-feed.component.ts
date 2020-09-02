@@ -1,8 +1,17 @@
-import {Component, HostListener, ViewChild, ElementRef, OnInit, EventEmitter, OnDestroy, AfterViewInit} from '@angular/core';
+import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy} from '@angular/core';
 import {Router, ActivatedRoute} from "@angular/router";
-import {Config, Camera, CameraPreset} from '../../../objects/objects';
 import {HttpClient} from '@angular/common/http';
-import { stringify } from '@angular/compiler/src/util';
+
+import {Camera, Preset} from '../../services/api.service';
+
+function isCameras(obj: Camera[] | any): obj is Camera[] {
+  const cams = obj as Camera[];
+  if (!cams || !cams.length || cams.length === 0) {
+    return false;
+  }
+
+  return cams[0].displayName !== undefined;
+}
 
 @Component({
   selector: 'app-camera-feed',
@@ -12,41 +21,51 @@ import { stringify } from '@angular/compiler/src/util';
 export class CameraFeedComponent implements OnInit, OnDestroy {
   rowHeight = "4:1.75"
 
-  timeout = 0
-  cameras: Config
+  timeout = 0;
+  cameras: Camera[];
 
-  tilting = false
-  zooming = false
+  tilting = false;
+  zooming = false;
 
-  @ViewChild('stream') img:ElementRef;
+  @ViewChild('stream') img: ElementRef;
 
   constructor(
     private router: Router,
     private http: HttpClient,
     public route: ActivatedRoute,
   ) {
+    this.route.params.subscribe(params => {
+      if ("room" in params && typeof params.room === "string") {
+        const split = params.room.split("-");
+        if (split.length == 2) {
+          document.title = `${split[0]} ${split[1]} Camera Control`;
+        } else {
+          document.title = `${params.room} Camera Control`;
+        }
+      }
+    })
+
     this.route.data.subscribe(data => {
-      this.cameras = data.uiConfig;
-      let title = this.cameras[0].displayName;
-      let splitted = title.split(" ");
-      title = splitted[0]+ " " + splitted[1];
-      document.title = title + " Camera Control";
+      if ("cameras" in data && isCameras(data.cameras)) {
+        this.cameras = data.cameras;
+      }
     })
   }
+
   ngOnInit() {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
-    } 
+    }
+
     setInterval(() => {
       this.timeout++
       if (this.timeout == 5) {
         console.log("preview timing out")
       }
-    }, 1000)
+    }, 1000);
   }
 
   ngOnDestroy() {
-    console.log("ending http request")
     this.img.nativeElement.src = "";
   }
 
@@ -189,7 +208,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     this.zooming = false
   }
 
-  selectPreset = (preset: CameraPreset) => {
+  selectPreset = (preset: Preset) => {
     this.timeout = 0
     console.log("selecting preset", preset.displayName, preset.setPreset);
     if (!preset.setPreset) {
@@ -207,7 +226,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     if (this.timeout >= 60) {
       return ""
     }
-    return cam.stream
-  } 
-}
 
+    return cam.stream
+  }
+}
