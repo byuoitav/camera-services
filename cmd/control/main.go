@@ -188,7 +188,8 @@ func main() {
 	})
 
 	api := r.Group("/api/v1/")
-	api.GET("/key/:key", handlers.GetCameras)
+	api.GET("/controlInfo", handlers.GetControlInfo)
+	api.GET("/cameras", handlers.GetCameras)
 
 	r.GET("/proxy/aver/*uri", middleware.RequestID, middleware.Log, handlers.Proxy(averProxyURL))
 	r.GET("/proxy/axis/*uri", middleware.RequestID, middleware.Log, handlers.Proxy(axisProxyURL))

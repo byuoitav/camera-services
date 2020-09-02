@@ -22,16 +22,17 @@ type ControlHandlers struct {
 }
 
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
 	defer cancel()
 
-	room, _, err := h.ControlKeyService.RoomAndControlGroup(ctx, c.Param("key"))
-	if err != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("unable to get room and control group: %s", err))
+	var info cameraservices.ControlInfo
+	if err := c.BindQuery(&info); err != nil {
 		return
 	}
 
-	cameras, err := h.ConfigService.Cameras(ctx, room)
+	// TODO verify that they are authorized for this room using the JWT
+
+	cameras, err := h.ConfigService.Cameras(ctx, info)
 	if err != nil {
 		c.String(http.StatusInternalServerError, fmt.Sprintf("unable to get cameras: %s", err))
 		return
@@ -76,6 +77,27 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 	c.JSON(http.StatusOK, cameras)
 }
 
+func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+	defer cancel()
+
+	room, cg, err := h.ControlKeyService.RoomAndControlGroup(ctx, c.Query("key"))
+	if err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("unable to get room: %s", err))
+		return
+	}
+
+	// TODO add an item to the JWT that grants them access to this room for the next x hours
+
+	info := cameraservices.ControlInfo{
+		Room:         room,
+		ControlGroup: cg,
+	}
+
+	c.JSON(http.StatusOK, info)
+}
+
+// TODO should i validate that they are allowed to get the info for each specific camera?
 func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.GetString(_cRequestID)

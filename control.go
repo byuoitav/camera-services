@@ -7,7 +7,7 @@ type ControlKeyService interface {
 }
 
 type ConfigService interface {
-	Cameras(ctx context.Context, room string) ([]CameraConfig, error)
+	Cameras(context.Context, ControlInfo) ([]CameraConfig, error)
 }
 
 type CameraConfig struct {
@@ -31,4 +31,9 @@ type CameraConfig struct {
 type CameraPreset struct {
 	DisplayName string `json:"displayName"`
 	SetPreset   string `json:"setPreset"`
+}
+
+type ControlInfo struct {
+	Room         string `json:"room" form:"room"`
+	ControlGroup string `json:"controlGroup" form:"controlGroup"`
 }
