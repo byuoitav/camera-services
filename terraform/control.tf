@@ -28,7 +28,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "980d0f2"
+  image_version  = "6496652"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -52,7 +52,7 @@ module "control_dev" {
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
     "--opa-url", data.aws_ssm_parameter.opa_url.value,
     "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
-    "--signing-secret", data.aws_ssm_parameter.control_signing_secret,
+    "--signing-secret", data.aws_ssm_parameter.control_signing_secret.value,
     "--aver-proxy", "http://camera-services-aver-dev",
     "--axis-proxy", "http://camera-services-axis-dev",
   ]
