@@ -113,7 +113,7 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 		if cgs, ok := rooms[room].(map[string]interface{}); ok {
 			// cgs: map[string]interface{} {"controlGroup": something}
 			if len(cgs) == 0 {
-				cgs = map[string]interface{}{
+				rooms[room] = map[string]interface{}{
 					cg: time.Now().Format(time.RFC3339),
 				}
 			} else {
@@ -134,7 +134,7 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 		}
 	}
 
-	session.Save(c.Request, c.Writer)
+	_ = session.Save(c.Request, c.Writer)
 	c.JSON(http.StatusOK, cameraservices.ControlInfo{
 		Room:         room,
 		ControlGroup: cg,
@@ -196,7 +196,7 @@ func (h *ControlHandlers) authorized(c *gin.Context, room, controlGroup string) 
 		return authorized
 	}
 
-	defer session.Save(c.Request, c.Writer)
+	defer session.Save(c.Request, c.Writer) // nolint:errcheck
 
 	if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
 		for roomID, cgs := range rooms {
