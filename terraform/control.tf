@@ -60,14 +60,14 @@ module "control" {
   // required
   name           = "camera-services-control"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "980d0f2"
+  image_version  = "e3cc934"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
   // optional
   image_pull_secret = "github-docker-registry"
   public_urls       = ["cameras.av.byu.edu"]
-  replicas          = 2
+  replicas          = 1
   container_env = {
     "GIN_MODE" = "release"
   }
