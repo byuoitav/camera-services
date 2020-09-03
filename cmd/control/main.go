@@ -51,6 +51,8 @@ func main() {
 		opaToken    string
 		disableAuth bool
 
+		signingSecret string
+
 		averProxy string
 		axisProxy string
 	)
@@ -69,6 +71,7 @@ func main() {
 	pflag.StringVar(&opaURL, "opa-url", "", "The URL of the OPA Authorization server")
 	pflag.StringVar(&opaToken, "opa-token", "", "The token to use for OPA")
 	pflag.BoolVar(&disableAuth, "disable-auth", false, "Disable all auth z/n checks")
+	pflag.StringVar(&signingSecret, "signing-secret", "", "secret to sign JWT tokens with")
 	pflag.StringVar(&averProxy, "aver-proxy", "", "base url to proxy camera control requests through")
 	pflag.StringVar(&axisProxy, "axis-proxy", "", "base url to proxy camera control requests through")
 
@@ -156,7 +159,12 @@ func main() {
 	}
 
 	wso2 := wso2.New(clientID, clientSecret, gatewayURL, callbackURL)
-	sessionStore := cookiestore.NewStore()
+	var sessionStore *cookiestore.Store
+	if len(signingSecret) > 0 {
+		sessionStore = cookiestore.NewStore(cookiestore.WithKey([]byte(signingSecret)))
+	} else {
+		sessionStore = cookiestore.NewStore()
+	}
 
 	auth := opa.Client{
 		Address:  opaURL,

@@ -18,6 +18,10 @@ data "aws_ssm_parameter" "control_client_secret" {
   name = "/env/camera-services/control/client-secret"
 }
 
+data "aws_ssm_parameter" "control_signing_secret" {
+  name = "/env/camera-services/control/signing-secret"
+}
+
 module "control_dev" {
   source = "github.com/byuoitav/terraform//modules/kubernetes-deployment"
 
@@ -48,6 +52,7 @@ module "control_dev" {
     "--gateway-url", data.aws_ssm_parameter.gateway_url.value,
     "--opa-url", data.aws_ssm_parameter.opa_url.value,
     "--opa-token", data.aws_ssm_parameter.control_opa_token.value,
+    "--signing-secret", data.aws_ssm_parameter.control_signing_secret,
     "--aver-proxy", "http://camera-services-aver-dev",
     "--axis-proxy", "http://camera-services-axis-dev",
   ]
