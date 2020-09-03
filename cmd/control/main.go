@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/byuoitav/auth/session/cookiestore"
 	"github.com/byuoitav/auth/wso2"
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/handlers"
@@ -23,6 +24,10 @@ import (
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+)
+
+const (
+	sessionName = "camera-services-control"
 )
 
 func main() {
@@ -150,16 +155,8 @@ func main() {
 		Logger: log,
 	}
 
-	handlers := handlers.ControlHandlers{
-		ConfigService: cs,
-		ControlKeyService: &keys.ControlKeyService{
-			Address: keyServiceAddr,
-		},
-		Me:     myURL,
-		Logger: log,
-	}
-
 	wso2 := wso2.New(clientID, clientSecret, gatewayURL, callbackURL)
+	sessionStore := cookiestore.NewStore()
 
 	auth := opa.Client{
 		Address:  opaURL,
@@ -168,12 +165,23 @@ func main() {
 		Logger:   log,
 	}
 
+	handlers := handlers.ControlHandlers{
+		ConfigService: cs,
+		ControlKeyService: &keys.ControlKeyService{
+			Address: keyServiceAddr,
+		},
+		Me:           myURL,
+		Logger:       log,
+		SessionStore: sessionStore,
+		SessionName:  sessionName,
+	}
+
 	r := gin.New()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 
 	if !disableAuth {
-		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware))
+		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware(sessionStore, sessionName)))
 		r.Use(auth.Authorize)
 	}
 

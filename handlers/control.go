@@ -9,9 +9,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/byuoitav/auth/session/cookiestore"
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+)
+
+const (
+	// claimAuthorizedRooms is a map[string]map[string]string
+	// where first map key is the roomID
+	// the second map key is the controlGroup
+	// and the value is the time (formatted in RFC3339) they were authenticated
+	claimAuthorizedRooms = "rooms"
 )
 
 type ControlHandlers struct {
@@ -19,6 +28,8 @@ type ControlHandlers struct {
 	ControlKeyService cameraservices.ControlKeyService
 	Me                *url.URL
 	Logger            *zap.Logger
+	SessionStore      *cookiestore.Store
+	SessionName       string
 }
 
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
@@ -27,10 +38,14 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 
 	var info cameraservices.ControlInfo
 	if err := c.BindQuery(&info); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// TODO verify that they are authorized for this room using the JWT
+	if !h.authorized(c, info.Room, info.ControlGroup) {
+		c.Status(http.StatusUnauthorized)
+		return
+	}
 
 	cameras, err := h.ConfigService.Cameras(ctx, info)
 	if err != nil {
@@ -87,19 +102,48 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 		return
 	}
 
-	// TODO add an item to the JWT that grants them access to this room for the next x hours
-
-	info := cameraservices.ControlInfo{
-		Room:         room,
-		ControlGroup: cg,
+	session, err := h.SessionStore.Get(c.Request, h.SessionName)
+	if err != nil {
+		c.String(http.StatusUnauthorized, err.Error())
+		return
 	}
 
-	c.JSON(http.StatusOK, info)
+	if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
+		// rooms: map[string]interface{} {"roomID": something}
+		if cgs, ok := rooms[room].(map[string]interface{}); ok {
+			// cgs: map[string]interface{} {"controlGroup": something}
+			if len(cgs) == 0 {
+				cgs = map[string]interface{}{
+					cg: time.Now().Format(time.RFC3339),
+				}
+			} else {
+				cgs[cg] = time.Now().Format(time.RFC3339)
+			}
+		} else {
+			rooms[room] = map[string]interface{}{
+				cg: time.Now().Format(time.RFC3339),
+			}
+		}
+
+		session.Values[claimAuthorizedRooms] = rooms
+	} else {
+		session.Values[claimAuthorizedRooms] = map[string]interface{}{
+			room: map[string]interface{}{
+				cg: time.Now().Format(time.RFC3339),
+			},
+		}
+	}
+
+	session.Save(c.Request, c.Writer)
+	c.JSON(http.StatusOK, cameraservices.ControlInfo{
+		Room:         room,
+		ControlGroup: cg,
+	})
 }
 
-// TODO should i validate that they are allowed to get the info for each specific camera?
 func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// TODO should i validate that they are allowed to get the info for each specific camera?
 		id := c.GetString(_cRequestID)
 
 		log := h.Logger
@@ -142,4 +186,50 @@ func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
 
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func (h *ControlHandlers) authorized(c *gin.Context, room, controlGroup string) bool {
+	var authorized bool
+
+	session, err := h.SessionStore.Get(c.Request, h.SessionName)
+	if err != nil {
+		return authorized
+	}
+
+	defer session.Save(c.Request, c.Writer)
+
+	if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
+		for roomID, cgs := range rooms {
+			if controlGroups, ok := cgs.(map[string]interface{}); ok {
+				for cg, v := range controlGroups {
+					if ts, ok := v.(string); ok {
+						if created, err := time.Parse(time.RFC3339, ts); err == nil {
+							switch {
+							case time.Since(created).Hours() >= 8:
+								delete(controlGroups, cg)
+							case room == roomID && controlGroup == cg:
+								authorized = true
+							}
+						} else {
+							// not a valid time
+							delete(controlGroups, cg)
+						}
+					} else {
+						// not a string
+						delete(controlGroups, cg)
+					}
+				}
+
+				if len(controlGroups) == 0 {
+					delete(rooms, roomID)
+				}
+			}
+		}
+
+		if len(rooms) == 0 {
+			delete(session.Values, claimAuthorizedRooms)
+		}
+	}
+
+	return authorized
 }
