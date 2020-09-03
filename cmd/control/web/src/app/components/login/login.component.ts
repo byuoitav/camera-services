@@ -1,8 +1,10 @@
-import {Component, OnInit, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef, NgZone, AfterViewInit} from '@angular/core';
+import {Component, OnInit, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {Camera} from '../../../objects/objects';
-import { ɵINTERNAL_BROWSER_DYNAMIC_PLATFORM_PROVIDERS } from '@angular/platform-browser-dynamic';
+import {HttpErrorResponse} from "@angular/common/http";
+import {MatDialog} from "@angular/material/dialog";
+import {APIService, Camera} from "../../services/api.service";
 
+import {ErrorDialog} from "../../dialogs/error/error.dialog";
 
 @Component({
   selector: 'app-login',
@@ -15,9 +17,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
   key = "";
   keyboardEmitter: EventEmitter<string>;
 
-  @ViewChild('form') form:ElementRef;
+  @ViewChild('form') form: ElementRef;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private api: APIService, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.keyboardEmitter = new EventEmitter<string>();
@@ -52,8 +54,49 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   goToCameraControl = async () => {
-    console.log("logging in with key", this.key);
-    this.router.navigate(["/key/" + this.key]);
+    this.api.getControlInfo(this.key).subscribe(info => {
+      return this.router.navigate(["/control/" + info.room], {
+        queryParams: {
+          controlGroup: info.controlGroup,
+        }
+      }).catch((err: HttpErrorResponse) => {
+        let msg = err.error;
+        switch (err.status) {
+          case 401:
+            msg = `Not authorized to control ${info.room}`;
+          default:
+        }
+
+        this.showError(msg);
+      });
+    }, (err: HttpErrorResponse) => {
+      let msg = err.error;
+      switch (err.status) {
+        case 401:
+          msg = "Invalid room code";
+        default:
+      }
+
+      this.showError(msg);
+    })
+
     this.key = "";
+  }
+
+  showError(msg: string) {
+    const dialogs = this.dialog.openDialogs.filter(dialog => {
+      return dialog.componentInstance instanceof ErrorDialog
+    })
+
+    if (dialogs.length > 0) {
+      return;
+    }
+
+    this.dialog.open(ErrorDialog, {
+      width: "fit-content",
+      data: {
+        msg: msg,
+      }
+    })
   }
 }

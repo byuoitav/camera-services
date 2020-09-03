@@ -3,7 +3,7 @@ import {Routes, RouterModule} from '@angular/router';
 import {AppComponent} from './app.component';
 import {CameraFeedComponent} from './components/camera-feed/camera-feed.component';
 import {LoginComponent} from './components/login/login.component';
-import {RoomResolver} from '../services/room.resolver';
+import {RoomResolver} from './services/room.resolver';
 
 
 const routes: Routes = [
@@ -21,9 +21,9 @@ const routes: Routes = [
         component: LoginComponent
       },
       {
-        path: "key/:key",
+        path: "control/:room",
         resolve: {
-          uiConfig: RoomResolver
+          cameras: RoomResolver
         },
         children: [
           {

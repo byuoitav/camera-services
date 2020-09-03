@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/byuoitav/auth/session/cookiestore"
 	"github.com/byuoitav/auth/wso2"
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/keys"
@@ -20,6 +21,10 @@ import (
 	adapter "github.com/gwatts/gin-adapter"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
+)
+
+const (
+	sessionName = "camera-services-spyglass"
 )
 
 func main() {
@@ -91,6 +96,7 @@ func main() {
 	}
 
 	wso2 := wso2.New(clientID, clientSecret, gatewayURL, callbackURL)
+	sessionStore := cookiestore.NewStore()
 
 	auth := opa.Client{
 		Address:  opaURL,
@@ -103,7 +109,7 @@ func main() {
 	r.Use(gin.Recovery())
 
 	if !disableAuth {
-		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware))
+		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware(sessionStore, sessionName)))
 		r.Use(auth.Authorize)
 	}
 

@@ -66,6 +66,8 @@ func (client *Client) Authorize(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 3*time.Second)
 	defer cancel()
 
+	client.Logger.Debug("Sending authentication request", zap.ByteString("body", oReq))
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s%s", client.Address, client.Endpoint), bytes.NewReader(oReq))
 	if err != nil {
 		client.Logger.Error("error trying to create request to OPA", zap.Error(err))
@@ -85,16 +87,18 @@ func (client *Client) Authorize(c *gin.Context) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
-		client.Logger.Error("bad response from opa", zap.Int("statusCode", res.StatusCode))
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		client.Logger.Error("unable to read body from OPA", zap.Error(err))
 		c.String(http.StatusInternalServerError, "error while contacting authorization server")
 		c.Abort()
 		return
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		client.Logger.Error("unable to read body from OPA", zap.Error(err))
+	client.Logger.Debug("Authentication response", zap.Int("statusCode", res.StatusCode), zap.ByteString("body", body))
+
+	if res.StatusCode != http.StatusOK {
+		client.Logger.Error("bad response from opa", zap.Int("statusCode", res.StatusCode))
 		c.String(http.StatusInternalServerError, "error while contacting authorization server")
 		c.Abort()
 		return
