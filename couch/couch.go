@@ -46,21 +46,21 @@ func NewWithClient(ctx context.Context, client *kivik.Client, opts ...Option) (*
 	}, nil
 }
 
-func (c *configService) Cameras(ctx context.Context, room string) ([]cameraservices.CameraConfig, error) {
+func (c *configService) Cameras(ctx context.Context, info cameraservices.ControlInfo) ([]cameraservices.CameraConfig, error) {
 	var config uiConfig
 
 	db := c.client.DB(ctx, c.uiConfigDB)
-	if err := db.Get(ctx, room).ScanDoc(&config); err != nil {
+	if err := db.Get(ctx, info.Room).ScanDoc(&config); err != nil {
 		return []cameraservices.CameraConfig{}, fmt.Errorf("unable to get/scan ui config: %w", err)
 	}
 
 	for _, cg := range config.ControlGroups {
-		if cg.Cameras != nil && len(cg.Cameras) != 0 {
+		if cg.ID == info.ControlGroup && len(cg.Cameras) > 0 {
 			return cg.Cameras, nil
 		}
 	}
 
-	return []cameraservices.CameraConfig{}, fmt.Errorf("no cameras found in %s", room)
+	return []cameraservices.CameraConfig{}, fmt.Errorf("no cameras found in %s/%s", info.Room, info.ControlGroup)
 }
 
 func (c *configService) CameraPreset(ctx context.Context, camID, presetID string) (string, error) {

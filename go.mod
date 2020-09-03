@@ -3,7 +3,7 @@ module github.com/byuoitav/camera-services
 go 1.14
 
 require (
-	github.com/byuoitav/auth v0.2.1
+	github.com/byuoitav/auth v0.3.0
 	github.com/byuoitav/aver v0.1.3
 	github.com/byuoitav/axis v0.3.0
 	github.com/byuoitav/central-event-system v0.0.0-20200121172633-64fd9d467249
