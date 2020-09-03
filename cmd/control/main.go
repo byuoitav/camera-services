@@ -182,6 +182,7 @@ func main() {
 		Logger:       log,
 		SessionStore: sessionStore,
 		SessionName:  sessionName,
+		DisableAuth:  disableAuth,
 	}
 
 	r := gin.New()

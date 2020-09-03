@@ -30,6 +30,7 @@ type ControlHandlers struct {
 	Logger            *zap.Logger
 	SessionStore      *cookiestore.Store
 	SessionName       string
+	DisableAuth       bool
 }
 
 func (h *ControlHandlers) GetCameras(c *gin.Context) {
@@ -42,7 +43,7 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		return
 	}
 
-	if !h.authorized(c, info.Room, info.ControlGroup) {
+	if !h.DisableAuth && !h.authorized(c, info.Room, info.ControlGroup) {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
@@ -102,39 +103,42 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 		return
 	}
 
-	session, err := h.SessionStore.Get(c.Request, h.SessionName)
-	if err != nil {
-		c.String(http.StatusUnauthorized, err.Error())
-		return
-	}
+	if !h.DisableAuth {
+		session, err := h.SessionStore.Get(c.Request, h.SessionName)
+		if err != nil {
+			c.String(http.StatusUnauthorized, err.Error())
+			return
+		}
 
-	if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
-		// rooms: map[string]interface{} {"roomID": something}
-		if cgs, ok := rooms[room].(map[string]interface{}); ok {
-			// cgs: map[string]interface{} {"controlGroup": something}
-			if len(cgs) == 0 {
+		if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
+			// rooms: map[string]interface{} {"roomID": something}
+			if cgs, ok := rooms[room].(map[string]interface{}); ok {
+				// cgs: map[string]interface{} {"controlGroup": something}
+				if len(cgs) == 0 {
+					rooms[room] = map[string]interface{}{
+						cg: time.Now().Format(time.RFC3339),
+					}
+				} else {
+					cgs[cg] = time.Now().Format(time.RFC3339)
+				}
+			} else {
 				rooms[room] = map[string]interface{}{
 					cg: time.Now().Format(time.RFC3339),
 				}
-			} else {
-				cgs[cg] = time.Now().Format(time.RFC3339)
 			}
+
+			session.Values[claimAuthorizedRooms] = rooms
 		} else {
-			rooms[room] = map[string]interface{}{
-				cg: time.Now().Format(time.RFC3339),
+			session.Values[claimAuthorizedRooms] = map[string]interface{}{
+				room: map[string]interface{}{
+					cg: time.Now().Format(time.RFC3339),
+				},
 			}
 		}
 
-		session.Values[claimAuthorizedRooms] = rooms
-	} else {
-		session.Values[claimAuthorizedRooms] = map[string]interface{}{
-			room: map[string]interface{}{
-				cg: time.Now().Format(time.RFC3339),
-			},
-		}
+		_ = session.Save(c.Request, c.Writer)
 	}
 
-	_ = session.Save(c.Request, c.Writer)
 	c.JSON(http.StatusOK, cameraservices.ControlInfo{
 		Room:         room,
 		ControlGroup: cg,

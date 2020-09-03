@@ -59,15 +59,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
         queryParams: {
           controlGroup: info.controlGroup,
         }
-      }).catch((err: HttpErrorResponse) => {
-        let msg = err.error;
-        switch (err.status) {
-          case 401:
-            msg = `Not authorized to control ${info.room}`;
-          default:
-        }
-
-        this.showError(msg);
       });
     }, (err: HttpErrorResponse) => {
       let msg = err.error;
