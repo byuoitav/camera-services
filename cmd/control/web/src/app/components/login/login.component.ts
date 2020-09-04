@@ -30,18 +30,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.key = s;
       }
     });
-    this.route.queryParams.subscribe(params => {
-      // If a key was passed in, use it and immediately call goToCameraControl
-      if (params['key']) {
-        this.key = params['key']
-		this.goToCameraControl()
-      }
-    });
     document.title = "BYU Camera Control";
   }
 
   ngAfterViewInit() {
     this.form.nativeElement.focus();
+
+    // If a key was passed in, use it and immediately call goToCameraControl
+    this.route.queryParams.subscribe(params => {
+      if (params['key']) {
+        this.key = params['key']
+		this.goToCameraControl()
+      }
+    });
   }
 
   _focus() {
