@@ -63,7 +63,7 @@ func main() {
 	pflag.StringVar(&opaURL, "opa-url", "", "The URL of the OPA Authorization server")
 	pflag.StringVar(&opaToken, "opa-token", "", "The token to use for OPA")
 	pflag.BoolVar(&disableAuth, "disable-auth", false, "Disable all auth z/n checks")
-	pflag.StringVar(&controlURLFormat, "control-url", "https://cameras.av.byu.edu/login?key=%s", "The url format string of the camera control service")
+	pflag.StringVar(&controlURLFormat, "control-url", "https://cameras.av.byu.edu/key-login?key=%s", "The url format string of the camera control service")
 
 	pflag.Parse()
 
