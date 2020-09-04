@@ -7,38 +7,35 @@ import {APIService, Camera} from "../../services/api.service";
 import {ErrorDialog} from "../../dialogs/error/error.dialog";
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: 'key-login',
+  templateUrl: './key-login.component.html',
+  styleUrls: ['./key-login.component.scss']
 })
-export class LoginComponent implements OnInit, AfterViewInit {
-  cameras: Camera[]
-
+export class KeyLoginComponent implements OnInit, AfterViewInit {
   key = "";
-  keyboardEmitter: EventEmitter<string>;
 
   @ViewChild('form') form: ElementRef;
 
   constructor(private router: Router, private api: APIService, private dialog: MatDialog, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.keyboardEmitter = new EventEmitter<string>();
-    this.keyboardEmitter.subscribe(s => {
-      if (s === "done") {
-        this.goToCameraControl()
-      } else {
-        this.key = s;
-      }
-    });
     document.title = "BYU Camera Control";
   }
 
   ngAfterViewInit() {
-    this.form.nativeElement.focus();
+
+    // If a key was passed in, use it and immediately call goToCameraControl
+    this.route.queryParams.subscribe(params => {
+      if (params['key']) {
+        this.key = params['key']
+		this.goToCameraControl()
+      } else {
+	    return this.router.navigate(["/login"])
+      }
+    });
   }
 
   _focus() {
-    this.form.nativeElement.focus();
   }
 
   hasFocus() {
