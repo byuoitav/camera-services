@@ -1,5 +1,5 @@
 import {Component, OnInit, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatDialog} from "@angular/material/dialog";
 import {APIService, Camera} from "../../services/api.service";
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   @ViewChild('form') form: ElementRef;
 
-  constructor(private router: Router, private api: APIService, private dialog: MatDialog) {}
+  constructor(private router: Router, private api: APIService, private dialog: MatDialog, private route: ActivatedRoute) {}
 
   ngOnInit() {
     this.keyboardEmitter = new EventEmitter<string>();
@@ -28,6 +28,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.goToCameraControl()
       } else {
         this.key = s;
+      }
+    });
+    this.route.queryParams.subscribe(params => {
+      // If a key was passed in, use it and immediately call goToCameraControl
+      if (params['key']) {
+        this.key = params['key']
+		this.goToCameraControl()
       }
     });
     document.title = "BYU Camera Control";
