@@ -145,6 +145,7 @@ func main() {
 		Address:  opaURL,
 		Endpoint: "/v1/data/spyglass",
 		Token:    opaToken,
+		Logger:   log,
 	}
 
 	r := gin.New()
