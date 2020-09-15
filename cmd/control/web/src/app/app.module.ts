@@ -19,7 +19,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {ErrorDialog} from './dialogs/error/error.dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 import {CookieService} from 'ngx-cookie-service';
-import {MatSnackBarModule} from '@angular/material/snack-bar'
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
