@@ -47,14 +47,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.form.nativeElement.focus();
     const decoder = new JwtHelperService();
     var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
-    // console.log(decoded)
-    // console.log("rooms ", Object.keys(this.rooms).length)
-    // console.log("rooms", decoded.rooms)
     if (decoded != null && (Object.keys(decoded.rooms).length > 0)){
       var room = this.findMostRecentRoom(decoded.rooms)
       let snackBarRef = this.snackBar.open("Would you like to go back to " + room.name + "?", "GO", {duration: 10000,})
       snackBarRef.onAction().subscribe(() => {
-        console.log("they pushed go!")
         this.router.navigate(["/control/" + room.name], {
           queryParams: {
             controlGroup: room.controlGroup
@@ -122,13 +118,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
     var mostRecent: Room
 
     for (const [room, val] of Object.entries(rooms)) {
-      console.log(room, val)
       for (const [preset, time] of Object.entries(val)) {
-        console.log(preset, time)
         if (mostRecent === undefined || mostRecent.controlGroup.time < time) {
           mostRecent = new Room(room, new ControlGroup(preset, time as string))
         }
-        console.log("most recent", mostRecent)
       }
     }
 
