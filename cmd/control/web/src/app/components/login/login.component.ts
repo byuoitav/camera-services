@@ -5,6 +5,9 @@ import {MatDialog} from "@angular/material/dialog";
 import {APIService, Camera} from "../../services/api.service";
 
 import {ErrorDialog} from "../../dialogs/error/error.dialog";
+import { CookieService } from 'ngx-cookie-service';
+import {JwtHelperService} from '@auth0/angular-jwt';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +22,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   @ViewChild('form') form: ElementRef;
 
-  constructor(private router: Router, private api: APIService, private dialog: MatDialog, private route: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private api: APIService,
+    private dialog: MatDialog,
+    private route: ActivatedRoute,
+    private cookieService: CookieService,
+    private snackBar: MatSnackBar,
+    ) {}
 
   ngOnInit() {
     this.keyboardEmitter = new EventEmitter<string>();
@@ -35,6 +45,23 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.form.nativeElement.focus();
+    const decoder = new JwtHelperService();
+    var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
+    // console.log(decoded)
+    // console.log("rooms ", Object.keys(this.rooms).length)
+    // console.log("rooms", decoded.rooms)
+    if (decoded != null && (Object.keys(decoded.rooms).length > 0)){
+      var room = this.findMostRecentRoom(decoded.rooms)
+      let snackBarRef = this.snackBar.open("Would you like to go back to " + room.name + "?", "GO", {duration: 10000,})
+      snackBarRef.onAction().subscribe(() => {
+        console.log("they pushed go!")
+        this.router.navigate(["/control/" + room.name], {
+          queryParams: {
+            controlGroup: room.controlGroup
+          }
+        })
+      })
+    }
   }
 
   _focus() {
@@ -89,5 +116,41 @@ export class LoginComponent implements OnInit, AfterViewInit {
         msg: msg,
       }
     })
+  }
+
+  findMostRecentRoom(rooms: Map<string, Map<string, string>>) {
+    var mostRecent: Room
+
+    for (const [room, val] of Object.entries(rooms)) {
+      console.log(room, val)
+      for (const [preset, time] of Object.entries(val)) {
+        console.log(preset, time)
+        if (mostRecent === undefined || mostRecent.controlGroup.time < time) {
+          mostRecent = new Room(room, new ControlGroup(preset, time as string))
+        }
+        console.log("most recent", mostRecent)
+      }
+    }
+
+    return mostRecent
+  }
+}
+
+export class Room {
+  name: string
+  controlGroup: ControlGroup
+  constructor(name: string, controlGroup: ControlGroup) {
+    this.name = name;
+    this.controlGroup = controlGroup
+  }
+}
+
+export class ControlGroup {
+  name: string
+  time: string
+
+  constructor(name: string, time: string) {
+    this.name = name;
+    this.time = time;
   }
 }
