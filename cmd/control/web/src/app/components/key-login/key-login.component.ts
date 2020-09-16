@@ -28,9 +28,9 @@ export class KeyLoginComponent implements OnInit, AfterViewInit {
     this.route.queryParams.subscribe(params => {
       if (params['key']) {
         this.key = params['key']
-		this.goToCameraControl()
+		    this.goToCameraControl()
       } else {
-	    return this.router.navigate(["/login"])
+	      return this.router.navigate(["/login"])
       }
     });
   }
