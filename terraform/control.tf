@@ -28,7 +28,7 @@ module "control_dev" {
   // required
   name           = "camera-services-control-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/control-dev"
-  image_version  = "db92550"
+  image_version  = "6c40663"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 

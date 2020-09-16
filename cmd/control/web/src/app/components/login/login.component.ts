@@ -49,12 +49,12 @@ export class LoginComponent implements OnInit, AfterViewInit {
     var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
     if (decoded != null && (Object.keys(decoded.rooms).length > 0)){
       var room = this.findMostRecentRoom(decoded.rooms)
-      let snackBarRef = this.snackBar.open("Would you like to go back to " + room.name + "?", "GO", {duration: 10000,})
+      let snackBarRef = this.snackBar.open("Would you like to go back to " + room.name + "?", "GO", {duration: 30000,})
       snackBarRef.onAction().subscribe(() => {
         this.router.navigate(["/control/" + room.name], {
           queryParams: {
-            controlGroup: room.controlGroup
-          }
+            controlGroup: room.controlGroup.name
+          },
         })
       })
     }
