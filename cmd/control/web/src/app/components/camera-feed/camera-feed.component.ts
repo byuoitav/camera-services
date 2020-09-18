@@ -3,6 +3,8 @@ import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
 
 import {Camera, Preset} from '../../services/api.service';
+import { MatDialog } from '@angular/material/dialog';
+import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
 
 function isCameras(obj: Camera[] | any): obj is Camera[] {
   const cams = obj as Camera[];
@@ -33,6 +35,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     private router: Router,
     private http: HttpClient,
     public route: ActivatedRoute,
+    private dialog: MatDialog,
   ) {
     this.route.params.subscribe(params => {
       if ("room" in params && typeof params.room === "string") {
@@ -228,5 +231,22 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     }
 
     return cam.stream
+  }
+
+  openPresetsDialog = (cam: Camera) => {
+    const dialogs = this.dialog.openDialogs.filter(dialog => {
+      return dialog.componentInstance instanceof PresetsDialog
+    })
+
+    if (dialogs.length > 0) {
+      return
+    }
+
+    this.dialog.open(PresetsDialog, {
+      width: "fit-content",
+      data: {
+        presets: cam.presets
+      }
+    })
   }
 }

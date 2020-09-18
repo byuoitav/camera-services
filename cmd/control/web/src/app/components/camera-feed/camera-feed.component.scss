@@ -24,7 +24,6 @@ $d-pad-arrow-move: 35%;
     display: flex;
     position: relative;
     height: 768px;
-    // width: 1366px;
     width: 100vw;
     flex-direction: row;
     justify-content: center;
@@ -121,8 +120,8 @@ $d-pad-arrow-move: 35%;
 
   .presets-container {
     position: relative;
-    height: 30%;
-    width: 256px;
+    // height: 30%;
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -151,6 +150,33 @@ $d-pad-arrow-move: 35%;
       white-space: normal;
       line-height: 1.2;
       background-color: #ddd;
+      justify-content: center;
+      text-align: center;
+
+      font-size: 1em;
+    }
+  }
+
+  .special-buttons {
+    width: 256px;
+    height: 40px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 4%;
+    .button-wrapper {
+      height: 55px;
+      width: 127.5px;
+      display: flex;
+      justify-content: space-evenly;
+    }
+    button {
+      height: 70%;
+      max-height: 50px;
+      width: 80%;
+      white-space: normal;
+      line-height: 1.2;
+      background-color: rgb(190, 0, 0);
+      color: white;
       justify-content: center;
       text-align: center;
 
@@ -461,7 +487,8 @@ $d-pad-arrow-move: 35%;
 
   .presets-container {
     position: relative;
-    height: 225px;
+    // height: 225px;
+    height: auto;
     width: 256px;
     display: flex;
     flex-direction: column;
@@ -490,6 +517,33 @@ $d-pad-arrow-move: 35%;
       white-space: normal;
       line-height: 1.2;
       background-color: #ddd;
+      justify-content: center;
+      text-align: center;
+
+      font-size: 1em;
+    }
+  }
+
+  .special-buttons {
+    width: 256px;
+    height: 40px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 4%;
+    .button-wrapper {
+      height: 55px;
+      width: 127.5px;
+      display: flex;
+      justify-content: space-evenly;
+    }
+    button {
+      height: 70%;
+      max-height: 50px;
+      width: 80%;
+      white-space: normal;
+      line-height: 1.2;
+      background-color: rgb(190, 0, 0);
+      color: white;
       justify-content: center;
       text-align: center;
 
@@ -868,6 +922,35 @@ $d-pad-arrow-move: 35%;
     }
   }
 
+  .special-buttons {
+    width: 95%;
+    min-width: 350px;
+    height: 40px;
+    display: flex;
+    justify-content: space-evenly;
+    margin-left: 2%;
+    margin-top: 2%;
+    .button-wrapper {
+      height: 150%;
+      width: 50%;
+      display: flex;
+      justify-content: space-evenly;
+    }
+    button {
+      height: 70%;
+      max-height: 50px;
+      width: 85%;
+      white-space: normal;
+      line-height: 1.2;
+      background-color: rgb(190, 0, 0);
+      color: white;
+      justify-content: center;
+      text-align: center;
+
+      font-size: max(2vh, 2vw);
+    }
+  }
+
   .d-pad-container {
     text-align: center;
     height: 100%;
@@ -887,12 +970,9 @@ $d-pad-arrow-move: 35%;
   
   .d-pad {
     position: relative;
-    // width: 150px;
-    // height: 150px;
     width: 15vh;
     height: 15vh;
     border-radius: 48%;
-    // margin-top: 30px;
   
     &:before {
       content: '';
