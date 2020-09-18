@@ -32,5 +32,5 @@ type AverCam interface {
 	GoToPreset(context.Context, string) error
 	Stream(context.Context) (chan image.Image, chan error, error)
 	Reboot(context.Context) error
-	SetPreset(context.Context) error
+	SetPreset(context.Context, int) error
 }
