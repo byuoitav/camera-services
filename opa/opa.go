@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -37,12 +38,6 @@ type requestData struct {
 	Method string `json:"method"`
 }
 
-type contextKey string
-
-const (
-	authMap contextKey = "authMap"
-)
-
 func (client *Client) AuthorizeFor(keys ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if !client.IsAuthorizedFor(c.Request.Context(), keys...) {
@@ -55,21 +50,12 @@ func (client *Client) AuthorizeFor(keys ...string) gin.HandlerFunc {
 	}
 }
 
-func (client *Client) Auth(ctx context.Context) map[string]bool {
-	auth, ok := ctx.Value(authMap).(map[string]bool)
-	if !ok {
-		return nil
-	}
-
-	return auth
-}
-
 func (client *Client) IsAuthorizedFor(ctx context.Context, keys ...string) bool {
 	if client.Disable {
 		return true
 	}
 
-	auth := client.Auth(ctx)
+	auth := cameraservices.CtxAuth(ctx)
 	for _, key := range keys {
 		if !auth[key] {
 			return false
@@ -156,6 +142,6 @@ func (client *Client) FillAuth(c *gin.Context) {
 		return
 	}
 
-	c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), authMap, oRes.Result))
+	c.Request = c.Request.WithContext(cameraservices.WithAuth(ctx, oRes.Result))
 	c.Next()
 }

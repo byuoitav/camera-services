@@ -22,6 +22,7 @@ const (
 	// and the value is the time (formatted in RFC3339) they were authenticated
 	claimAuthorizedRooms = "rooms"
 
+	// claimAuth is a map[string]bool
 	claimAuth = "auth"
 )
 
@@ -87,6 +88,7 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		cameras[i].ZoomOut = rewrite(cameras[i].ZoomOut)
 		cameras[i].ZoomStop = rewrite(cameras[i].ZoomStop)
 		cameras[i].Stream = rewrite(cameras[i].Stream)
+		cameras[i].Reboot = rewrite(cameras[i].Reboot)
 
 		for j := range cameras[i].Presets {
 			cameras[i].Presets[j].SetPreset = rewrite(cameras[i].Presets[j].SetPreset)
@@ -113,7 +115,8 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 			return
 		}
 
-		session.Values[claimAuth] = h.AuthService.Auth(ctx)
+		// stick auth map into the cookie
+		session.Values[claimAuth] = cameraservices.CtxAuth(ctx)
 
 		if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
 			// rooms: map[string]interface{} {"roomID": something}
