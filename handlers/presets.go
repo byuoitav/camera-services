@@ -34,3 +34,7 @@ func (h *CameraController) GoToPreset(c *gin.Context) {
 	log.Info("Went to preset")
 	c.Status(http.StatusOK)
 }
+
+func (h *CameraController) SetPreset(c *gin.Context) {
+
+}

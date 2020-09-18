@@ -170,6 +170,8 @@ func main() {
 	pro520.GET("/zoom/stop", handlers.Publish("ZoomStop"), handlers.ZoomStop)
 	pro520.GET("/preset/:preset", handlers.Publish("GoToPreset"), handlers.GoToPreset)
 	pro520.GET("/stream", handlers.Publish("Stream"), handlers.Stream)
+	pro520.GET("/setPreset/:preset", handlers.Publish("SetPreset"), handlers.SetPreset)
+	pro520.GET("/reboot", handlers.Publish("Reboot"), handlers.Reboot)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

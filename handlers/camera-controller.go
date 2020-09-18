@@ -87,3 +87,27 @@ func (h *CameraController) CameraMiddleware(c *gin.Context) {
 	c.Set(_cCamera, cam)
 	c.Next()
 }
+
+func (h *CameraController) Reboot(c *gin.Context) {
+	cam := c.MustGet(_cCamera).(cameraservices.AverCam)
+	id := c.GetString(_cRequestID)
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	log := h.Logger
+	if len(id) > 0 {
+		log = log.With(zap.String("requestID", id))
+	}
+
+	log.Info("Rebooting...")
+
+	if err := cam.Reboot(ctx); err != nil {
+		log.Warn("unable to tilt down", zap.Error(err))
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	log.Info("Started reboot")
+	c.Status(http.StatusOK)
+}

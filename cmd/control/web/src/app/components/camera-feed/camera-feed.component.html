@@ -30,7 +30,7 @@
             </div>
           </div>
 
-          <div  class="presets-container">
+          <div class="presets-container">
             <h2>Presets</h2>
 
             <mat-divider class="divider"></mat-divider>
@@ -40,6 +40,14 @@
                 <button mat-flat-button (click)="selectPreset(preset)">{{preset?.displayName}}</button>
               </mat-grid-tile>
             </mat-grid-list>
+          </div>
+          <div class="special-buttons">
+            <div class="button-wrapper">
+              <button mat-flat-button>Reboot</button>
+            </div>
+            <div class="button-wrapper">
+              <button mat-flat-button (click)="openPresetsDialog(cam)">Set Preset</button>
+            </div>
           </div>
         </div>
 
