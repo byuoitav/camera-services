@@ -166,7 +166,7 @@ func main() {
 		sessionStore = cookiestore.NewStore()
 	}
 
-	auth := opa.Client{
+	auth := &opa.Client{
 		Address:  opaURL,
 		Endpoint: "/v1/data/cameras",
 		Token:    opaToken,
@@ -178,6 +178,7 @@ func main() {
 		ControlKeyService: &keys.ControlKeyService{
 			Address: keyServiceAddr,
 		},
+		AuthService:  auth,
 		Me:           myURL,
 		Logger:       log,
 		SessionStore: sessionStore,
@@ -191,10 +192,10 @@ func main() {
 
 	if !disableAuth {
 		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware(sessionStore, sessionName)))
-		r.Use(auth.Authorize)
+		r.Use(auth.FillAuth)
 	}
 
-	r.NoRoute(func(c *gin.Context) {
+	r.NoRoute(auth.AuthorizeFor("allow"), func(c *gin.Context) {
 		dir, file := path.Split(c.Request.RequestURI)
 
 		if file == "" || filepath.Ext(file) == "" {
@@ -204,12 +205,12 @@ func main() {
 		}
 	})
 
-	api := r.Group("/api/v1/")
+	api := r.Group("/api/v1/", auth.AuthorizeFor("allow"))
 	api.GET("/controlInfo", handlers.GetControlInfo)
 	api.GET("/cameras", handlers.GetCameras)
 
-	r.GET("/proxy/aver/*uri", middleware.RequestID, middleware.Log, handlers.Proxy(averProxyURL))
-	r.GET("/proxy/axis/*uri", middleware.RequestID, middleware.Log, handlers.Proxy(axisProxyURL))
+	r.GET("/proxy/aver/*uri", handlers.AuthorizeProxy, middleware.RequestID, middleware.Log, handlers.Proxy(averProxyURL))
+	r.GET("/proxy/axis/*uri", handlers.AuthorizeProxy, middleware.RequestID, middleware.Log, handlers.Proxy(axisProxyURL))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

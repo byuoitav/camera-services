@@ -21,11 +21,14 @@ const (
 	// the second map key is the controlGroup
 	// and the value is the time (formatted in RFC3339) they were authenticated
 	claimAuthorizedRooms = "rooms"
+
+	claimAuth = "auth"
 )
 
 type ControlHandlers struct {
 	ConfigService     cameraservices.ConfigService
 	ControlKeyService cameraservices.ControlKeyService
+	AuthService       cameraservices.AuthService
 	Me                *url.URL
 	Logger            *zap.Logger
 	SessionStore      *cookiestore.Store
@@ -110,6 +113,8 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 			return
 		}
 
+		session.Values[claimAuth] = h.AuthService.Auth(ctx)
+
 		if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
 			// rooms: map[string]interface{} {"roomID": something}
 			if cgs, ok := rooms[room].(map[string]interface{}); ok {
@@ -190,6 +195,28 @@ func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
 
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func (h *ControlHandlers) AuthorizeProxy(c *gin.Context) {
+	var authorized bool
+	path := c.Request.URL.Path
+
+	switch {
+	case strings.Contains(path, "reboot"):
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "reboot")
+	case strings.Contains(path, "setPreset"):
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "setPreset")
+	default:
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "allow")
+	}
+
+	if !authorized {
+		c.String(http.StatusForbidden, "Unauthorized")
+		c.Abort()
+		return
+	}
+
+	c.Next()
 }
 
 func (h *ControlHandlers) authorized(c *gin.Context, room, controlGroup string) bool {

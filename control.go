@@ -26,6 +26,10 @@ type CameraConfig struct {
 	Stream string `json:"stream"`
 
 	Presets []CameraPreset `json:"presets"`
+
+	// admin items
+	Reboot    string `json:"reboot"`
+	SetPreset string `json:"setPreset"`
 }
 
 type CameraPreset struct {

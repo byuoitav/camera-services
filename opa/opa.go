@@ -17,17 +17,14 @@ type Client struct {
 	Address  string
 	Endpoint string
 	Token    string
+	Disable  bool
 
 	Logger *zap.Logger
 }
 
 type response struct {
-	DecisionID string `json:"decision_id"`
-	Result     result `json:"result"`
-}
-
-type result struct {
-	Allow bool `json:"allow"`
+	DecisionID string          `json:"decision_id"`
+	Result     map[string]bool `json:"result"`
 }
 
 type request struct {
@@ -40,7 +37,54 @@ type requestData struct {
 	Method string `json:"method"`
 }
 
-func (client *Client) Authorize(c *gin.Context) {
+type contextKey string
+
+const (
+	authMap contextKey = "authMap"
+)
+
+func (client *Client) AuthorizeFor(keys ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !client.IsAuthorizedFor(c.Request.Context(), keys...) {
+			c.String(http.StatusForbidden, "Unauthorized")
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func (client *Client) Auth(ctx context.Context) map[string]bool {
+	auth, ok := ctx.Value(authMap).(map[string]bool)
+	if !ok {
+		return nil
+	}
+
+	return auth
+}
+
+func (client *Client) IsAuthorizedFor(ctx context.Context, keys ...string) bool {
+	if client.Disable {
+		return true
+	}
+
+	auth := client.Auth(ctx)
+	for _, key := range keys {
+		if !auth[key] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (client *Client) FillAuth(c *gin.Context) {
+	if client.Disable {
+		c.Next()
+		return
+	}
+
 	var user string
 	if v, ok := c.Request.Context().Value("user").(string); ok {
 		user = v
@@ -112,11 +156,6 @@ func (client *Client) Authorize(c *gin.Context) {
 		return
 	}
 
-	if !oRes.Result.Allow {
-		c.String(http.StatusForbidden, "Unauthorized")
-		c.Abort()
-		return
-	}
-
+	c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), authMap, oRes.Result))
 	c.Next()
 }
