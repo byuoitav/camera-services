@@ -20,17 +20,6 @@ type Camera interface {
 	Stream(context.Context) (chan image.Image, chan error, error)
 }
 
-type AverCam interface {
-	TiltUp(context.Context) error
-	TiltDown(context.Context) error
-	PanLeft(context.Context) error
-	PanRight(context.Context) error
-	PanTiltStop(context.Context) error
-	ZoomIn(context.Context) error
-	ZoomOut(context.Context) error
-	ZoomStop(context.Context) error
-	GoToPreset(context.Context, string) error
-	Stream(context.Context) (chan image.Image, chan error, error)
+type Rebootable interface {
 	Reboot(context.Context) error
-	SetPreset(context.Context) error
 }
