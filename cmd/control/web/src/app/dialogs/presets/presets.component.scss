@@ -1,3 +1,7 @@
+.selected {
+    background-color: lightskyblue;
+}
+
 @media only screen and (min-width: 1024px) {
     .presets-container {
         height: auto;
@@ -16,7 +20,7 @@
             width: 80%;
             white-space: normal;
             line-height: 1.2;
-            background-color: #ddd;
+            // background-color: #ddd;
             justify-content: center;
             text-align: center;
             font-size: 1em;

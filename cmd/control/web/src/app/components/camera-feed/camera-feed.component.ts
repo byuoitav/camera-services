@@ -5,6 +5,8 @@ import {HttpClient} from '@angular/common/http';
 import {Camera, Preset} from '../../services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
+import { CookieService } from 'ngx-cookie-service';
+import {JwtHelperService} from '@auth0/angular-jwt';
 
 function isCameras(obj: Camera[] | any): obj is Camera[] {
   const cams = obj as Camera[];
@@ -21,7 +23,9 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   styleUrls: ['./camera-feed.component.scss']
 })
 export class CameraFeedComponent implements OnInit, OnDestroy {
-  rowHeight = "4:1.75"
+  rowHeight = "4:1.75";
+
+  admin = false;
 
   timeout = 0;
   cameras: Camera[];
@@ -36,6 +40,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     public route: ActivatedRoute,
     private dialog: MatDialog,
+    private cookieService: CookieService,
   ) {
     this.route.params.subscribe(params => {
       if ("room" in params && typeof params.room === "string") {
@@ -58,6 +63,12 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
+    }
+
+    const decoder = new JwtHelperService();
+    var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
+    if (decoded != null && decoded.auth.reboot == true) {
+        this.admin = true;
     }
 
     setInterval(() => {

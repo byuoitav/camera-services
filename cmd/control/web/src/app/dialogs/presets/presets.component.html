@@ -4,7 +4,7 @@
 <div class="presets-container">
     <mat-grid-list class="presets" cols="2" rowHeight="4:1.75">
         <mat-grid-tile *ngFor="let preset of data?.presets" class="preset">
-            <button mat-flat-button (click)="setCurPreset(preset)">{{preset?.displayName}}</button>
+            <button id={{preset?.displayName}} mat-flat-button (click)="setCurPreset(preset)">{{preset?.displayName}}</button>
         </mat-grid-tile>
     </mat-grid-list>
 </div>

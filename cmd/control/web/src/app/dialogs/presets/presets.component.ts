@@ -33,9 +33,19 @@ export class PresetsDialog implements OnInit {
       return
     }
     console.log(this.curPreset)
+    for (let i = 0; i < this.data.presets.length; i++) {
+      if (this.curPreset == this.data.presets[i]) {
+        //hit the endpoint here with i as the preset
+      }
+    }
   }
 
   setCurPreset = (preset: Preset) => {
+    var selected = document.querySelectorAll(".selected");
+    for (let i = 0; i < selected.length; i++) {
+      selected[i].classList.remove("selected");
+    }
+    document.getElementById(preset.displayName).classList.add("selected");
     this.curPreset = preset;
   }
 

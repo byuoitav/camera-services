@@ -41,7 +41,7 @@
               </mat-grid-tile>
             </mat-grid-list>
           </div>
-          <div class="special-buttons">
+          <div *ngIf="!admin" class="special-buttons">
             <div class="button-wrapper">
               <button mat-flat-button>Reboot</button>
             </div>
