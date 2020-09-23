@@ -146,18 +146,19 @@ func main() {
 		Endpoint: "/v1/data/spyglass",
 		Token:    opaToken,
 		Logger:   log,
+		Disable:  disableAuth,
 	}
 
 	r := gin.New()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
+	r.Use(auth.FillAuth)
 
 	if !disableAuth {
 		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware(sessionStore, sessionName)))
-		r.Use(auth.Authorize)
 	}
 
-	r.NoRoute(func(c *gin.Context) {
+	r.NoRoute(auth.AuthorizeFor("allow"), func(c *gin.Context) {
 		dir, file := path.Split(c.Request.RequestURI)
 
 		if file == "" || filepath.Ext(file) == "" {
@@ -167,7 +168,7 @@ func main() {
 		}
 	})
 
-	api := r.Group("/api/v1/")
+	api := r.Group("/api/v1/", auth.AuthorizeFor("allow"))
 	api.GET("/rooms", handlers.GetRooms)
 	api.GET("/rooms/:room/controlGroups", handlers.GetControlGroups)
 	api.GET("/rooms/:room/controlGroups/:controlGroup", handlers.ControlPage)

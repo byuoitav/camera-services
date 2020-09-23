@@ -21,11 +21,15 @@ const (
 	// the second map key is the controlGroup
 	// and the value is the time (formatted in RFC3339) they were authenticated
 	claimAuthorizedRooms = "rooms"
+
+	// claimAuth is a map[string]bool
+	claimAuth = "auth"
 )
 
 type ControlHandlers struct {
 	ConfigService     cameraservices.ConfigService
 	ControlKeyService cameraservices.ControlKeyService
+	AuthService       cameraservices.AuthService
 	Me                *url.URL
 	Logger            *zap.Logger
 	SessionStore      *cookiestore.Store
@@ -84,9 +88,11 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		cameras[i].ZoomOut = rewrite(cameras[i].ZoomOut)
 		cameras[i].ZoomStop = rewrite(cameras[i].ZoomStop)
 		cameras[i].Stream = rewrite(cameras[i].Stream)
+		cameras[i].Reboot = rewrite(cameras[i].Reboot)
 
 		for j := range cameras[i].Presets {
 			cameras[i].Presets[j].SetPreset = rewrite(cameras[i].Presets[j].SetPreset)
+			cameras[i].Presets[j].NewPreset = rewrite(cameras[i].Presets[j].NewPreset)
 		}
 	}
 
@@ -109,6 +115,9 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 			c.String(http.StatusUnauthorized, err.Error())
 			return
 		}
+
+		// stick auth map into the cookie
+		session.Values[claimAuth] = cameraservices.CtxAuth(ctx)
 
 		if rooms, ok := session.Values[claimAuthorizedRooms].(map[string]interface{}); ok {
 			// rooms: map[string]interface{} {"roomID": something}
@@ -190,6 +199,28 @@ func (h *ControlHandlers) Proxy(to *url.URL) gin.HandlerFunc {
 
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func (h *ControlHandlers) AuthorizeProxy(c *gin.Context) {
+	var authorized bool
+	path := c.Request.URL.Path
+
+	switch {
+	case strings.Contains(path, "reboot"):
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "reboot")
+	case strings.Contains(path, "setPreset"):
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "setPreset")
+	default:
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "allow")
+	}
+
+	if !authorized {
+		c.String(http.StatusForbidden, "Unauthorized")
+		c.Abort()
+		return
+	}
+
+	c.Next()
 }
 
 func (h *ControlHandlers) authorized(c *gin.Context, room, controlGroup string) bool {

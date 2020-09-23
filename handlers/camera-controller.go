@@ -87,3 +87,31 @@ func (h *CameraController) CameraMiddleware(c *gin.Context) {
 	c.Set(_cCamera, cam)
 	c.Next()
 }
+
+func (h *CameraController) Reboot(c *gin.Context) {
+	id := c.GetString(_cRequestID)
+	cam, ok := c.MustGet(_cCamera).(cameraservices.Rebootable)
+	if !ok || cam == nil {
+		c.String(http.StatusBadRequest, "not supported")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
+	defer cancel()
+
+	log := h.Logger
+	if len(id) > 0 {
+		log = log.With(zap.String("requestID", id))
+	}
+
+	log.Info("Rebooting...")
+
+	if err := cam.Reboot(ctx); err != nil {
+		log.Warn("unable to reboot", zap.Error(err))
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	log.Info("Rebooted")
+	c.Status(http.StatusOK)
+}

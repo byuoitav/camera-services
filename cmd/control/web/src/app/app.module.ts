@@ -20,6 +20,7 @@ import {ErrorDialog} from './dialogs/error/error.dialog';
 import {MatDialogModule} from '@angular/material/dialog';
 import {CookieService} from 'ngx-cookie-service';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {PresetsDialog} from './dialogs/presets/presets.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     CameraFeedComponent,
     LoginComponent,
     ErrorDialog,
+    PresetsDialog,
   ],
   imports: [
     BrowserModule,
