@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/byuoitav/auth v0.3.0
-	github.com/byuoitav/aver v0.1.4
+	github.com/byuoitav/aver v0.1.5
 	github.com/byuoitav/axis v0.3.0
 	github.com/byuoitav/central-event-system v0.0.0-20200121172633-64fd9d467249
 	github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271
@@ -32,3 +32,4 @@ require (
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
+
