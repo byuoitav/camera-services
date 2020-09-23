@@ -152,11 +152,12 @@ func main() {
 	r := gin.New()
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
-	r.Use(auth.FillAuth)
 
 	if !disableAuth {
 		r.Use(adapter.Wrap(wso2.AuthCodeMiddleware(sessionStore, sessionName)))
 	}
+
+	r.Use(auth.FillAuth)
 
 	r.NoRoute(auth.AuthorizeFor("allow"), func(c *gin.Context) {
 		dir, file := path.Split(c.Request.RequestURI)
