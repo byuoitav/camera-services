@@ -3,6 +3,12 @@ import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
 
 import {Camera, Preset} from '../../services/api.service';
+import { MatDialog } from '@angular/material/dialog';
+import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
+import { CookieService } from 'ngx-cookie-service';
+import {JwtHelperService} from '@auth0/angular-jwt';
+import { ErrorDialog } from '../../dialogs/error/error.dialog';
+
 
 function isCameras(obj: Camera[] | any): obj is Camera[] {
   const cams = obj as Camera[];
@@ -19,7 +25,9 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   styleUrls: ['./camera-feed.component.scss']
 })
 export class CameraFeedComponent implements OnInit, OnDestroy {
-  rowHeight = "4:1.75"
+  rowHeight = "4:1.75";
+
+  admin = false;
 
   timeout = 0;
   cameras: Camera[];
@@ -33,6 +41,8 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     private router: Router,
     private http: HttpClient,
     public route: ActivatedRoute,
+    private dialog: MatDialog,
+    private cookieService: CookieService,
   ) {
     this.route.params.subscribe(params => {
       if ("room" in params && typeof params.room === "string") {
@@ -55,6 +65,12 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
+    }
+
+    const decoder = new JwtHelperService();
+    var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
+    if (decoded != null && decoded.auth.reboot == true) {
+        this.admin = true;
     }
 
     setInterval(() => {
@@ -191,6 +207,20 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  reboot = (cam: Camera) => {
+    this.http.get(cam.reboot).subscribe(resp => {
+      console.log("resp", resp);
+    }, err => {
+      console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+        data: {
+          msg: "Unable to reboot camera"
+        }
+      })
+    })
+  }
+
   zoomStop = (cam: Camera) => {
     if (!this.zooming) {
       return
@@ -229,4 +259,22 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
 
     return cam.stream
   }
+
+  openPresetsDialog = (cam: Camera) => {
+    const dialogs = this.dialog.openDialogs.filter(dialog => {
+      return dialog.componentInstance instanceof PresetsDialog
+    })
+
+    if (dialogs.length > 0) {
+      return
+    }
+
+    this.dialog.open(PresetsDialog, {
+      width: "fit-content",
+      data: {
+        presets: cam.presets
+      }
+    })
+  }
+
 }

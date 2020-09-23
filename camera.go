@@ -19,3 +19,8 @@ type Camera interface {
 	GoToPreset(context.Context, string) error
 	Stream(context.Context) (chan image.Image, chan error, error)
 }
+
+type Rebootable interface {
+	Reboot(context.Context) error
+	SetPreset(context.Context, int) error
+}
