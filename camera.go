@@ -22,4 +22,5 @@ type Camera interface {
 
 type Rebootable interface {
 	Reboot(context.Context) error
+	SetPreset(context.Context, int) error
 }

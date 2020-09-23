@@ -1,5 +1,9 @@
 .selected {
-    background-color: lightskyblue;
+    background-color: lightskyblue !important;
+}
+
+.mat-flat-button ::ng-deep .mat-button-focus-overlay {
+    display: none;
 }
 
 @media only screen and (min-width: 1024px) {
@@ -20,7 +24,7 @@
             width: 80%;
             white-space: normal;
             line-height: 1.2;
-            // background-color: #ddd;
+            background-color: #ddd;
             justify-content: center;
             text-align: center;
             font-size: 1em;

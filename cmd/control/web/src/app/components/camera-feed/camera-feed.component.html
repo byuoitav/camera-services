@@ -41,9 +41,9 @@
               </mat-grid-tile>
             </mat-grid-list>
           </div>
-          <div *ngIf="!admin" class="special-buttons">
+          <div *ngIf="admin" class="special-buttons">
             <div class="button-wrapper">
-              <button mat-flat-button>Reboot</button>
+              <button mat-flat-button (click)=reboot(cam)>Reboot</button>
             </div>
             <div class="button-wrapper">
               <button mat-flat-button (click)="openPresetsDialog(cam)">Set Preset</button>

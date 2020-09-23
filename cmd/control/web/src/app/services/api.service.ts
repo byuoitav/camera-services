@@ -19,6 +19,8 @@ export interface Camera {
   zoomOut: string;
   zoomStop: string;
 
+  reboot: string;
+
   memoryRecall: string;
   stream: string;
 
@@ -28,6 +30,7 @@ export interface Camera {
 export interface Preset {
   displayName: string;
   setPreset: string;
+  newPreset: string;
 }
 
 @Injectable({

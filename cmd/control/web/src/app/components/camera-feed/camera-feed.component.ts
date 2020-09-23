@@ -7,6 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
 import { CookieService } from 'ngx-cookie-service';
 import {JwtHelperService} from '@auth0/angular-jwt';
+import { ErrorDialog } from '../../dialogs/error/error.dialog';
+
 
 function isCameras(obj: Camera[] | any): obj is Camera[] {
   const cams = obj as Camera[];
@@ -205,6 +207,20 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  reboot = (cam: Camera) => {
+    this.http.get(cam.reboot).subscribe(resp => {
+      console.log("resp", resp);
+    }, err => {
+      console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+        data: {
+          msg: "Unable to reboot camera"
+        }
+      })
+    })
+  }
+
   zoomStop = (cam: Camera) => {
     if (!this.zooming) {
       return
@@ -260,4 +276,5 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
       }
     })
   }
+
 }

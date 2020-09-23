@@ -171,6 +171,7 @@ func main() {
 		Endpoint: "/v1/data/cameras",
 		Token:    opaToken,
 		Logger:   log,
+		Disable:  disableAuth,
 	}
 
 	handlers := handlers.ControlHandlers{
