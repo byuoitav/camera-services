@@ -69,7 +69,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
 
     const decoder = new JwtHelperService();
     var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
-    if (decoded != null && decoded.auth.reboot == true) {
+    if (decoded != null && decoded.auth.restart == true) {
         this.admin = true;
     }
 
