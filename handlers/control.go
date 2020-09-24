@@ -207,7 +207,7 @@ func (h *ControlHandlers) AuthorizeProxy(c *gin.Context) {
 
 	switch {
 	case strings.Contains(path, "reboot"):
-		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "reboot")
+		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "restart")
 	case strings.Contains(path, "setPreset"):
 		authorized = h.AuthService.IsAuthorizedFor(c.Request.Context(), "setPreset")
 	default:
