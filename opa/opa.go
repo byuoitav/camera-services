@@ -80,7 +80,7 @@ func (client *Client) FillAuth(c *gin.Context) {
 		request{
 			Input: requestData{
 				User:   user,
-				Path:   c.FullPath(),
+				Path:   c.Request.URL.Path,
 				Method: c.Request.Method,
 			},
 		},
@@ -142,6 +142,6 @@ func (client *Client) FillAuth(c *gin.Context) {
 		return
 	}
 
-	c.Request = c.Request.WithContext(cameraservices.WithAuth(ctx, oRes.Result))
+	c.Request = c.Request.WithContext(cameraservices.WithAuth(c.Request.Context(), oRes.Result))
 	c.Next()
 }
