@@ -78,6 +78,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   goToCameraControl = async () => {
     this.api.getControlInfo(this.key).subscribe(info => {
+      this.snackBar.dismiss();
       return this.router.navigate(["/control/" + info.room], {
         queryParams: {
           controlGroup: info.controlGroup,
