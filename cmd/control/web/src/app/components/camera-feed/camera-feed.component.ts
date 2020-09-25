@@ -26,6 +26,7 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
 })
 export class CameraFeedComponent implements OnInit, OnDestroy {
   rowHeight = "4:1.75";
+  imgWidth: number;
 
   admin = false;
 
@@ -67,8 +68,12 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
       this.rowHeight = "4:1.25";
     }
     
-    let width = document.getElementById("stream").naturalWidth;
-    console.log("width!: ", width)
+
+    let elem = (<HTMLImageElement[]><any>document.getElementById("stream"));
+    if (elem != null && elem.length > 0) {
+      this.imgWidth = elem[0].naturalHeight
+    }
+    console.log("width!: ", this.imgWidth)
 
     const decoder = new JwtHelperService();
     var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
@@ -78,7 +83,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
 
     setInterval(() => {
       this.timeout++
-      console.log("current width: ", width)
+      console.log("current width: ", this.imgWidth)
       if (this.timeout == 5) {
         console.log("preview timing out")
       }
