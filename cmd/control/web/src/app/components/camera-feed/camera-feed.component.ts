@@ -26,7 +26,6 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
 })
 export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   rowHeight = "4:1.75";
-  imgWidth: number;
 
   admin = false;
 
@@ -84,10 +83,11 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     let stream = document.getElementById("stream") as HTMLImageElement;
-    this.imgWidth = stream.naturalWidth;
-    setInterval(() => {
-      console.log("width!: ", this.imgWidth);
-    }, 1000)
+    if (stream != null) {
+      setInterval(() => {
+        console.log("width!: ", stream.naturalWidth);
+      }, 1000)
+    }
   }
 
   ngOnDestroy() {
