@@ -24,3 +24,7 @@ type Rebootable interface {
 	Reboot(context.Context) error
 	SetPreset(context.Context, int) error
 }
+
+type JPEGCamera interface {
+	StreamJPEG(context.Context) (chan []byte, chan error, error)
+}
