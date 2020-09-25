@@ -1,4 +1,4 @@
-import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy} from '@angular/core';
+import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
 import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
 
@@ -24,7 +24,7 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   templateUrl: './camera-feed.component.html',
   styleUrls: ['./camera-feed.component.scss']
 })
-export class CameraFeedComponent implements OnInit, OnDestroy {
+export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   rowHeight = "4:1.75";
   imgWidth: number;
 
@@ -67,13 +67,6 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
     }
-    
-
-    let elem = (<HTMLImageElement[]><any>document.getElementById("stream"));
-    if (elem != null && elem.length > 0) {
-      this.imgWidth = elem[0].naturalHeight
-    }
-    console.log("width!: ", this.imgWidth)
 
     const decoder = new JwtHelperService();
     var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
@@ -83,11 +76,18 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
 
     setInterval(() => {
       this.timeout++
-      console.log("current width: ", this.imgWidth)
       if (this.timeout == 5) {
         console.log("preview timing out")
       }
     }, 1000);
+  }
+
+  ngAfterViewInit() {
+    let stream = document.getElementById("stream") as HTMLImageElement;
+    this.imgWidth = stream.naturalWidth;
+    setInterval(() => {
+      console.log("width!: ", this.imgWidth);
+    }, 1000)
   }
 
   ngOnDestroy() {
