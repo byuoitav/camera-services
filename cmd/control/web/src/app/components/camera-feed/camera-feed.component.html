@@ -53,7 +53,7 @@
 
       <!-- <div class="aspect-ratio"> -->
         <div class="camera-container">
-          <img #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
+          <img id="stream" #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
           <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
             <div >PREVIEW PAUSED</div>
             <div class="unpause-text">Click to unpause</div>

@@ -66,6 +66,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
     }
+    
+    let width = document.getElementById("stream").naturalWidth;
+    console.log("width!: ", width)
 
     const decoder = new JwtHelperService();
     var decoded = decoder.decodeToken(this.cookieService.get("camera-services-control"))
@@ -75,6 +78,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
 
     setInterval(() => {
       this.timeout++
+      console.log("current width: ", width)
       if (this.timeout == 5) {
         console.log("preview timing out")
       }
