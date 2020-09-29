@@ -1,4 +1,4 @@
-import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit} from '@angular/core';
+import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit, EventEmitter} from '@angular/core';
 import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
 
@@ -8,6 +8,7 @@ import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
 import { CookieService } from 'ngx-cookie-service';
 import {JwtHelperService} from '@auth0/angular-jwt';
 import { ErrorDialog } from '../../dialogs/error/error.dialog';
+import { RebootDialog } from 'src/app/dialogs/reboot/reboot.component';
 
 
 function isCameras(obj: Camera[] | any): obj is Camera[] {
@@ -28,12 +29,15 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
   rowHeight = "4:1.75";
 
   admin = false;
+  rebooting = false;
 
   timeout = 0;
   cameras: Camera[];
 
   tilting = false;
   zooming = false;
+
+  reboot: EventEmitter<boolean> = new EventEmitter();
 
   @ViewChild('stream') img: ElementRef;
 
@@ -58,6 +62,16 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     this.route.data.subscribe(data => {
       if ("cameras" in data && isCameras(data.cameras)) {
         this.cameras = data.cameras;
+      }
+    })
+
+    this.reboot.subscribe(rebooting => {
+      if (rebooting == true) {
+        this.rebooting = true
+        setTimeout(() => {
+          this.rebooting = false;
+          this.timeout = 0;
+        }, 20000);
       }
     })
   }
@@ -207,20 +221,6 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     });
   }
 
-
-  reboot = (cam: Camera) => {
-    this.http.get(cam.reboot).subscribe(resp => {
-      console.log("resp", resp);
-    }, err => {
-      console.warn("err", err);
-      this.dialog.open(ErrorDialog, {
-        data: {
-          msg: "Unable to reboot camera"
-        }
-      })
-    })
-  }
-
   zoomStop = (cam: Camera) => {
     if (!this.zooming) {
       return
@@ -253,7 +253,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
   }
 
   getStreamURL = (cam: Camera) => {
-    if (this.timeout >= 60) {
+    if (this.timeout >= 60 || this.rebooting) {
       return ""
     }
 
@@ -276,5 +276,22 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
       }
     })
   }
+
+  openRebootDialog = (cam: Camera) => {
+    const dialogs = this.dialog.openDialogs.filter(dialog => {
+      return dialog.componentInstance instanceof RebootDialog
+    })
+
+    if (dialogs.length > 0) {
+      return
+    }
+
+    this.dialog.open(RebootDialog, {
+      width: "fit-content",
+      data: {
+        camera: cam,
+        reboot: this.reboot,
+      }
+    })  }
 
 }

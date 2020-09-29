@@ -11,7 +11,7 @@ import { ErrorDialog } from '../error/error.dialog';
   templateUrl: './presets.component.html',
   styleUrls: ['./presets.component.scss']
 })
-export class PresetsDialog implements OnInit {
+export class PresetsDialog {
   curPreset: Preset;
 
   constructor(
@@ -22,11 +22,7 @@ export class PresetsDialog implements OnInit {
     public data: {
       presets: Preset[];
     }
-  ) {
-   }
-
-  ngOnInit(): void {
-  }
+  ) {}
 
   close = () => {
     this.ref.close();
@@ -60,4 +56,11 @@ export class PresetsDialog implements OnInit {
     console.log(this.curPreset);
   }
 
+  disabled = () => {
+    if (this.curPreset == undefined) {
+      return true;
+    }
+
+    return false;
+  }
 }

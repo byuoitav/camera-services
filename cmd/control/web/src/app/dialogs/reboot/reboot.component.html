@@ -1,0 +1,9 @@
+<div style="text-align: center; font-size: 1.2em;">Are you sure you would like to reboot?</div>
+<div class="confirm-cancel">
+    <div class="button-wrapper">
+        <button mat-flat-button color="primary" class="confirm" (click)="confirm()" [disabled]="disabled()">Confirm</button>
+    </div>
+    <div class="button-wrapper">
+        <button mat-flat-button class="cancel" (click)="close()">Cancel</button>
+    </div>
+</div>

@@ -41,9 +41,9 @@
               </mat-grid-tile>
             </mat-grid-list>
           </div>
-          <div *ngIf="admin" class="special-buttons">
+          <div *ngIf="!admin" class="special-buttons">
             <div class="button-wrapper">
-              <button mat-flat-button (click)=reboot(cam)>Reboot</button>
+              <button mat-flat-button (click)=openRebootDialog(cam)>Reboot</button>
             </div>
             <div class="button-wrapper">
               <button mat-flat-button (click)="openPresetsDialog(cam)">Set Preset</button>
@@ -53,10 +53,15 @@
 
       <!-- <div class="aspect-ratio"> -->
         <div class="camera-container">
-          <img id="stream" #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
-          <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
-            <div >PREVIEW PAUSED</div>
-            <div class="unpause-text">Click to unpause</div>
+          <ng-container *ngIf="!rebooting">
+            <img id="stream" #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
+            <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
+              <div>PREVIEW PAUSED</div>
+              <div class="unpause-text">Click to unpause</div>
+            </div>
+          </ng-container>
+          <div *ngIf="rebooting" class="preview-paused">
+            <div>Camera is rebooting...</div>
           </div>
         </div>
       <!-- </div> -->

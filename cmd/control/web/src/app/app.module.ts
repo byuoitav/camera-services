@@ -21,6 +21,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {CookieService} from 'ngx-cookie-service';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {PresetsDialog} from './dialogs/presets/presets.component';
+import { RebootDialog } from './dialogs/reboot/reboot.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import {PresetsDialog} from './dialogs/presets/presets.component';
     LoginComponent,
     ErrorDialog,
     PresetsDialog,
+    RebootDialog,
   ],
   imports: [
     BrowserModule,
