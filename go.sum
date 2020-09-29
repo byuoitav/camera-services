@@ -5,6 +5,8 @@ github.com/byuoitav/auth v0.3.0 h1:3E8Cs4kd1WC22ewvb+U5sdeBK4cHxt+fsplWb/CQ4N0=
 github.com/byuoitav/auth v0.3.0/go.mod h1:pbb0bFvLfcV6JcQA1zJd61QQRvmpyAfQbrnjtUJX4s8=
 github.com/byuoitav/aver v0.1.4 h1:ab/YNmIhzn/UGwDD4jbtnhyqILpCUVw+vc/A8/wfq/8=
 github.com/byuoitav/aver v0.1.4/go.mod h1:7I1UKwTvc8/h4ac9j//SyKmvGzjNKpCW41E8j8igblY=
+github.com/byuoitav/aver v0.1.5 h1:hqKig+IJiPJXBofLWfbi2LllfBptfjYlHvQNk+WBu/8=
+github.com/byuoitav/aver v0.1.5/go.mod h1:7I1UKwTvc8/h4ac9j//SyKmvGzjNKpCW41E8j8igblY=
 github.com/byuoitav/axis v0.3.0/go.mod h1:weSaaxrvwO4AuvEkvuMa1T+AWNNCwBxQXRSMaXBzgWU=
 github.com/byuoitav/central-event-system v0.0.0-20200121172633-64fd9d467249/go.mod h1:+KCvx75wISCCkCrgIWRdlJxRXlA2yxQvR4HHgU/TdpU=
 github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271/go.mod h1:YTDTFEmez7HU3oyCIWjU3RfQ/P6v24LEzH5YUebph7I=
@@ -151,6 +153,7 @@ golang.org/x/net v0.0.0-20200707034311-ab3426394381/go.mod h1:/O7V0waA8r7cgGh81R
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
+golang.org/x/sync v0.0.0-20190423024810-112230192c58 h1:8gQV6CLnAEikrhgkHFbMAEhagSSnXWGV915qUMm9mrU=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sys v0.0.0-20180830151530-49385e6e1522/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=

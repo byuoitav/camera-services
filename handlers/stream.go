@@ -17,6 +17,12 @@ import (
 	"go.uber.org/zap"
 )
 
+type stream struct {
+	sync.Mutex
+	subs map[chan []byte]struct{}
+	done chan struct{}
+}
+
 func (h *CameraController) Stream(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
@@ -29,111 +35,16 @@ func (h *CameraController) Stream(c *gin.Context) {
 		log = log.With(zap.String("requestID", id))
 	}
 
-	log.Info("Starting a stream")
-
-	images, errs, err := cam.Stream(ctx)
-	if err != nil {
-		log.Warn("unable to start stream", zap.Error(err))
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	m := multipart.NewWriter(c.Writer)
-
-	// write the headers
-	c.Writer.Header().Set(_hContentType, "multipart/x-mixed-replace; boundary="+m.Boundary())
-
-	defer m.Close()
-
-	frames := 0
-	numErrs := 0
-	avgFrameSize := 0
-	start := time.Now()
-
-	defer func() {
-		avgFps := float64(frames) / time.Since(start).Seconds()
-		log.Info("Done streaming", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize))
-	}()
-
-	buf := &bytes.Buffer{}
-	header := textproto.MIMEHeader{}
-
-	for {
-		select {
-		case image := <-images:
-			buf.Reset()
-
-			if err := jpeg.Encode(buf, image, nil); err != nil {
-				log.Warn("unable to encode image", zap.Error(err))
-				return
-			}
-
-			header.Set(_hContentType, "image/jpeg")
-			header.Set(_hContentLength, strconv.Itoa(buf.Len()))
-
-			part, err := m.CreatePart(header)
-			if err != nil {
-				log.Warn("unable to create part", zap.Error(err))
-				return
-			}
-
-			if _, err := part.Write(buf.Bytes()); err != nil {
-				log.Warn("unable to write part", zap.Error(err))
-				return
-			}
-
-			if flusher, ok := c.Writer.(http.Flusher); ok {
-				flusher.Flush()
-			}
-
-			if avgFrameSize == 0 {
-				avgFrameSize = buf.Len()
-			} else {
-				avgFrameSize = (avgFrameSize + buf.Len()) / 2
-			}
-
-			numErrs = 0
-			frames++
-		case err := <-errs:
-			numErrs++
-			log.Warn("unable to get the next image", zap.Error(err))
-
-			// we are averaging 8fps or so, so if we don't
-			// get a single frame for 3 seconds, we'll end it
-			if numErrs >= 24 {
-				log.Warn("ending stream", zap.String("reason", "exceeded consecutive error count"))
-				return
-			}
-		case <-ctx.Done():
-			log.Info("ending stream", zap.String("reason", (ctx.Err().Error())))
-			return
-		}
-	}
-}
-
-type stream struct {
-	subs  int
-	frame []byte
-	sync.RWMutex
-}
-
-func (h *CameraController) stream(c *gin.Context) {
-	cam := c.MustGet(_cCamera).(cameraservices.Camera)
-	id := c.GetString(_cRequestID)
-
-	log := h.Logger
-	if len(id) > 0 {
-		log = log.With(zap.String("requestID", id))
-	}
+	log.Info("Subscribing to stream")
 
 	// get the stream, or start it
-	v, err, _ := h.single.Do("Stream+address", func() (interface{}, error) {
+	v, err, _ := h.single.Do("stream"+cam.RemoteAddr(), func() (interface{}, error) {
 		s, ok := h.streams.Load(cam)
 		if ok {
 			return s, nil
 		}
 
-		s, err := h.startStream(cam)
+		s, err := h.startStream(cam, h.Logger.With(zap.String("addr", cam.RemoteAddr())))
 		if err != nil {
 			return nil, err
 		}
@@ -142,35 +53,45 @@ func (h *CameraController) stream(c *gin.Context) {
 		return s, nil
 	})
 	if err != nil {
-		// unable to start stream
+		log.Warn("unable to start stream", zap.Error(err))
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
+	// add our frames channel to the stream so they get sent to us
+	frames := make(chan []byte)
+
 	s := v.(*stream)
 	s.Lock()
-	s.subs++
+	s.subs[frames] = struct{}{}
+	log.Info("Subscribed to stream", zap.Int("numSubs", len(s.subs)))
 	s.Unlock()
 
 	// start a multipart writer
 	m := multipart.NewWriter(c.Writer)
-	c.Writer.Header().Set(_hContentType, "multipart/x-mixed-replace; boundary="+m.Boundary())
 	defer m.Close()
 
+	// write the headers
+	c.Writer.Header().Set(_hContentType, "multipart/x-mixed-replace; boundary="+m.Boundary())
+
+	// headers for each frame
 	header := textproto.MIMEHeader{}
 	header.Set(_hContentType, "image/jpeg")
 
-	ticker := time.NewTicker(125 * time.Millisecond)
-	defer ticker.Stop()
-
-	// prevFrame to not rewrite a duplicate??
+	defer func() {
+		s.Lock()
+		delete(s.subs, frames)
+		log.Info("Unsubscribing from stream", zap.Int("numSubs", len(s.subs)))
+		s.Unlock()
+	}()
 
 	for {
 		select {
-		case <-ticker.C:
-			s.RLock()
-			frame := make([]byte, len(s.frame))
-			copy(frame, s.frame)
-			s.RUnlock()
+		case frame, ok := <-frames:
+			if !ok {
+				log.Info("Finished streaming", zap.String("reason", "frame chan closed"))
+				return
+			}
 
 			header.Set(_hContentLength, strconv.Itoa(len(frame)))
 
@@ -188,26 +109,36 @@ func (h *CameraController) stream(c *gin.Context) {
 			if flusher, ok := c.Writer.(http.Flusher); ok {
 				flusher.Flush()
 			}
-		case <-(make(chan string)): // just for lint rn, should be ctx probably
+
+		case <-ctx.Done():
+			log.Info("Finished streaming", zap.String("reason", ctx.Err().Error()))
+			return
+		case <-s.done:
+			log.Info("Finished streaming", zap.String("reason", "done chan closed"))
+			return
 		}
 	}
 }
 
-func (h *CameraController) startStream(cam cameraservices.Camera, s *stream) error {
+func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logger) (*stream, error) {
 	var jpegs chan []byte
 	var errors chan error
 	var err error
+
+	log.Info("Starting stream")
 
 	if jCam, ok := cam.(cameraservices.JPEGCamera); ok {
 		jpegs, errors, err = jCam.StreamJPEG(context.Background())
 	} else {
 		var imgs chan image.Image
 		var streamErrs chan error
-		convertErrs := make(chan error)
 		jpegs = make(chan []byte)
+		errors = make(chan error)
 
 		imgs, streamErrs, err = cam.Stream(context.Background())
 		if err == nil {
+			convertErrs := make(chan error)
+
 			// convert imgs to jpegs
 			go func() {
 				defer close(jpegs)
@@ -218,7 +149,7 @@ func (h *CameraController) startStream(cam cameraservices.Camera, s *stream) err
 					buf.Reset()
 
 					if err := jpeg.Encode(buf, img, nil); err != nil {
-						// log.Warn("unable to encode image", zap.Error(err))
+						log.Warn("unable to encode image", zap.Error(err))
 						convertErrs <- err
 						continue
 					}
@@ -252,46 +183,76 @@ func (h *CameraController) startStream(cam cameraservices.Camera, s *stream) err
 	}
 
 	if err != nil {
-		// log.Warn("unable to start stream", zap.Error(err))
-		// c.String(http.StatusInternalServerError, err.Error())
-		return err
+		return nil, err
 	}
 
-	// check this often every if nobody is using our stream anymore
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
+	log.Info("Started stream")
 
-	// defer removing this stream from the map
-	defer h.streams.Delete(cam)
+	s := &stream{
+		subs: make(map[chan []byte]struct{}),
+		done: make(chan struct{}),
+	}
 
-	errCount := 0
-	for {
-		select {
-		case jpeg, ok := <-jpegs:
-			if !ok {
-				return nil
+	go func() {
+		defer close(s.done)
+		defer h.streams.Delete(cam)
+
+		// metrics info
+		frameCount := 0
+		avgFrameSize := 0
+		start := time.Now()
+
+		defer func() {
+			avgFps := float64(frameCount) / time.Since(start).Seconds()
+			log.Info("Ending stream", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize), zap.Duration("duration", time.Since(start)))
+		}()
+
+		errCount := 0
+		for {
+			select {
+			case jpeg, ok := <-jpegs:
+				if !ok {
+					return
+				}
+
+				s.Lock()
+				if len(s.subs) == 0 {
+					log.Info("No more subs on stream, killing it now")
+					s.Unlock()
+					return
+				}
+
+				// send this image to all of the subs
+				for c := range s.subs {
+					select {
+					case c <- jpeg:
+					default:
+					}
+				}
+				s.Unlock()
+
+				if avgFrameSize == 0 {
+					avgFrameSize = len(jpeg)
+				} else {
+					avgFrameSize = (avgFrameSize + len(jpeg)) / 2
+				}
+
+				frameCount++
+			case err, ok := <-errors:
+				if !ok {
+					return
+				}
+
+				log.Warn("unable to get frame", zap.Error(err))
+
+				errCount++
+				if errCount >= 24 {
+					log.Warn("killing stream", zap.String("error", "exceeded consecutive error count"))
+					return
+				}
 			}
-
-			s.Lock()
-			s.frame = jpeg
-			s.Unlock()
-		case err, ok := <-errors:
-			if !ok {
-				return nil
-			}
-
-			errCount++
-			if errCount >= 24 {
-				return err
-			}
-		case <-ticker.C:
-			s.RLock()
-			if s.subs == 0 {
-				s.RUnlock()
-				return nil
-			}
-
-			s.RUnlock()
 		}
-	}
+	}()
+
+	return s, nil
 }

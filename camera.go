@@ -8,6 +8,7 @@ import (
 type NewCameraFunc func(context.Context, string) (Camera, error)
 
 type Camera interface {
+	RemoteAddr() string
 	TiltUp(context.Context) error
 	TiltDown(context.Context) error
 	PanLeft(context.Context) error

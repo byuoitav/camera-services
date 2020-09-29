@@ -103,37 +103,36 @@ func main() {
 	middleware := handlers.Middleware{
 		Logger: log,
 	}
-	handlers := handlers.CameraController{
-		Logger: log,
+	handlers := handlers.NewCameraController()
+	handlers.Logger = log
+	handlers.CreateCamera = func(ctx context.Context, addr string) (cameraservices.Camera, error) {
 		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
-		CreateCamera: func(ctx context.Context, addr string) (cameraservices.Camera, error) {
-			if cam, ok := cameras.Load(addr); ok {
-				return cam.(*aver.Pro520), nil
-			}
+		if cam, ok := cameras.Load(addr); ok {
+			return cam.(*aver.Pro520), nil
+		}
 
-			addrNoPort := addr
-			if strings.Contains(addrNoPort, ":") {
-				var err error
-				if addrNoPort, _, err = net.SplitHostPort(addrNoPort); err != nil {
-					return nil, err
-				}
+		addrNoPort := addr
+		if strings.Contains(addrNoPort, ":") {
+			var err error
+			if addrNoPort, _, err = net.SplitHostPort(addrNoPort); err != nil {
+				return nil, err
 			}
+		}
 
-			cam := &aver.Pro520{
-				Camera:   visca.New(addr, visca.WithLogger(log.Sugar().Named(addr))),
-				Address:  addrNoPort,
-				Username: camUsername,
-				Password: camPassword,
-			}
+		cam := &aver.Pro520{
+			Camera:   visca.New(addr, visca.WithLogger(log.Sugar().Named(addr))),
+			Address:  addrNoPort,
+			Username: camUsername,
+			Password: camPassword,
+		}
 
-			cameras.Store(addr, cam)
-			return cam, nil
-		},
-		EventPublisher: &event.Publisher{
-			GeneratingSystem: name,
-			URL:              eventURL,
-			Resolver:         resolver,
-		},
+		cameras.Store(addr, cam)
+		return cam, nil
+	}
+	handlers.EventPublisher = &event.Publisher{
+		GeneratingSystem: name,
+		URL:              eventURL,
+		Resolver:         resolver,
 	}
 
 	r := gin.New()

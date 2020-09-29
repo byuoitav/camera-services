@@ -25,6 +25,13 @@ type CameraController struct {
 	single  *singleflight.Group
 }
 
+func NewCameraController() *CameraController {
+	return &CameraController{
+		streams: &sync.Map{},
+		single:  &singleflight.Group{},
+	}
+}
+
 func (h *CameraController) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
 	var err error
 
