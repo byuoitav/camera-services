@@ -91,8 +91,8 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		cameras[i].Reboot = rewrite(cameras[i].Reboot)
 
 		for j := range cameras[i].Presets {
+			cameras[i].Presets[j].GoToPreset = rewrite(cameras[i].Presets[j].GoToPreset)
 			cameras[i].Presets[j].SetPreset = rewrite(cameras[i].Presets[j].SetPreset)
-			cameras[i].Presets[j].NewPreset = rewrite(cameras[i].Presets[j].NewPreset)
 		}
 	}
 

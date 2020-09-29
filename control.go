@@ -28,14 +28,13 @@ type CameraConfig struct {
 	Presets []CameraPreset `json:"presets"`
 
 	// admin items
-	Reboot    string `json:"reboot"`
-	SetPreset string `json:"setPreset"`
+	Reboot string `json:"reboot"`
 }
 
 type CameraPreset struct {
 	DisplayName string `json:"displayName"`
 	SetPreset   string `json:"setPreset"`
-	NewPreset   string `json:"newPreset"`
+	GoToPreset  string `json:"goToPreset"`
 }
 
 type ControlInfo struct {

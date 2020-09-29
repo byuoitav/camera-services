@@ -37,7 +37,7 @@ export class PresetsDialog implements OnInit {
       return
     }
     console.log(this.curPreset)
-    this.http.get(this.curPreset.newPreset).subscribe(resp => {
+    this.http.get(this.curPreset.setPreset).subscribe(resp => {
       console.log("resp", resp);
       this.ref.close();
     }, err => {

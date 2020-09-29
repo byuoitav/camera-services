@@ -73,7 +73,7 @@ func (c *configService) CameraPreset(ctx context.Context, camID, presetID string
 						"$elemMatch": map[string]interface{}{
 							"presets": map[string]interface{}{
 								"$elemMatch": map[string]interface{}{
-									"setPreset": map[string]interface{}{
+									"goToPreset": map[string]interface{}{
 										"$regex": fmt.Sprintf(".*%s.*", camID),
 									},
 								},
@@ -102,7 +102,7 @@ func (c *configService) CameraPreset(ctx context.Context, camID, presetID string
 	for _, cg := range config.ControlGroups {
 		for _, cam := range cg.Cameras {
 			for _, preset := range cam.Presets {
-				if strings.Contains(preset.SetPreset, camID) && strings.HasSuffix(preset.SetPreset, presetID) {
+				if strings.Contains(preset.GoToPreset, camID) && strings.HasSuffix(preset.GoToPreset, presetID) {
 					return preset.DisplayName, nil
 				}
 			}

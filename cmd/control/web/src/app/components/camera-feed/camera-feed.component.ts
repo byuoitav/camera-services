@@ -24,7 +24,7 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   templateUrl: './camera-feed.component.html',
   styleUrls: ['./camera-feed.component.scss']
 })
-export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
+export class CameraFeedComponent implements OnInit, OnDestroy {
   rowHeight = "4:1.75";
 
   admin = false;
@@ -75,19 +75,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
     setInterval(() => {
       this.timeout++
-      if (this.timeout == 5) {
+      if (this.timeout == 60) {
         console.log("preview timing out")
       }
     }, 1000);
-  }
-
-  ngAfterViewInit() {
-    let stream = document.getElementById("stream") as HTMLImageElement;
-    if (stream != null) {
-      setInterval(() => {
-        console.log("width!: ", stream.naturalWidth);
-      }, 1000)
-    }
   }
 
   ngOnDestroy() {
@@ -249,12 +240,12 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
   selectPreset = (preset: Preset) => {
     this.timeout = 0
-    console.log("selecting preset", preset.displayName, preset.setPreset);
-    if (!preset.setPreset) {
+    console.log("selecting preset", preset.displayName, preset.goToPreset);
+    if (!preset.goToPreset) {
       return;
     }
 
-    this.http.get(preset.setPreset).subscribe(resp => {
+    this.http.get(preset.goToPreset).subscribe(resp => {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
