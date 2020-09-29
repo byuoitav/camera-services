@@ -71,7 +71,8 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.rebooting = false;
           this.timeout = 0;
-        }, 20000);
+          window.location.reload();
+        }, 30000);
       }
     })
   }
