@@ -18,6 +18,10 @@ import (
 type goodTestCamera struct{}
 type badTestCamera struct{}
 
+func (t *goodTestCamera) RemoteAddr() string {
+	return ""
+}
+
 func (t *goodTestCamera) TiltUp(ctx context.Context) error {
 	return nil
 }
@@ -57,6 +61,10 @@ func (t *goodTestCamera) GoToPreset(ctx context.Context, preset string) error {
 // TODO test with this. just added so that the tests will build
 func (t *goodTestCamera) Stream(ctx context.Context) (chan image.Image, chan error, error) {
 	return nil, nil, nil
+}
+
+func (t *badTestCamera) RemoteAddr() string {
+	return ""
 }
 
 func (t *badTestCamera) TiltUp(ctx context.Context) error {
