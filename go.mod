@@ -35,3 +35,4 @@ require (
 )
 
 replace github.com/byuoitav/aver => ../aver
+replace github.com/byuoitav/axis => ../axis
