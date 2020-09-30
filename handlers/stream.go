@@ -3,7 +3,6 @@ package handlers
 import (
 	"bytes"
 	"context"
-	"image"
 	"image/jpeg"
 	"mime/multipart"
 	"net/http"
@@ -27,7 +26,7 @@ func (h *CameraController) Stream(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Minute)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 1*time.Minute)
 	defer cancel()
 
 	log := h.Logger
@@ -123,67 +122,68 @@ func (h *CameraController) Stream(c *gin.Context) {
 func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logger) (*stream, error) {
 	var jpegs chan []byte
 	var errors chan error
-	var err error
 
+	ctx, cancel := context.WithCancel(context.Background())
 	log.Info("Starting stream")
 
 	if jCam, ok := cam.(cameraservices.JPEGCamera); ok {
-		jpegs, errors, err = jCam.StreamJPEG(context.Background())
+		var err error
+
+		jpegs, errors, err = jCam.StreamJPEG(ctx)
+		if err != nil {
+			cancel()
+			return nil, err
+		}
 	} else {
-		var imgs chan image.Image
-		var streamErrs chan error
+		imgs, streamErrs, err := cam.Stream(ctx)
+		if err != nil {
+			cancel()
+			return nil, err
+		}
+
 		jpegs = make(chan []byte)
 		errors = make(chan error)
+		convertErrs := make(chan error)
 
-		imgs, streamErrs, err = cam.Stream(context.Background())
-		if err == nil {
-			convertErrs := make(chan error)
+		// convert imgs to jpegs
+		go func() {
+			defer close(jpegs)
+			defer close(convertErrs)
 
-			// convert imgs to jpegs
-			go func() {
-				defer close(jpegs)
-				defer close(convertErrs)
+			buf := &bytes.Buffer{}
+			for img := range imgs {
+				buf.Reset()
 
-				buf := &bytes.Buffer{}
-				for img := range imgs {
-					buf.Reset()
+				if err := jpeg.Encode(buf, img, nil); err != nil {
+					convertErrs <- err
+					continue
+				}
 
-					if err := jpeg.Encode(buf, img, nil); err != nil {
-						log.Warn("unable to encode image", zap.Error(err))
-						convertErrs <- err
-						continue
+				jpegs <- buf.Bytes()
+			}
+		}()
+
+		// merge streamErrs and convertErrs channels to errors
+		go func() {
+			defer close(errors)
+
+			for {
+				select {
+				case err, ok := <-streamErrs:
+					if !ok {
+						return
 					}
 
-					jpegs <- buf.Bytes()
-				}
-			}()
-
-			// merge streamErrs and convertErrs channels to errors
-			go func() {
-				defer close(errors)
-
-				for {
-					select {
-					case err, ok := <-streamErrs:
-						if !ok {
-							return
-						}
-
-						errors <- err
-					case err := <-convertErrs:
-						if !ok {
-							return
-						}
-
-						errors <- err
+					errors <- err
+				case err, ok := <-convertErrs:
+					if !ok {
+						return
 					}
-				}
-			}()
-		}
-	}
 
-	if err != nil {
-		return nil, err
+					errors <- err
+				}
+			}
+		}()
 	}
 
 	log.Info("Started stream")
@@ -194,8 +194,9 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 	}
 
 	go func() {
-		defer close(s.done)
 		defer h.streams.Delete(cam)
+		defer close(s.done)
+		defer cancel()
 
 		// metrics info
 		frameCount := 0
@@ -204,7 +205,7 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 
 		defer func() {
 			avgFps := float64(frameCount) / time.Since(start).Seconds()
-			log.Info("Ending stream", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize), zap.Duration("duration", time.Since(start)))
+			log.Info("Stopped stream", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize), zap.Duration("duration", time.Since(start)))
 		}()
 
 		errCount := 0
@@ -217,7 +218,7 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 
 				s.Lock()
 				if len(s.subs) == 0 {
-					log.Info("No more subs on stream, killing it now")
+					log.Info("No more subs on stream, stopping it now")
 					s.Unlock()
 					return
 				}
@@ -247,7 +248,7 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 
 				errCount++
 				if errCount >= 24 {
-					log.Warn("killing stream", zap.String("error", "exceeded consecutive error count"))
+					log.Warn("stopping stream", zap.String("error", "exceeded consecutive error count"))
 					return
 				}
 			}
