@@ -124,9 +124,9 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 	var errors chan error
 
 	ctx, cancel := context.WithCancel(context.Background())
-	log.Info("Starting stream")
 
 	if jCam, ok := cam.(cameraservices.JPEGCamera); ok {
+		log.Info("Starting JPEG stream")
 		var err error
 
 		jpegs, errors, err = jCam.StreamJPEG(ctx)
@@ -135,6 +135,7 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 			return nil, err
 		}
 	} else {
+		log.Info("Starting stream")
 		imgs, streamErrs, err := cam.Stream(ctx)
 		if err != nil {
 			cancel()
