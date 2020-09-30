@@ -7,17 +7,29 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"golang.org/x/sync/singleflight"
 )
 
 type CameraController struct {
 	CreateCamera   cameraservices.NewCameraFunc
 	EventPublisher cameraservices.EventPublisher
 	Logger         *zap.Logger
+
+	streams *sync.Map
+	single  *singleflight.Group
+}
+
+func NewCameraController() *CameraController {
+	return &CameraController{
+		streams: &sync.Map{},
+		single:  &singleflight.Group{},
+	}
 }
 
 func (h *CameraController) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
