@@ -26,7 +26,7 @@ func (h *CameraController) Stream(c *gin.Context) {
 	cam := c.MustGet(_cCamera).(cameraservices.Camera)
 	id := c.GetString(_cRequestID)
 
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 1*time.Minute)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Minute)
 	defer cancel()
 
 	log := h.Logger
@@ -159,7 +159,10 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 					continue
 				}
 
-				jpegs <- buf.Bytes()
+				select {
+				case jpegs <- buf.Bytes():
+				default:
+				}
 			}
 		}()
 
@@ -174,13 +177,19 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 						return
 					}
 
-					errors <- err
+					select {
+					case errors <- err:
+					default:
+					}
 				case err, ok := <-convertErrs:
 					if !ok {
 						return
 					}
 
-					errors <- err
+					select {
+					case errors <- err:
+					default:
+					}
 				}
 			}
 		}()
@@ -194,16 +203,16 @@ func (h *CameraController) startStream(cam cameraservices.Camera, log *zap.Logge
 	}
 
 	go func() {
-		defer h.streams.Delete(cam)
-		defer close(s.done)
-		defer cancel()
-
 		// metrics info
 		frameCount := 0
 		avgFrameSize := 0
 		start := time.Now()
 
 		defer func() {
+			h.streams.Delete(cam)
+			close(s.done)
+			cancel()
+
 			avgFps := float64(frameCount) / time.Since(start).Seconds()
 			log.Info("Stopped stream", zap.Float64("avgFps", avgFps), zap.Int("avgFrameSize", avgFrameSize), zap.Duration("duration", time.Since(start)))
 		}()
