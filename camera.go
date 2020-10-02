@@ -21,9 +21,9 @@ type Camera interface {
 	Stream(context.Context) (chan image.Image, chan error, error)
 }
 
-type Rebootable interface {
+type CameraAdmin interface {
 	Reboot(context.Context) error
-	SetPreset(context.Context, int) error
+	SetPreset(context.Context, string) error
 }
 
 type JPEGCamera interface {

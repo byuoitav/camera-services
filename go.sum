@@ -4,8 +4,8 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/byuoitav/auth v0.3.0 h1:3E8Cs4kd1WC22ewvb+U5sdeBK4cHxt+fsplWb/CQ4N0=
 github.com/byuoitav/auth v0.3.0/go.mod h1:pbb0bFvLfcV6JcQA1zJd61QQRvmpyAfQbrnjtUJX4s8=
-github.com/byuoitav/aver v0.2.0 h1:Z1huz0KVK5nKOI/yMyXtDnaq6+sg6Ucrnj8BmVS9oR0=
-github.com/byuoitav/aver v0.2.0/go.mod h1:7I1UKwTvc8/h4ac9j//SyKmvGzjNKpCW41E8j8igblY=
+github.com/byuoitav/aver v0.2.1 h1:tX0ok6An1Gh9zqaihTLSH1Bo9JSPPZNlXn9NlbiI950=
+github.com/byuoitav/aver v0.2.1/go.mod h1:++O4+jKx3Uc8NoTw/vjBHVwsLqJEwekTkwKyriAi2Uk=
 github.com/byuoitav/axis v0.4.0 h1:3JPVE/QVuujwEyxh9ibmJTl0l1k19aB/mCU6TmU7Gw0=
 github.com/byuoitav/axis v0.4.0/go.mod h1:weSaaxrvwO4AuvEkvuMa1T+AWNNCwBxQXRSMaXBzgWU=
 github.com/byuoitav/central-event-system v0.0.0-20200121172633-64fd9d467249 h1:LffuZk+Xft6AnDURHGAexbT4wrMo15qt/LpLLDq7Tq4=
@@ -14,8 +14,8 @@ github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271 h1:3bUfk879CvOFb+H
 github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271/go.mod h1:YTDTFEmez7HU3oyCIWjU3RfQ/P6v24LEzH5YUebph7I=
 github.com/byuoitav/connpool v0.4.1 h1:pYqy5iEWY18Hwub+q9wuJgzIzRA4263s9UkjQbC0x2k=
 github.com/byuoitav/connpool v0.4.1/go.mod h1:9jVn2IL91Wp6eHEymqxZ5v7zPy07FtIWp/JIfDCMGQY=
-github.com/byuoitav/visca v0.1.0 h1:t4DRO059prpf1mQHplslfSDjORsS1rad7eRzHT43BW4=
-github.com/byuoitav/visca v0.1.0/go.mod h1:dx6LLs98Bh/eTpohthRRH6lI6+TGQiOKz2gezUPZl1Y=
+github.com/byuoitav/visca v0.2.0 h1:rIqP2Qt+DXgRCamiaD5ZXHopuKglvNQrp3rOr+VeevQ=
+github.com/byuoitav/visca v0.2.0/go.mod h1:dx6LLs98Bh/eTpohthRRH6lI6+TGQiOKz2gezUPZl1Y=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

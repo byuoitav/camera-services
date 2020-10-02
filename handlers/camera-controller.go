@@ -102,7 +102,7 @@ func (h *CameraController) CameraMiddleware(c *gin.Context) {
 
 func (h *CameraController) Reboot(c *gin.Context) {
 	id := c.GetString(_cRequestID)
-	cam, ok := c.MustGet(_cCamera).(cameraservices.Rebootable)
+	cam, ok := c.MustGet(_cCamera).(cameraservices.CameraAdmin)
 	if !ok || cam == nil {
 		c.String(http.StatusBadRequest, "not supported")
 		return

@@ -4,7 +4,7 @@ module "axis_dev" {
   // required
   name           = "camera-services-axis-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/axis-dev"
-  image_version  = "e4e4048"
+  image_version  = "629a75b"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 

@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
@@ -37,8 +36,12 @@ func (h *CameraController) GoToPreset(c *gin.Context) {
 }
 
 func (h *CameraController) SetPreset(c *gin.Context) {
-	cam := c.MustGet(_cCamera).(cameraservices.Rebootable)
 	id := c.GetString(_cRequestID)
+	cam, ok := c.MustGet(_cCamera).(cameraservices.CameraAdmin)
+	if !ok || cam == nil {
+		c.String(http.StatusBadRequest, "not supported")
+		return
+	}
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)
 	defer cancel()
@@ -48,13 +51,8 @@ func (h *CameraController) SetPreset(c *gin.Context) {
 		log = log.With(zap.String("requestID", id))
 	}
 
-	preset, er := strconv.Atoi(c.Param("preset"))
-	if er != nil {
-		log.Warn("unable to convert string to int", zap.Error(er))
-		c.String(http.StatusInternalServerError, er.Error())
-		return
-	}
-	log.Info("Setting preset", zap.Int("preset", preset))
+	preset := c.Param("preset")
+	log.Info("Setting preset", zap.String("preset", preset))
 
 	if err := cam.SetPreset(ctx, preset); err != nil {
 		log.Warn("unable to set preset", zap.Error(err))
