@@ -96,53 +96,51 @@ func main() {
 	middleware := handlers.Middleware{
 		Logger: log,
 	}
-	p5414EHandlers := handlers.CameraController{
-		Logger: log,
+	p5414EHandlers := handlers.NewCameraController()
+	p5414EHandlers.Logger = log
+	p5414EHandlers.CreateCamera = func(ctx context.Context, addr string) (cameraservices.Camera, error) {
 		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
-		CreateCamera: func(ctx context.Context, addr string) (cameraservices.Camera, error) {
-			if cam, ok := cameras.Load(addr); ok {
-				if c, ok := cam.(*axis.P5414E); ok {
-					return c, nil
-				}
+		if cam, ok := cameras.Load(addr); ok {
+			if c, ok := cam.(*axis.P5414E); ok {
+				return c, nil
 			}
+		}
 
-			cam := &axis.P5414E{
-				Address:       addr,
-				StreamProfile: "control",
-			}
+		cam := &axis.P5414E{
+			Address:       addr,
+			StreamProfile: "control",
+		}
 
-			cameras.Store(addr, cam)
-			return cam, nil
-		},
-		EventPublisher: &event.Publisher{
-			GeneratingSystem: name,
-			URL:              eventURL,
-			Resolver:         resolver,
-		},
+		cameras.Store(addr, cam)
+		return cam, nil
 	}
-	v5915Handlers := handlers.CameraController{
-		Logger: log,
-		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
-		CreateCamera: func(ctx context.Context, addr string) (cameraservices.Camera, error) {
-			if cam, ok := cameras.Load(addr); ok {
-				if c, ok := cam.(*axis.V5915); ok {
-					return c, nil
-				}
-			}
+	p5414EHandlers.EventPublisher = &event.Publisher{
+		GeneratingSystem: name,
+		URL:              eventURL,
+		Resolver:         resolver,
+	}
 
-			cam := &axis.V5915{
-				Address:       addr,
-				StreamProfile: "control",
+	v5915Handlers := handlers.NewCameraController()
+	v5915Handlers.Logger = log
+	v5915Handlers.CreateCamera = func(ctx context.Context, addr string) (cameraservices.Camera, error) {
+		if cam, ok := cameras.Load(addr); ok {
+			if c, ok := cam.(*axis.V5915); ok {
+				return c, nil
 			}
+		}
 
-			cameras.Store(addr, cam)
-			return cam, nil
-		},
-		EventPublisher: &event.Publisher{
-			GeneratingSystem: name,
-			URL:              eventURL,
-			Resolver:         resolver,
-		},
+		cam := &axis.V5915{
+			Address:       addr,
+			StreamProfile: "control",
+		}
+
+		cameras.Store(addr, cam)
+		return cam, nil
+	}
+	v5915Handlers.EventPublisher = &event.Publisher{
+		GeneratingSystem: name,
+		URL:              eventURL,
+		Resolver:         resolver,
 	}
 
 	r := gin.New()

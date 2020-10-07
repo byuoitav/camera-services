@@ -1,15 +1,17 @@
 <div class="presets-container">
-    <mat-grid-list class="presets" cols="2" rowHeight="4:1.75">
-        <mat-grid-tile *ngFor="let preset of data?.presets" class="preset">
-            <button id={{preset?.displayName}} mat-flat-button (click)="setCurPreset(preset)">{{preset?.displayName}}</button>
-        </mat-grid-tile>
-    </mat-grid-list>
+	<mat-grid-list class="presets" cols="2" rowHeight="4:1.75">
+		<mat-grid-tile *ngFor="let preset of data?.presets" class="preset">
+			<button id={{preset?.displayName}} mat-flat-button
+				(click)="setCurPreset(preset)">{{preset?.displayName}}</button>
+		</mat-grid-tile>
+	</mat-grid-list>
 </div>
 <div class="confirm-cancel">
-    <div class="button-wrapper">
-        <button mat-flat-button color="primary" class="confirm" (click)="confirm()" [disabled]="disabled()">Confirm</button>
-    </div>
-    <div class="button-wrapper">
-        <button mat-flat-button class="cancel" (click)="close()">Cancel</button>
-    </div>
+	<div class="button-wrapper">
+		<button mat-flat-button class="cancel" (click)="close()">Cancel</button>
+	</div>
+	<div class="button-wrapper">
+		<button mat-flat-button color="primary" class="confirm" (click)="confirm()"
+			[disabled]="disabled()">Confirm</button>
+	</div>
 </div>

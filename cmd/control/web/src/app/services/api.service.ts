@@ -29,7 +29,7 @@ export interface Camera {
 
 export interface Preset {
   displayName: string;
-  goToPreset: string;
+  setPreset: string;
   savePreset: string;
 }
 

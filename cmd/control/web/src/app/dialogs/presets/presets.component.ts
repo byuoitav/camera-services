@@ -33,7 +33,7 @@ export class PresetsDialog {
       return
     }
     console.log(this.curPreset)
-    this.http.get(this.curPreset.setPreset).subscribe(resp => {
+    this.http.get(this.curPreset.savePreset).subscribe(resp => {
       console.log("resp", resp);
       this.ref.close();
     }, err => {

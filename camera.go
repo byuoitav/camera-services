@@ -8,6 +8,7 @@ import (
 type NewCameraFunc func(context.Context, string) (Camera, error)
 
 type Camera interface {
+	RemoteAddr() string
 	TiltUp(context.Context) error
 	TiltDown(context.Context) error
 	PanLeft(context.Context) error
@@ -20,7 +21,11 @@ type Camera interface {
 	Stream(context.Context) (chan image.Image, chan error, error)
 }
 
-type Rebootable interface {
+type CameraAdmin interface {
 	Reboot(context.Context) error
-	SetPreset(context.Context, int) error
+	SetPreset(context.Context, string) error
+}
+
+type JPEGCamera interface {
+	StreamJPEG(context.Context) (chan []byte, chan error, error)
 }

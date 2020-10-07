@@ -241,12 +241,12 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
 
   selectPreset = (preset: Preset) => {
     this.timeout = 0
-    console.log("selecting preset", preset.displayName, preset.goToPreset);
-    if (!preset.goToPreset) {
+    console.log("selecting preset", preset.displayName, preset.setPreset);
+    if (!preset.setPreset) {
       return;
     }
 
-    this.http.get(preset.goToPreset).subscribe(resp => {
+    this.http.get(preset.setPreset).subscribe(resp => {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
@@ -296,13 +296,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     })  
   }
 
-  checkSetPreset = (cam: Camera) => {
-    cam.presets.forEach(preset => {
-      if (preset.setPreset != undefined) {
-        return true;
-      }
-    });
-
-    return false;
+  checkSavePreset = (cam: Camera) => {
+    return cam.presets.some(function (element) {
+      return (element.savePreset != undefined)
+    })
   }
 }

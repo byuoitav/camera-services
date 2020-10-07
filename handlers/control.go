@@ -60,6 +60,10 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 
 	// change urls to go through proxy (me)
 	rewrite := func(u string) string {
+		if u == "" {
+			return ""
+		}
+
 		url, err := url.Parse(u)
 		if err != nil {
 			return ""
@@ -91,8 +95,8 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		cameras[i].Reboot = rewrite(cameras[i].Reboot)
 
 		for j := range cameras[i].Presets {
-			cameras[i].Presets[j].GoToPreset = rewrite(cameras[i].Presets[j].GoToPreset)
 			cameras[i].Presets[j].SetPreset = rewrite(cameras[i].Presets[j].SetPreset)
+			cameras[i].Presets[j].SavePreset = rewrite(cameras[i].Presets[j].SavePreset)
 		}
 	}
 

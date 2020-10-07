@@ -7,17 +7,29 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"golang.org/x/sync/singleflight"
 )
 
 type CameraController struct {
 	CreateCamera   cameraservices.NewCameraFunc
 	EventPublisher cameraservices.EventPublisher
 	Logger         *zap.Logger
+
+	streams *sync.Map
+	single  *singleflight.Group
+}
+
+func NewCameraController() *CameraController {
+	return &CameraController{
+		streams: &sync.Map{},
+		single:  &singleflight.Group{},
+	}
 }
 
 func (h *CameraController) getCameraIP(ctx context.Context, addr string) (net.IP, error) {
@@ -90,7 +102,7 @@ func (h *CameraController) CameraMiddleware(c *gin.Context) {
 
 func (h *CameraController) Reboot(c *gin.Context) {
 	id := c.GetString(_cRequestID)
-	cam, ok := c.MustGet(_cCamera).(cameraservices.Rebootable)
+	cam, ok := c.MustGet(_cCamera).(cameraservices.CameraAdmin)
 	if !ok || cam == nil {
 		c.String(http.StatusBadRequest, "not supported")
 		return
