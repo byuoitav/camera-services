@@ -33,7 +33,7 @@ type CameraConfig struct {
 
 type CameraPreset struct {
 	DisplayName string `json:"displayName"`
-	SetPreset   string `json:"setPreset"`
+	SavePreset  string `json:"savePreset"`
 	GoToPreset  string `json:"goToPreset"`
 }
 

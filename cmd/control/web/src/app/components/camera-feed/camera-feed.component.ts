@@ -72,7 +72,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
           this.rebooting = false;
           this.timeout = 0;
           window.location.reload();
-        }, 30000);
+        }, 45000);
       }
     })
   }
@@ -293,6 +293,16 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
         camera: cam,
         reboot: this.reboot,
       }
-    })  }
+    })  
+  }
 
+  checkSetPreset = (cam: Camera) => {
+    cam.presets.forEach(preset => {
+      if (preset.setPreset != undefined) {
+        return true;
+      }
+    });
+
+    return false;
+  }
 }
