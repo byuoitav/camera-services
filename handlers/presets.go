@@ -35,7 +35,7 @@ func (h *CameraController) GoToPreset(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *CameraController) SetPreset(c *gin.Context) {
+func (h *CameraController) SavePreset(c *gin.Context) {
 	id := c.GetString(_cRequestID)
 	cam, ok := c.MustGet(_cCamera).(cameraservices.CameraAdmin)
 	if !ok || cam == nil {
