@@ -36,6 +36,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
   tilting = false;
   zooming = false;
+  loading = 0;
 
   reboot: EventEmitter<boolean> = new EventEmitter();
 
@@ -67,14 +68,13 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.reboot.subscribe(rebooting => {
       if (rebooting == true) {
-        this.rebooting = true
         setTimeout(() => {
           this.rebooting = false;
           this.timeout = 0;
-          window.location.reload();
         }, 45000);
       }
     })
+
   }
 
   ngOnInit() {
@@ -89,10 +89,17 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     setInterval(() => {
-      this.timeout++
+      this.timeout++;
       if (this.timeout == 60) {
         console.log("preview timing out")
       } 
+    }, 1000);
+
+    let loadInterval = setInterval(() => {
+      this.loading++;
+      if (this.loading > 3) {
+        clearInterval(loadInterval)
+      }
     }, 1000);
   }
 

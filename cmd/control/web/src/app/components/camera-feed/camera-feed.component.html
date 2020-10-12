@@ -60,7 +60,7 @@
             </div>
 
             <!-- <div class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable<br>Click to attempt to reconnect</div> -->
-            <div class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable
+            <div *ngIf="loading > 3" class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable
               <div class="unpause-text">Click to attempt to reconnect</div>
             </div>
           </ng-container>
