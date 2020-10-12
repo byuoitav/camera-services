@@ -68,6 +68,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.reboot.subscribe(rebooting => {
       if (rebooting == true) {
+        this.rebooting = true;
         setTimeout(() => {
           this.rebooting = false;
           this.timeout = 0;
