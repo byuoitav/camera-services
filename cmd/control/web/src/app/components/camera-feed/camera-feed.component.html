@@ -1,10 +1,7 @@
-<!-- <div>
-    <button mat-flat-button class="exit-button" (click)="exitRoom()">Exit Room</button>
-</div> -->
 <div style="justify-content: center;">
   <mat-tab-group>
     <!-- tabs of cameras -->
-    <mat-tab *ngFor="let cam of cameras" [label]="cam?.displayName" style="height: 100%;">
+    <mat-tab id="tab" *ngFor="let cam of cameras" [label]="cam?.displayName" style="height: 100%;">
       <div class="body-container" (pointercancel)="panTiltStop(cam); zoomStop(cam)" (pointerup)="panTiltStop(cam); zoomStop(cam)">
         <div class="outer-container">
           <div class="movement-container">
@@ -54,10 +51,17 @@
       <!-- <div class="aspect-ratio"> -->
         <div class="camera-container">
           <ng-container *ngIf="!rebooting">
-            <img id="stream" #stream *ngIf="timeout<60" [src]="getStreamURL(cam)" class="feed">
+            <!-- <img id="stream" #stream *ngIf="timeout<60" [src]=getStreamURL(cam) class="feed" (onerror)="restartStream(cam)" (click)="restartStream(cam)"/> -->
+            <img id="stream" #stream *ngIf="timeout<60" [src]=getStreamURL(cam) class="feed" (onerror)="this.src=cam?.stream" (click)="restartStream(cam)"/>
+              
             <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
               <div>PREVIEW PAUSED</div>
               <div class="unpause-text">Click to unpause</div>
+            </div>
+
+            <!-- <div class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable<br>Click to attempt to reconnect</div> -->
+            <div class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable
+              <div class="unpause-text">Click to attempt to reconnect</div>
             </div>
           </ng-container>
           <div *ngIf="rebooting" class="preview-paused">

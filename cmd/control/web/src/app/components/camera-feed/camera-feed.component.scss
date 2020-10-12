@@ -52,6 +52,21 @@ $d-pad-arrow-move: 35%;
     text-align: center;
     background-color: black;
     color: white;
+    z-index: 1000;
+  }
+
+  .click-to-restart {
+    height: 576px;
+    width: 1024px;
+    font-size: 5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background-color: black;
+    color: white;
+    position: absolute;
+    line-height: 1;
   }
 
   .unpause-text {
@@ -69,6 +84,7 @@ $d-pad-arrow-move: 35%;
     height: 576px;
     width: 1024px;
     display: flex;
+    z-index: 1000;
   }
 
   .camera-container {
@@ -430,12 +446,28 @@ $d-pad-arrow-move: 35%;
     text-align: center;
     background-color: black;
     color: white;
+    z-index: 1000;
+  }
+
+  .click-to-restart {
+    position: absolute;
+    height: 432px;
+    width: 768px;
+    font-size: 4em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background-color: black;
+    color: white;
+    line-height: 1;
   }
 
   .feed {
     height: 432px;
     width: 768px;
     display: flex;
+    z-index: 1000;
   }
 
   .camera-container {
@@ -801,6 +833,7 @@ $d-pad-arrow-move: 35%;
     width: 100vw;
     display: flex;
     position: relative;
+    z-index: 1000;
   }
 
   .preview-paused {
@@ -814,6 +847,24 @@ $d-pad-arrow-move: 35%;
     text-align: center;
     background-color: black;
     color: white;
+    z-index: 1000;
+    position: absolute;
+  }
+
+  .click-to-restart {
+    min-width: 350px;
+    font-size: 2.5em;
+    height: 56.25vw;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background-color: black;
+    color: white;
+    position: absolute;
+    top: 0;
+    line-height: 1;
   }
 
   .unpause-text {
@@ -1198,6 +1249,7 @@ $d-pad-arrow-move: 35%;
     height: 56.25vw;
     width: 100vw;
     display: flex;
+    z-index: 1000;
   }
 
   .preview-paused {
@@ -1210,6 +1262,21 @@ $d-pad-arrow-move: 35%;
     text-align: center;
     background-color: black;
     color: white;
+    z-index: 1000;
+  }
+
+  .click-to-restart {
+    font-size: 2.5em;
+    height: 56.25vw;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    background-color: black;
+    color: white;
+    position: absolute;
+    line-height: 1;
   }
 
   .unpause-text {

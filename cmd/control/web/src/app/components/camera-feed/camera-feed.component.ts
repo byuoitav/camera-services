@@ -25,7 +25,7 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   templateUrl: './camera-feed.component.html',
   styleUrls: ['./camera-feed.component.scss']
 })
-export class CameraFeedComponent implements OnInit, OnDestroy {
+export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   rowHeight = "4:1.75";
 
   admin = false;
@@ -92,8 +92,24 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
       this.timeout++
       if (this.timeout == 60) {
         console.log("preview timing out")
-      }
+      } 
     }, 1000);
+  }
+
+  ngAfterViewInit() {
+    let streams = document.getElementsByClassName("feed");
+    for (let i = 0; i < streams.length; i++) {
+      let stream = streams[i] as HTMLImageElement;
+      if (stream != null) {
+        let refresher = stream.src;
+        // setInterval(() => {
+        //   console.log("width!: ", stream.naturalWidth);
+        // }, 1000)
+        setInterval(() => {
+          stream.src = refresher;
+        }, 20000)
+      }
+    }
   }
 
   ngOnDestroy() {
@@ -258,7 +274,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
       return ""
     }
 
-    return cam.stream
+    return cam.stream;
   }
 
   openPresetsDialog = (cam: Camera) => {
@@ -300,5 +316,13 @@ export class CameraFeedComponent implements OnInit, OnDestroy {
     return cam.presets.some(function (element) {
       return (element.savePreset != undefined)
     })
+  }
+
+  restartStream = (cam: Camera) => {
+    let stream = document.getElementById("stream") as HTMLImageElement;
+    this.timeout = 0;
+    stream.src = "";
+    stream.src = cam.stream;
+    console.log("well we're in here")
   }
 }
