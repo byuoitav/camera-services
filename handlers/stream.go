@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"image/jpeg"
 	"mime/multipart"
 	"net/http"
@@ -100,14 +101,20 @@ func (h *CameraController) Stream(c *gin.Context) {
 				return
 			}
 
+			fmt.Printf("writing frame\n")
+
 			if _, err := part.Write(frame); err != nil {
 				log.Warn("unable to write part", zap.Error(err))
 				return
 			}
 
+			fmt.Printf("wrote frame\n")
+
 			if flusher, ok := c.Writer.(http.Flusher); ok {
 				flusher.Flush()
 			}
+
+			fmt.Printf("flushed frame\n")
 
 		case <-ctx.Done():
 			log.Info("Finished streaming", zap.String("reason", ctx.Err().Error()))

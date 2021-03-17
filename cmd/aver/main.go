@@ -16,6 +16,7 @@ import (
 	"github.com/byuoitav/camera-services/handlers"
 	"github.com/byuoitav/visca"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
@@ -138,6 +139,7 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(cors.Default())
+	pprof.Register(r)
 
 	debug := r.Group("/debug")
 	debug.GET("/healthz", func(c *gin.Context) {

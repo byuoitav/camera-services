@@ -11,6 +11,7 @@ require (
 	github.com/byuoitav/visca v0.2.0
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-contrib/pprof v1.3.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-kivik/couchdb/v3 v3.2.0
 	github.com/go-kivik/kivik/v3 v3.2.0
