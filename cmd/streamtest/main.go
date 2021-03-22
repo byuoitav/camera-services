@@ -24,7 +24,7 @@ func main() {
 
 	errg, ctx := errgroup.WithContext(ctx)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 200; i++ {
 		id := strconv.Itoa(i)
 		errg.Go(func() error {
 			return makeBadRequest(id, ctx)
