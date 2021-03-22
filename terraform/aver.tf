@@ -63,4 +63,8 @@ module "aver" {
     "--cam-password", data.aws_ssm_parameter.aver_password.value,
   ]
   health_check = false
+  resource_limits = {
+    memory = "2Gi"
+    cpu    = null
+  }
 }
