@@ -12,7 +12,7 @@ module "aver_dev" {
   // required
   name           = "camera-services-aver-dev"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "2fa8a90"
+  image_version  = "79867d3"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 
@@ -41,7 +41,7 @@ module "aver" {
   // required
   name           = "camera-services-aver"
   image          = "docker.pkg.github.com/byuoitav/camera-services/aver-dev"
-  image_version  = "2fa8a90"
+  image_version  = "79867d3"
   container_port = 8080
   repo_url       = "https://github.com/byuoitav/camera-services"
 

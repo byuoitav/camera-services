@@ -34,7 +34,7 @@ func main() {
 		camUsername string
 		camPassword string
 	)
-
+	// List of flags
 	pflag.IntVarP(&port, "port", "P", 8080, "port to run the server on")
 	pflag.StringVarP(&logLevel, "log-level", "L", "", "level to log at. refer to https://godoc.org/go.uber.org/zap/zapcore#Level for options")
 	pflag.StringVar(&eventURL, "event-url", "", "url to send events to")
@@ -74,7 +74,7 @@ func main() {
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-
+	// build logging configuration
 	log, err := config.Build()
 	if err != nil {
 		fmt.Printf("unable to build logger: %s", err)
