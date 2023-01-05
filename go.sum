@@ -14,8 +14,9 @@ github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271 h1:3bUfk879CvOFb+H
 github.com/byuoitav/common v0.0.0-20200521193927-1fdf4e0a4271/go.mod h1:YTDTFEmez7HU3oyCIWjU3RfQ/P6v24LEzH5YUebph7I=
 github.com/byuoitav/connpool v0.4.1 h1:pYqy5iEWY18Hwub+q9wuJgzIzRA4263s9UkjQbC0x2k=
 github.com/byuoitav/connpool v0.4.1/go.mod h1:9jVn2IL91Wp6eHEymqxZ5v7zPy07FtIWp/JIfDCMGQY=
-github.com/byuoitav/visca v0.2.0 h1:rIqP2Qt+DXgRCamiaD5ZXHopuKglvNQrp3rOr+VeevQ=
 github.com/byuoitav/visca v0.2.0/go.mod h1:dx6LLs98Bh/eTpohthRRH6lI6+TGQiOKz2gezUPZl1Y=
+github.com/byuoitav/visca v0.3.0 h1:cjRh9gcy96CKWGkYbGxeKBj5mIlHW4cPHY37vZM3/0Y=
+github.com/byuoitav/visca v0.3.0/go.mod h1:TkSFkIY4GQb6nlyw6g4SyJBZFDzuhT+ixD8ZEJmx7eM=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -102,6 +103,8 @@ github.com/labstack/gommon v0.3.0/go.mod h1:MULnywXg0yavhxWKc+lOruYdAhDwPK9wf0OL
 github.com/leodido/go-urn v1.1.0/go.mod h1:+cyI34gQWZcE1eQU7NVgKkkzdXDQHr1dBMtdAPozLkw=
 github.com/leodido/go-urn v1.2.0 h1:hpXL4XnriNwQ/ABnpepYM/1vCLWNDfUNts8dX3xTG6Y=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
+github.com/matryer/is v1.4.0 h1:sosSmIWwkYITGrxZ25ULNDeKiMNzFSr4V/eqBQP0PeE=
+github.com/matryer/is v1.4.0/go.mod h1:8I/i5uYgLzgsgEloJE1U6xx5HkBQpAZvepWuujKwMRU=
 github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-colorable v0.1.4 h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaaviA=
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
