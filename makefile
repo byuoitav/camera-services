@@ -82,7 +82,7 @@ docker: clean build
 ifeq (${COMMIT_HASH}, ${TAG})
 	@echo Building dev container with tag ${COMMIT_HASH}
 
-	echo Building container ${DOCKER_PKG}/aver-dev:${COMMIT_HASH}
+	@echo Building container ${DOCKER_PKG}/aver-dev:${COMMIT_HASH}
 	@docker build -f dockerfile --build-arg NAME=aver-linux-amd64 -t ${DOCKER_PKG}/aver-dev:${COMMIT_HASH} dist
 
 	@echo Building container ${DOCKER_PKG}/axis-dev:${COMMIT_HASH}
