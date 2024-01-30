@@ -1,5 +1,9 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog} from '@angular/material/dialog';
+//import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialog as MatDialog} from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
+//import { MatDialog } from '@angular/material/dialog';
+
 import { Preset } from 'src/app/services/api.service';
 import { HttpClient } from '@angular/common/http';
 import { ErrorDialog } from '../error/error.dialog';
@@ -18,7 +22,7 @@ export class PresetsDialog {
     private http: HttpClient,
     private dialog: MatDialog,
     public ref: MatDialogRef<PresetsDialog>,
-    @Inject(MAT_DIALOG_DATA)
+    @Inject(MatDialog)
     public data: {
       presets: Preset[];
     }

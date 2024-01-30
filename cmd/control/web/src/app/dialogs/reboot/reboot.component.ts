@@ -1,6 +1,9 @@
 import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
 import { Camera } from 'src/app/services/api.service';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
+//import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef, MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 
 @Component({

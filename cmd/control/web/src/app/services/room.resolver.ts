@@ -1,9 +1,10 @@
 import {Injectable} from "@angular/core";
-import {Router, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot} from "@angular/router";
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import {Observable, of, EMPTY} from "rxjs";
 import {HttpErrorResponse} from "@angular/common/http";
 import {take, mergeMap, catchError} from 'rxjs/operators';
-import {MatDialog} from "@angular/material/dialog";
+//import {MatLegacyDialog as MatDialog} from "@angular/material/legacy-dialog";
+import { MatDialog } from '@angular/material/dialog';
 
 import {APIService, Camera} from "./api.service";
 import {ErrorDialog} from "../dialogs/error/error.dialog";
@@ -11,7 +12,7 @@ import {ErrorDialog} from "../dialogs/error/error.dialog";
 @Injectable({
   providedIn: "root"
 })
-export class RoomResolver implements Resolve<Camera[]> {
+export class RoomResolver  {
   constructor(private router: Router, private api: APIService, private dialog: MatDialog) {}
 
   resolve(

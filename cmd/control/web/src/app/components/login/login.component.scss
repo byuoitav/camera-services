@@ -33,6 +33,7 @@
     justify-content: space-evenly;
     min-height: 30px;
     height: 30px;
+    
   }
   
   .code-char {
@@ -82,8 +83,15 @@
 
 .input-field {
   width: 14vw;
-  margin-left: .8vw;
+  margin-left: 0vw;
   position: absolute;
   letter-spacing: 1vw;
   opacity: 0;
 }
+
+.instruction{
+  font-size: 12pt;
+  margin-top: 5px !important;
+}
+
+

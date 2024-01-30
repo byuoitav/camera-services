@@ -1,7 +1,7 @@
 import {Component, OnInit, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {HttpErrorResponse} from "@angular/common/http";
-import {MatDialog} from "@angular/material/dialog";
+import { MatDialog } from '@angular/material/dialog';
 import {APIService, Camera} from "../../services/api.service";
 
 import {ErrorDialog} from "../../dialogs/error/error.dialog";
@@ -16,7 +16,10 @@ export class KeyLoginComponent implements OnInit, AfterViewInit {
 
   @ViewChild('form') form: ElementRef;
 
-  constructor(private router: Router, private api: APIService, private dialog: MatDialog, private route: ActivatedRoute) {}
+  constructor(private router: Router, 
+    private api: APIService, 
+    private dialog: MatDialog, 
+    private route: ActivatedRoute) {}
 
   ngOnInit() {
     document.title = "BYU Camera Control";

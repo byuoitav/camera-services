@@ -1,13 +1,13 @@
 import {Component, OnInit, EventEmitter, ViewChild, ElementRef, AfterViewInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {HttpErrorResponse} from "@angular/common/http";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog} from '@angular/material/dialog';
 import {APIService, Camera} from "../../services/api.service";
-
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {ErrorDialog} from "../../dialogs/error/error.dialog";
 import { CookieService } from 'ngx-cookie-service';
 import {JwtHelperService} from '@auth0/angular-jwt';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatSnackBar as MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private route: ActivatedRoute,
     private cookieService: CookieService,
+    private matFormField: MatFormFieldModule,
     private snackBar: MatSnackBar,
     ) {}
 

@@ -2,9 +2,11 @@
 	<ng-container>
 		<img src="../assets/logo.svg" class="logo" />
 		<span style="margin-top: 5%;">Enter Control Key:</span>
+		<span class="instruction">found on classroom control panel</span>
+		<div class="transparent">
 		<mat-form-field>
 			<input #form matInput class="input-field" inputmode="numeric" [(ngModel)]="key" maxlength="6"
-				(keyup.enter)="goToCameraControl()" autocomplete="off" />
+				(keyup.enter)="goToCameraControl()" autocomplete="off"/>
 			<div class="room-code">
 				<div *ngIf="key?.length == 0 && hasFocus()" class="code-char-selected">{{ key[0] ? key[0] : " " }}</div>
 				<div *ngIf="key?.length != 0 || !hasFocus()" class="code-char">{{ key[0] ? key[0] : " " }}</div>
@@ -20,6 +22,7 @@
 				<div *ngIf="key?.length != 5 || !hasFocus()" class="code-char">{{ key[5] ? key[5] : " " }}</div>
 			</div>
 		</mat-form-field>
+	</div>
 
 		<button mat-stroked-button color="primary" class="sign-in" [disableRipple]="true" (click)="goToCameraControl()">
 			Enter

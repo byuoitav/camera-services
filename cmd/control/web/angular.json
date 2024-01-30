@@ -44,7 +44,6 @@
 							"optimization": true,
 							"outputHashing": "all",
 							"sourceMap": false,
-							"extractCss": true,
 							"namedChunks": false,
 							"extractLicenses": true,
 							"vendorChunk": false,
@@ -66,19 +65,19 @@
 				},
 				"serve": {
 					"builder": "@angular-devkit/build-angular:dev-server",
-					"options": {
-						"browserTarget": "web:build"
+          "options": {
+            "buildTarget": "web:build"
 					},
 					"configurations": {
-						"production": {
-							"browserTarget": "web:build:production"
+            "production": {
+              "buildTarget": "web:build:production"
 						}
 					}
 				},
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
-					"options": {
-						"browserTarget": "web:build"
+          "options": {
+            "buildTarget": "web:build"
 					}
 				},
 				"test": {
@@ -126,8 +125,7 @@
 				}
 			}
 		}
-	},
-	"defaultProject": "web",
+  },
 	"cli": {
 		"analytics": "d47ad348-43e1-4123-ae4d-630572940882"
 	}

@@ -1,7 +1,7 @@
 import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit, EventEmitter} from '@angular/core';
 import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
-
+import {MatTabsModule} from '@angular/material/tabs';
 import {Camera, Preset} from '../../services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
