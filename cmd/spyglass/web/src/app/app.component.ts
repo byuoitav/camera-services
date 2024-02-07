@@ -1,6 +1,6 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn} from "@angular/forms";
+import {UntypedFormGroup, UntypedFormBuilder, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn} from "@angular/forms";
 import {Observable, of} from "rxjs";
 import {tap, startWith, debounceTime, distinctUntilChanged, switchMap, map, catchError} from "rxjs/operators";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
@@ -41,12 +41,12 @@ export class APIService {
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  firstFormGroup: FormGroup;
-  secondFormGroup: FormGroup;
+  firstFormGroup: UntypedFormGroup;
+  secondFormGroup: UntypedFormGroup;
   filteredRooms: Observable<any[]>;
   controlGroups: string[];
 
-  constructor(private _api: APIService, private _formBuilder: FormBuilder) {
+  constructor(private _api: APIService, private _formBuilder: UntypedFormBuilder) {
     this.firstFormGroup = this._formBuilder.group({
       room: ['', [Validators.required], [this._api.roomValidator()]]
     });
