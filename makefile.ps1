@@ -72,117 +72,172 @@ function Deps {
     Invoke-Expression "cd .."
     Invoke-Expression "cd .."
     Write-Output "Exiting cmd/spyglass/web/"
-
 }
 
 function Build {
-    Write-Output "Build"
+    Write-Output "*******************Build Start**********************"
 
+    # Create directories for compiled code
     New-Item -Path dist -ItemType Directory
-    $location = Get-Location
-    Write-Output $location\deps
-    Write-Output "$location\redirect.html"
-    Copy-Item "$location\redirect.html" -Destination "$location\dist\"
-    Copy-Item "$location\version.txt" -Destination "$location\dist\"
+    New-Item -Path dist/control -ItemType Directory
+    New-Item -Path dist/spyglass -ItemType Directory
 
-    Write-Output "*****************************************"
-    Write-Output "Building for linux-amd64"
+    # - Set default env vars for Windows if they dont exist
+    if ($null -eq $env:CGO_ENABLED) { $env:CGO_ENABLED = 0 }
+    if ($null -eq $env:GOOS) { $env:GOOS = "windows" }
+    if ($null -eq $env:GOARCH) { $env:GOARCH = "amd64" }
+
+    #Get current env vars
+    $Start_CGO_ENABLED = $env:CGO_ENABLED
+    Write-Output "Got CGO_ENABLED: $Start_CGO_ENABLED"
+
+    $Start_GOOS = $env:GOOS
+    Write-Output "Got GOOS: $Start_GOOS"
+
+    $Start_GOARCH = $env:GOARCH
+    Write-Output "Got GOARCH: $Start_GOARCH"
+
+    # Set temp environment vars - same for all build actions
+    Write-Output "Setting CGO_ENABLED, GOOS, and GOARCH for all build actions"
     Set-Item -Path env:CGO_ENABLED -Value 0
     Set-Item -Path env:GOOS -Value "linux"
     Set-Item -Path env:GOARCH -Value "amd64"
-    Invoke-Expression "go build -v -o dist/${NAME}-bin"
 
-    Write-Output "*****************************************"
-    Write-Output "Building for linux-arm"
-    Set-Item -Path env:CGO_ENABLED -Value 0
-    Set-Item -Path env:GOOS -Value "linux"
-    Set-Item -Path env:GOARCH -Value "arm"
-    Invoke-Expression "go build -v -o dist/${NAME}-arm"
+    # Buld AVER for Linux AMD64
+    Write-Output "Building AVER for Linux AMD64"
+    Invoke-Expression "go build -v -o dist/aver-linux-amd64 ./cmd/aver/..."
 
-    Write-Output "*****************************************"
-    Write-Output "Building for linux-arm"
-    Set-Item -Path env:CGO_ENABLED -Value 0
-    Set-Item -Path env:GOOS -Value "windows"
-    Set-Item -Path env:GOARCH -Value "amd64"
-    Invoke-Expression "go build -v -o dist/${NAME}-windows"
+    # Buld AXIS for Linux AMD64
+    Write-Output "Building AXIS for Linux AMD64"
+    Invoke-Expression "go build -v -o dist/axis-linux-amd64 ./cmd/axis/..."
 
-    Write-Output "*****************************************"
-    Write-Output "Building Frontend"
-    if (Test-Path "analog") {
-        Set-Location "analog"
-        Write-Output "Entering \analog"
-        New-Item -Path dist -ItemType Directory
-        #Invoke-Expression "npm run-script build"
-        Invoke-Expression "npm run ng build --aot --optimization --base-href='./'"
-        Invoke-Expression "cd .."
-        Write-Output "Exiting \analog and moving files to \dist"
-        Move-Item "$location\analog\dist\" -Destination "$location\dist\"
-    }
+    # Buld Control Backend for Linux AMD64
+    Write-Output "Building Control Backend for Linux AMD64"
+    Invoke-Expression "go build -v -o dist/control-linux-amd64 ./cmd/control/..."
+
+    # Buld Spyglass Backend for Linux AMD64
+    Write-Output "Building Spyglass Backend for Linux AMD64"
+    Invoke-Expression "go build -v -o dist/spyglass-linux-amd64 ./cmd/spyglass/..."
+
+
+    # Buld Control Frontend
+    Write-Output "Building Control Frontend"
+    Invoke-Expression "npm --prefix ./cmd/control/web run-script build"
+    Write-Output "Moving files to  ./dist/control"
+    Move-Item "./cmd/control/web/dist/" -Destination "./dist/control"
+
+    # # Buld Spyglass Frontend
+    Write-Output "Building Spyglass Frontend"
+    Invoke-Expression "npm --prefix ./cmd/spyglass/web run-script build"
+    Write-Output "Moving files to  ./dist/spyglass"
+    Move-Item "./cmd/spyglass/web/dist/" -Destination "./dist/spyglass"
+
+    #Cleanup Env Vars
+    Write-Output "*******************Build End**********************"
+    Write-Output "Resetting env vars to start values"
+    Set-Item -Path env:CGO_ENABLED -Value $Start_CGO_ENABLED
+    Set-Item -Path env:GOOS -Value $Start_GOOS
+    Set-Item -Path env:GOARCH -Value $Start_GOARCH
 }
 
 function Cleanup {
     Write-Output "Clean"
     Invoke-Expression "go clean"
     if (Test-Path -Path "dist") {
-    Remove-Item dist -recurse
-    Write-Output "Recursively deleted dist/"
-    } else {
+        Remove-Item dist -recurse
+        Write-Output "Recursively deleted dist/"
+    }
+    else {
         Write-Output "No dist directory to delete"
     }
     if (Test-Path -Path "analog/dist") {
         Remove-Item analog/dist -recurse
         Write-Output "Recursively deleted dist/"
-        } else {
-            Write-Output "No analog/dist directory to delete"
-        }
+    }
+    else {
+        Write-Output "No analog/dist directory to delete"
+    }
 }
 
-function DockerFunc {   #can not just be docker because it creates an infinite loop
+function DockerFunc {
+    #can not just be docker because it creates an infinite loop
+    $DevTag = ""
+    $FileTag = ""
+
     Write-Output "Function Docker      Commit Hash: $COMMIT_HASH     Tag: $TAG"
     if ($COMMIT_HASH -eq $TAG) {
-        Write-Output "Building dev containers with tag $COMMIT_HASH"
-
-        Write-Output "Building container $DOCKER_PKG/$NAME-dev:$COMMIT_HASH"
-        Invoke-Expression "docker build -f dockerfile --build-arg NAME=$NAME-arm -t $DOCKER_PKG/$NAME-dev:$COMMIT_HASH dist"
-    } elseif ($TAG -match $DEV_TAG_REGEX) {
-        Write-Output "Building dev containers with tag $TAG"
-
-    	Write-Output "Building container $DOCKER_PKG/$NAME-dev:$TAG"
-    	Invoke-Expression "docker build -f dockerfile --build-arg NAME=$NAME-arm -t $DOCKER_PKG/$NAME-dev:$TAG dist"
-    } elseif ($TAG -match $PRD_TAG_REGEX) {
-        Write-Output "Building prd containers with tag $TAG"
-
-    	Write-Output "Building container $DOCKER_PKG/${NAME}:$TAG"
-    	Invoke-Expression "docker build -f dockerfile --build-arg NAME=$NAME-arm -t $DOCKER_PKG/${NAME}:$TAG dist"
-    } else {
-        Write-Output "Docker function quit unexpectedly. Commit Hash: $COMMIT_HASH     Tag: $TAG"
+        
+        $FileTag = $COMMIT_HASH
+        $DevTag = "-dev"
+        Write-Output "Building dev containers with tag $FileTag"
     }
- }
+    elseif ($TAG -match $DEV_TAG_REGEX) {
+        $FileTag = $TAG
+        $DevTag = "-dev"
+        Write-Output "Building dev containers with tag $FileTag"
+    }
+    elseif ($TAG -match $PRD_TAG_REGEX) {
+        $FileTag = $TAG
+        $DevTag = ""
+        Write-Output "Building prd containers with tag $FileTag"
+
+    }
+    else {
+        Write-Output "Docker function quit unexpectedly. Commit Hash: $COMMIT_HASH     Tag: $TAG"
+        return
+    }
+
+    Write-Output "Building container $DOCKER_PKG/aver${DevTag}:${FileTag}"
+    Invoke-Expression "docker build -f dockerfile --build-arg NAME=aver-linux-amd64 -t $DOCKER_PKG/aver${DevTag}:${FileTag} dist"
+
+    Write-Output "Building container $DOCKER_PKG/axis${DevTag}:${FileTag}"
+    Invoke-Expression "docker build -f dockerfile --build-arg NAME=axis-linux-amd64 -t $DOCKER_PKG/axis${DevTag}:${FileTag} dist"
+
+    Write-Output "Building container $DOCKER_PKG/control${DevTag}:${FileTag}"
+    Invoke-Expression "docker build -f dockerfile-control --build-arg NAME=control-linux-amd64 -t $DOCKER_PKG/control${DevTag}:${FileTag} dist"
+
+    Write-Output "Building container $DOCKER_PKG/camera-spyglass${DevTag}:${FileTag}"
+    Invoke-Expression "docker build -f dockerfile-spyglass --build-arg NAME=spyglass-linux-amd64 -t $DOCKER_PKG/camera-spyglass${DevTag}:${FileTag} dist"
+}
 
 function Deploy {
+    $DevTag = ""
+    $FileTag = ""
     Write-Output "Deploy      Commit Hash: $COMMIT_HASH     Tag: $TAG"
 
     Write-Output "Logging into repo"    
     Invoke-Expression "docker login $DOCKER_URL -u $Env:DOCKER_USERNAME -p $Env:DOCKER_PASSWORD"
     
     if ($COMMIT_HASH -eq $TAG) {
-            Write-Output "Pushing dev containers with tag $COMMIT_HASH"
-    
-            Write-Output "Pushing container $DOCKER_PKG/$NAME-dev:$COMMIT_HASH"
-            Invoke-Expression "docker push $DOCKER_PKG/$NAME-dev:$COMMIT_HASH"
-        } elseif ($TAG -match $DEV_TAG_REGEX) {
-            Write-Output "Pushing dev containers with tag $TAG"
-    
-            Write-Output "Pushing container $DOCKER_PKG/$NAME-dev:$TAG"
-            Invoke-Expression "docker push $DOCKER_PKG/$NAME-dev:$TAG"
-        } elseif ($TAG -match $PRD_TAG_REGEX) {
-            Write-Output "Pushing prd containers with tag $TAG"
-    
-            Write-Output "Pushing container $DOCKER_PKG/${NAME}:$TAG"
-            Invoke-Expression "docker push $DOCKER_PKG/${NAME}:$TAG"
-        } else {
-            Write-Output "Deploy function quit unexpectedly. Commit Hash: $COMMIT_HASH     Tag: $TAG"
-        }
+        $FileTag = $COMMIT_HASH
+        $DevTag = "-dev"
+        Write-Output "Pushing dev containers with tag $FileTag"
+    }
+    elseif ($TAG -match $DEV_TAG_REGEX) {
+        $FileTag = $TAG
+        $DevTag = "-dev"
+        Write-Output "Pushing dev containers with tag $FileTag"
+    }
+    elseif ($TAG -match $PRD_TAG_REGEX) {
+        $FileTag = $TAG
+        $DevTag = ""
+        Write-Output "Pushing prd containers with tag $FileTag"
+    }
+    else {
+        Write-Output "Deploy function quit unexpectedly. Commit Hash: $COMMIT_HASH     Tag: $TAG"
+    }
+
+    Write-Output "Pushing container $DOCKER_PKG/aver${DevTag}:${FileTag}"
+    Invoke-Expression "docker push $DOCKER_PKG/aver${DevTag}:${FileTag}"
+
+    Write-Output "Pushing container $DOCKER_PKG/axis${DevTag}:${FileTag}"
+    Invoke-Expression "docker push $DOCKER_PKG/axis${DevTag}:${FileTag}"
+
+    Write-Output "Pushing container $DOCKER_PKG/control${DevTag}:${FileTag}"
+    Invoke-Expression "docker push $DOCKER_PKG/control${DevTag}:${FileTag}"
+
+    Write-Output "Pushing container $DOCKER_PKG/camera-spyglass${DevTag}:${FileTag}"
+    Invoke-Expression "docker push $DOCKER_PKG/camera-spyglass${DevTag}:${FileTag}"
 }
 
 

@@ -1,5 +1,4 @@
-FROM gcr.io/distroless/static
-MAINTAINER Daniel Randall <danny_randall@byu.edu>
+FROM alpine:3.18
 
 ARG NAME
 
