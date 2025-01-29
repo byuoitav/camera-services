@@ -112,7 +112,7 @@ func (c *Client) ValidateAuthorizationCode(ac string) (AuthCodeResponse, error) 
 // passed in, this identifier helps identify state when the response comes back
 func (c *Client) GetAuthCodeURL(state string) string {
 
-	return fmt.Sprintf("%sauthorize?response_type=code&client_id=%s&redirect_uri=%s&scope=openid&state=%s",
+	return fmt.Sprintf("%s/authorize?response_type=code&client_id=%s&redirect_uri=%s&scope=openid&state=%s",
 		c.gatewayURL, c.clientID, c.callbackURL, state)
 
 }

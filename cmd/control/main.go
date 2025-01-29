@@ -215,12 +215,12 @@ func main() {
 	})
 
 	api := r.Group("/api/v1/", auth.AuthorizeFor("allow"))
-	api.Use(func(c *gin.Context) {
+	r.Use(func(c *gin.Context) {
 		wso2.JWTValidationMiddleware()
 		c.Next()
 	})
 
-	api.Use(func(c *gin.Context) {
+	r.Use(func(c *gin.Context) {
 		if middleware.Authenticated(c.Request) {
 			c.Next()
 			return
@@ -232,7 +232,7 @@ func main() {
 		c.Abort()
 	})
 
-	api.Use(func(c *gin.Context) {
+	r.Use(func(c *gin.Context) {
 		o.Authorize()
 		c.Next()
 	})
