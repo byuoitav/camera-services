@@ -13,7 +13,8 @@ import (
 	"time"
 
 	"github.com/byuoitav/auth/session/cookiestore"
-	"github.com/byuoitav/auth/wso2"
+	"github.com/byuoitav/camera-services/cmd/control/middleware"
+	"github.com/byuoitav/camera-services/cmd/control/wso2"
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/handlers"
 	"github.com/byuoitav/camera-services/keys"
@@ -154,7 +155,7 @@ func main() {
 		log.Fatal("unable to create config service", zap.Error(err))
 	}
 
-	middleware := handlers.Middleware{
+	handlerMiddleware := handlers.Middleware{
 		Logger: log,
 	}
 
@@ -188,6 +189,12 @@ func main() {
 	}
 
 	r := gin.New()
+
+	// WSO2 Create Client
+	o := opa.Client{
+		Address: opaURL,
+		Token:   opaToken,
+	}
 	r.Use(cors.Default())
 	r.Use(gin.Recovery())
 
@@ -208,11 +215,33 @@ func main() {
 	})
 
 	api := r.Group("/api/v1/", auth.AuthorizeFor("allow"))
+	api.Use(func(c *gin.Context) {
+		wso2.JWTValidationMiddleware()
+		c.Next()
+	})
+
+	api.Use(func(c *gin.Context) {
+		if middleware.Authenticated(c.Request) {
+			c.Next()
+			return
+		}
+		log.Info("WSO2 Authentication Failed")
+		log.Debug("WSO2 Authentication Failed", zap.String("Request", c.Request.RequestURI))
+		log.Debug("Output of JWT: ", zap.Any("JWT", c.Request.Header.Get("Authorization")))
+		c.JSON(http.StatusForbidden, gin.H{"error": "Unauthorized"})
+		c.Abort()
+	})
+
+	api.Use(func(c *gin.Context) {
+		o.Authorize()
+		c.Next()
+	})
+
 	api.GET("/controlInfo", handlers.GetControlInfo)
 	api.GET("/cameras", handlers.GetCameras)
 
-	r.GET("/proxy/aver/*uri", handlers.AuthorizeProxy, middleware.RequestID, middleware.Log, handlers.Proxy(averProxyURL))
-	r.GET("/proxy/axis/*uri", handlers.AuthorizeProxy, middleware.RequestID, middleware.Log, handlers.Proxy(axisProxyURL))
+	r.GET("/proxy/aver/*uri", handlers.AuthorizeProxy, handlerMiddleware.RequestID, handlerMiddleware.Log, handlers.Proxy(averProxyURL))
+	r.GET("/proxy/axis/*uri", handlers.AuthorizeProxy, handlerMiddleware.RequestID, handlerMiddleware.Log, handlers.Proxy(axisProxyURL))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
