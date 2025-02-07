@@ -21,13 +21,20 @@ body { margin: 0; }
 
 }
 
-.mdc-tab {
+.mdc-tab, .mat-mdc-tab-header-pagination-after, .mat-mdc-tab-header-pagination-before, .mat-mdc-tab-header-pagination-disabled {
     background-color: $top-bar-color !important;
     --mdc-tab-indicator-active-indicator-color: #0774fa !important;
     --mat-tab-header-active-focus-label-text-color: #0774fa !important;
     --mat-tab-header-active-focus-indicator-color: #0774fa !important;
     --mat-tab-header-active-hover-indicator-color: #0774fa !important;
+    color: white !important;
     &:hover {
         background-color: $top-bar-hover !important;
     }
 }
+
+.mat-mdc-tab-header-pagination-chevron {
+    border-color: white !important; 
+    color: white !important; 
+  }
+  
