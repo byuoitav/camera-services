@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/byuoitav/auth/session/cookiestore"
 	cameraservices "github.com/byuoitav/camera-services"
+	"github.com/byuoitav/camera-services/auth/session/cookiestore"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

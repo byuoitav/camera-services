@@ -199,7 +199,7 @@ func (c *Client) validationFunc(k *rsa.PublicKey) jwt.Keyfunc {
 
 		// Check that the issuer is who we expect
 		if iss, ok := claims["iss"].(string); ok {
-			if iss != c.gatewayURL && !strings.HasPrefix(iss, "https://wso2-is.byu.edu") {
+			if iss != c.gatewayURL && !strings.HasPrefix(iss, "https://api-sandbox.byu.edu") {
 				return nil, fmt.Errorf("Unexpected issuer: %s", iss)
 			}
 		}

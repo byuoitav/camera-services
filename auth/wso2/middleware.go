@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/byuoitav/auth/middleware"
-	"github.com/byuoitav/auth/session"
+	"github.com/byuoitav/camera-services/auth/middleware"
+	"github.com/byuoitav/camera-services/auth/session"
 	"github.com/segmentio/ksuid"
 )
 

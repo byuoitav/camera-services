@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/byuoitav/auth/session/cookiestore"
-	"github.com/byuoitav/auth/wso2"
+	"github.com/byuoitav/camera-services/auth/session/cookiestore"
+	"github.com/byuoitav/camera-services/auth/wso2"
 	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/keys"
 	"github.com/byuoitav/camera-services/opa"
