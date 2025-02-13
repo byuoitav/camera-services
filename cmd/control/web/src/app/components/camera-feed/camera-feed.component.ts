@@ -26,7 +26,8 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   styleUrls: ['./camera-feed.component.scss']
 })
 export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
-  rowHeight = "4:1.75";
+  rowHeight = "4:.75";
+  cols: number = 3;
 
   admin = false;
   rebooting = false;
@@ -81,6 +82,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
+      this.cols = 2;
     }
 
     const decoder = new JwtHelperService();
@@ -126,10 +128,12 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
-    if (window.innerWidth > 1024) {
-      this.rowHeight = "4:1.75"
+    if (window.innerWidth >= 1024) {
+      this.rowHeight = "4:.8";
+      this.cols = 3;
     } else {
-      this.rowHeight = "4:1.25"
+      this.rowHeight = "4:1.25";
+      this.cols = 2;
     }
   }
 

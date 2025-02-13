@@ -2,59 +2,83 @@
   <mat-tab-group>
     <!-- tabs of cameras -->
     <mat-tab id="tab" *ngFor="let cam of cameras" [label]="cam?.displayName" style="height: 100%;">
-      <div class="body-container" (pointercancel)="panTiltStop(cam); zoomStop(cam)" (pointerup)="panTiltStop(cam); zoomStop(cam)">
-        <div class="outer-container">
-          <div class="controls-container">
-            <h2>Cam Controls</h2>
-            <mat-divider class="divider"></mat-divider>
+      <div class="body-container" (pointercancel)="panTiltStop(cam); zoomStop(cam)"
+        (pointerup)="panTiltStop(cam); zoomStop(cam)">
+        <div class="header-container">
+          <div class="outer-container">
+            <div class="controls-container">
+              <div class="movement-container">
+                <div class="d-pad-container">
+                  <nav class="d-pad">
+                    <a class="up" (pointerdown)="tiltUp(cam)" (pointerup)="panTiltStop(cam)"></a>
+                    <a class="right" (pointerdown)="panRight(cam)" (pointerup)="panTiltStop(cam)"></a>
+                    <a class="down" (pointerdown)="tiltDown(cam)" (pointerup)="panTiltStop(cam)"></a>
+                    <a class="left" (pointerdown)="panLeft(cam)" (pointerup)="panTiltStop(cam)"></a>
+                  </nav>
+                </div>
 
-            <div class="movement-container">
-              <div class="d-pad-container">
-                <nav class="d-pad">
-                  <a class="up" (pointerdown)="tiltUp(cam)" (pointerup)="panTiltStop(cam)"></a>
-                  <a class="right" (pointerdown)="panRight(cam)" (pointerup)="panTiltStop(cam)"></a>
-                  <a class="down" (pointerdown)="tiltDown(cam)" (pointerup)="panTiltStop(cam)"></a>
-                  <a class="left" (pointerdown)="panLeft(cam)" (pointerup)="panTiltStop(cam)"></a>
-                </nav>
+                <div class="zoom">
+                  <button mat-flat-button (pointerdown)="zoomIn(cam)" (pointerup)="zoomStop(cam)">
+                    <mat-icon>zoom_in</mat-icon>
+                    <div>In</div>
+                  </button>
+
+                  <button mat-flat-button (pointerdown)="zoomOut(cam)" (pointerup)="zoomStop(cam)">
+                    <mat-icon>zoom_out</mat-icon>
+                    <div>Out</div>
+                  </button>
+                </div>
               </div>
-  
-              <div class="zoom">
-                <button mat-flat-button (pointerdown)="zoomIn(cam)" (pointerup)="zoomStop(cam)">
-                  <mat-icon>zoom_in</mat-icon>
-                  <div>In</div>
-                </button>
-  
-                <button mat-flat-button (pointerdown)="zoomOut(cam)" (pointerup)="zoomStop(cam)">
-                  <mat-icon>zoom_out</mat-icon>
-                  <div>Out</div>
-                </button>
+            </div>
+
+
+            <div *ngIf="admin" class="special-buttons">
+              <div *ngIf="cam?.reboot != undefined" class="button-wrapper">
+                <button mat-flat-button (click)=openRebootDialog(cam)>Reboot</button>
+              </div>
+              <div *ngIf="checkSavePreset(cam)" class="button-wrapper">
+                <button mat-flat-button (click)="openPresetsDialog(cam)">Set Preset</button>
               </div>
             </div>
           </div>
-          
 
-          <div class="presets-container">
-            <h2>Presets</h2>
+          <div class="camera-container">
+            <ng-container *ngIf="!rebooting">
+              <!-- <img id="stream" #stream *ngIf="timeout<60" [src]=getStreamURL(cam) class="feed" (onerror)="restartStream(cam)" (click)="restartStream(cam)"/> -->
+              <img id="stream" #stream *ngIf="timeout<60" [src]=getStreamURL(cam) class="feed"
+                (onerror)="this.src=cam?.stream" (click)="restartStream(cam)" />
 
-            <mat-divider class="divider"></mat-divider>
+              <div *ngIf="timeout>59" class="preview-paused" (click)="timeout=0">
+                <div>PREVIEW PAUSED</div>
+                <div class="unpause-text">Click to unpause</div>
+              </div>
 
-            <mat-grid-list class="presets" cols="2" [rowHeight]="rowHeight">
-              <mat-grid-tile *ngFor="let preset of cam?.presets" class="preset">
-                <button mat-flat-button (click)="selectPreset(preset)">{{preset?.displayName}}</button>
-              </mat-grid-tile>
-            </mat-grid-list>
-          </div>
-          <div *ngIf="admin" class="special-buttons">
-            <div *ngIf="cam?.reboot != undefined" class="button-wrapper">
-              <button mat-flat-button (click)=openRebootDialog(cam)>Reboot</button>
-            </div>
-            <div *ngIf="checkSavePreset(cam)" class="button-wrapper">
-              <button mat-flat-button (click)="openPresetsDialog(cam)">Set Preset</button>
+              <!-- <div class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable<br>Click to attempt to reconnect</div> -->
+              <div *ngIf="loading > 3" class="click-to-restart" (click)="restartStream(cam)">Stream Unavailable
+                <div class="unpause-text">Click to attempt to reconnect</div>
+              </div>
+            </ng-container>
+            <div *ngIf="rebooting" class="preview-paused">
+              <div>Camera is rebooting...</div>
             </div>
           </div>
         </div>
+        <div class="presets-container">
+          <h2>Presets</h2>
 
+          <mat-divider class="divider"></mat-divider>
+
+          <mat-grid-list class="presets" [cols]="cols" [rowHeight]="rowHeight">
+            <mat-grid-tile *ngFor="let preset of cam?.presets" class="preset">
+              <button mat-flat-button (click)="selectPreset(preset)">{{preset?.displayName}}</button>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </div>
       </div>
+
+
+
+
     </mat-tab>
   </mat-tab-group>
 </div>
