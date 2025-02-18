@@ -200,28 +200,25 @@ $button-color: #0047ba;
   }
 
   .special-buttons {
-    width: 256px;
-    height: 40px;
     display: flex;
     justify-content: space-evenly;
     margin-top: 4%;
     .button-wrapper {
-      height: 55px;
-      width: 127.5px;
       display: flex;
       justify-content: space-evenly;
+      margin-left: 10px;
     }
     button {
-      height: 70%;
-      max-height: 50px;
-      width: 80%;
       white-space: normal;
       line-height: 1.2;
       background-color: rgb(190, 0, 0);
       color: white;
       justify-content: center;
       text-align: center;
-
+      border-radius: 20px;
+      padding: 15px;
+      height: 90px;
+      width: 90px;
       font-size: 1em;
     }
   }
@@ -444,11 +441,12 @@ $button-color: #0047ba;
   }
 
   .body-container {
-    padding: 20px;
+    padding: 0px;
     display: flex;
     flex-direction: column;
     min-height: 550px;
     justify-content: flex-end;
+    align-content: center;
     align-items: center;
   }
 
@@ -471,7 +469,7 @@ $button-color: #0047ba;
   .feed {
     min-width: 350px;
     height: 56.25vw;
-    width: 90vw;
+    width: 100vw;
     display: flex;
     position: relative;
     z-index: 1000;
@@ -481,14 +479,12 @@ $button-color: #0047ba;
     min-width: 350px;
     font-size: 2.5em;
     height: 56.25vw;
-    width: 90vw;
+    width: 100vw;
     display: flex;
-    width: 95%;
     flex-direction: column;
     min-width: 350px;
     font-size: 2.5em;
     height: 56.25vw;
-    width: 90vw;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -512,6 +508,8 @@ $button-color: #0047ba;
     width: 90vw;
     justify-content: center;
     align-items: center;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .controls-container {
@@ -524,6 +522,7 @@ $button-color: #0047ba;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    align-content: center;
   }
 
   .movement-container {
@@ -545,8 +544,6 @@ $button-color: #0047ba;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    // margin-top: 03vh;
-    float: left;
     width: 20%;
     button {
       display: flex;
@@ -579,13 +576,14 @@ $button-color: #0047ba;
     width: 100%;
     align-self: center;
     margin-top: 2%;
+    margin-bottom: 2%;
   }
 
   .presets-container {
-    min-width: 350px;
+    min-width: 330px;
     position: relative;
     height: 55%;
-    width: 95%;
+    width: 90%;
     margin-left: auto;
     margin-right: auto;
     display: flex;
@@ -599,6 +597,7 @@ $button-color: #0047ba;
       height: 10%;
       text-align: center;
       margin-bottom: 0px !important;
+      margin-top: 10px;
     }
   
     .presets {
@@ -632,13 +631,13 @@ $button-color: #0047ba;
   }
 
   .special-buttons {
-    width: 95%;
+    width: 90%;
     min-width: 350px;
-    height: 40px;
+    height: 60px;
     display: flex;
     justify-content: space-evenly;
     margin-left: 2%;
-    margin-top: 2%;
+    margin-top: 7%;
     .button-wrapper {
       height: 150%;
       width: 50%;
@@ -646,7 +645,7 @@ $button-color: #0047ba;
       justify-content: space-evenly;
     }
     button {
-      height: 70%;
+      height: 80%;
       max-height: 50px;
       width: 85%;
       white-space: normal;
@@ -655,7 +654,7 @@ $button-color: #0047ba;
       color: white;
       justify-content: center;
       text-align: center;
-
+      border-radius: 20px;
       font-size: max(2vh, 2vw);
     }
   }

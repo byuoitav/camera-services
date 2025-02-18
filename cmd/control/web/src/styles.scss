@@ -21,6 +21,7 @@ body { margin: 0; }
 
 }
 
+// the active tab color
 .mdc-tab, .mat-mdc-tab-header-pagination-after, .mat-mdc-tab-header-pagination-before, .mat-mdc-tab-header-pagination-disabled {
     background-color: $top-bar-color !important;
     --mdc-tab-indicator-active-indicator-color: #0774fa !important;
@@ -33,8 +34,21 @@ body { margin: 0; }
     }
 }
 
+// the arrow keys for changing tabs
 .mat-mdc-tab-header-pagination-chevron {
     border-color: white !important; 
     color: white !important; 
   }
   
+// the dialog box settings
+.mat-mdc-dialog-surface {
+    border-radius: 20px !important;
+    background-color: $top-bar-color !important;
+    border-width: 0px !important;
+    color: white !important;
+    .confirm {
+        background-color: $top-bar-hover !important;
+    }
+    padding: 5px !important;
+
+}
