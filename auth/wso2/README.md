@@ -17,8 +17,8 @@ package main
 import (
 	"net/http"
 	
-	"https://github.com/byuoitav/camera-services/auth/wso2"
-	"https://github.com/byuoitav/camera-services/auth/session/cookiestore"
+	"https://github.com/byuoitav/auth/wso2"
+	"https://github.com/byuoitav/auth/session/cookiestore"
 	"https://github.com/labstack/echo"
 )
 

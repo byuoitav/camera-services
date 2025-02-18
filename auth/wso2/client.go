@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/dgrijalva/jwt-go"
 )
 
 var errCantIdentifyKey = fmt.Errorf("Unable to identify key used for signing")
@@ -74,7 +74,7 @@ func (c *Client) ValidateAuthorizationCode(ac string) (AuthCodeResponse, error) 
 	data.Set("redirect_uri", c.callbackURL)
 
 	// Send back the auth code in exchange for a token and refresh token
-	req, err := http.NewRequest("POST", fmt.Sprintf("%stoken", c.gatewayURL), strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/token", c.gatewayURL), strings.NewReader(data.Encode()))
 	if err != nil {
 		return AuthCodeResponse{}, fmt.Errorf("Error while trying to create authorization code request: %w", err)
 	}
@@ -199,7 +199,7 @@ func (c *Client) validationFunc(k *rsa.PublicKey) jwt.Keyfunc {
 
 		// Check that the issuer is who we expect
 		if iss, ok := claims["iss"].(string); ok {
-			if iss != c.gatewayURL && !strings.HasPrefix(iss, "https://api-sandbox.byu.edu") {
+			if iss != c.gatewayURL && !strings.HasPrefix(iss, "https://wso2-is.byu.edu") {
 				return nil, fmt.Errorf("Unexpected issuer: %s", iss)
 			}
 		}
@@ -226,7 +226,7 @@ func (c *Client) validationFunc(k *rsa.PublicKey) jwt.Keyfunc {
 func (c *Client) refreshKeyCache() error {
 
 	// Get openid-configuration document
-	res, err := http.Get(fmt.Sprintf("%s.well-known/openid-configuration", c.gatewayURL))
+	res, err := http.Get(fmt.Sprintf("%s/.well-known/openid-configuration", c.gatewayURL))
 	if err != nil {
 		return fmt.Errorf("Error while trying to get openid configuration: %w", err)
 	}
