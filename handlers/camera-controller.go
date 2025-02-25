@@ -74,7 +74,7 @@ func (h *CameraController) checkControlKey(c *gin.Context, key, address string) 
 		return false
 	}
 
-	room, cg, err := h.ControlKeyService.RoomAndControlGroup(c, key)
+	room, _, err := h.ControlKeyService.RoomAndControlGroup(c, key)
 	if err != nil {
 		return false
 	}
@@ -86,8 +86,6 @@ func (h *CameraController) checkControlKey(c *gin.Context, key, address string) 
 
 	return true
 }
-
-//	pro520 := r.Group("/v1/Pro520/:address", middleware.RequestID, middleware.Log, handlers.CameraMiddleware)
 
 func (h *CameraController) CameraMiddleware(c *gin.Context) {
 	ck, err := c.Cookie("control-key")
