@@ -40,4 +40,5 @@ type CameraPreset struct {
 type ControlInfo struct {
 	Room         string `json:"room" form:"room"`
 	ControlGroup string `json:"controlGroup" form:"controlGroup"`
+	ControlKey   string `json:"controlKey" form:"controlKey"`
 }

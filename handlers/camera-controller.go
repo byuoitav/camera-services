@@ -17,9 +17,10 @@ import (
 )
 
 type CameraController struct {
-	CreateCamera   cameraservices.NewCameraFunc
-	EventPublisher cameraservices.EventPublisher
-	Logger         *zap.Logger
+	CreateCamera      cameraservices.NewCameraFunc
+	EventPublisher    cameraservices.EventPublisher
+	ControlKeyService cameraservices.ControlKeyService
+	Logger            *zap.Logger
 
 	streams *sync.Map
 	single  *singleflight.Group
@@ -68,7 +69,48 @@ func (h *CameraController) getCameraIP(ctx context.Context, addr string) (net.IP
 	return ip, nil
 }
 
+func (h *CameraController) checkControlKey(c *gin.Context, key, address string) bool {
+	if key == "" {
+		return false
+	}
+
+	room, cg, err := h.ControlKeyService.RoomAndControlGroup(c, key)
+	if err != nil {
+		return false
+	}
+
+	// Check if address starts with room
+	if !strings.HasPrefix(address, room) {
+		return false
+	}
+
+	return true
+}
+
+//	pro520 := r.Group("/v1/Pro520/:address", middleware.RequestID, middleware.Log, handlers.CameraMiddleware)
+
 func (h *CameraController) CameraMiddleware(c *gin.Context) {
+	ck, err := c.Cookie("control-key")
+	if err != nil {
+		c.String(http.StatusUnauthorized, "no control key")
+		c.Abort()
+		return
+	}
+
+	address := c.Param("address")
+	if address == "" {
+		c.String(http.StatusBadRequest, "must include camera address")
+		c.Abort()
+		return
+	}
+
+	authorized := h.checkControlKey(c, ck, address)
+	if !authorized {
+		c.String(http.StatusForbidden, "Unauthorized")
+		c.Abort()
+		return
+	}
+
 	addr := c.Param("address")
 	if addr == "" {
 		c.String(http.StatusBadRequest, "must include camera address")

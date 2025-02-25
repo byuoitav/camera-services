@@ -14,6 +14,7 @@ import (
 	cameraservices "github.com/byuoitav/camera-services"
 	"github.com/byuoitav/camera-services/event"
 	"github.com/byuoitav/camera-services/handlers"
+	"github.com/byuoitav/camera-services/keys"
 	"github.com/byuoitav/visca"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,8 @@ func main() {
 	var (
 		port     int
 		logLevel string
+
+		keyServiceAddr string
 
 		eventURL string
 		name     string
@@ -42,6 +45,7 @@ func main() {
 	pflag.StringVar(&dnsAddr, "dns-addr", "", "dns server to use for reverse ip lookups")
 	pflag.StringVar(&camUsername, "cam-username", "", "username of the camera")
 	pflag.StringVar(&camPassword, "cam-password", "", "password of the camera")
+	pflag.StringVar(&keyServiceAddr, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
 	pflag.Parse()
 
 	var level zapcore.Level
@@ -133,6 +137,10 @@ func main() {
 		GeneratingSystem: name,
 		URL:              eventURL,
 		Resolver:         resolver,
+	}
+
+	handlers.ControlKeyService = &keys.ControlKeyService{
+		Address: keyServiceAddr,
 	}
 
 	r := gin.New()

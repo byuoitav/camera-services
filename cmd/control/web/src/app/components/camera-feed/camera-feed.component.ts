@@ -297,9 +297,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
     if (dialogs.length > 0) {
       return
     }
-
     this.dialog.open(PresetsDialog, {
-      width: "fit-content",
+      width: "500px",
+      height: "auto",
+      maxHeight: "90vh",
       data: {
         presets: cam.presets
       }
