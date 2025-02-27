@@ -153,6 +153,13 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 		_ = session.Save(c.Request, c.Writer)
 	}
 
+	// add control-key cookie
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:  "control-key",
+		Value: c.Query("key"),
+		Path:  "/",
+	})
+
 	c.JSON(http.StatusOK, cameraservices.ControlInfo{
 		Room:         room,
 		ControlGroup: cg,
