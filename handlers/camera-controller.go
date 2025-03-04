@@ -104,7 +104,7 @@ func (h *CameraController) CameraMiddleware(c *gin.Context) {
 
 	authorized := h.checkControlKey(c, ck, address)
 	if !authorized {
-		c.String(http.StatusForbidden, "Unauthorized")
+		c.String(http.StatusForbidden, "Unauthorized Key")
 		c.Abort()
 		return
 	}
