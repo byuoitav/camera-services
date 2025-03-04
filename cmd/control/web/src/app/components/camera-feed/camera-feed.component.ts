@@ -1,8 +1,9 @@
 import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit, EventEmitter} from '@angular/core';
+// Removed incorrect import of NodeJS
 import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
 import {MatTabsModule} from '@angular/material/tabs';
-import {Camera, Preset} from '../../services/api.service';
+import {Camera, Preset, APIService, ControlInfo} from '../../services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -42,6 +43,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   reboot: EventEmitter<boolean> = new EventEmitter();
 
   @ViewChild('stream') img: ElementRef;
+  controlKeyInterval: any;
 
   constructor(
     private router: Router,
@@ -49,6 +51,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
     public route: ActivatedRoute,
     private dialog: MatDialog,
     private cookieService: CookieService,
+    private apiService: APIService
   ) {
     this.route.params.subscribe(params => {
       if ("room" in params && typeof params.room === "string") {
@@ -104,6 +107,25 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
         clearInterval(loadInterval)
       }
     }, 1000);
+
+    // Check getControlInfo every 10 seconds
+    this.controlKeyInterval = setInterval(() => {
+      this.apiService.getControlInfo(this.cookieService.get("control-key")).subscribe(
+        (response: ControlInfo) => {
+          // Handle valid response
+          // console.log("ControlInfo is valid", response);
+        },
+        (error) => {
+          // Handle error response
+          console.error("ControlInfo is invalid", error);
+          clearInterval(this.controlKeyInterval);
+          this.dialog.open(ErrorDialog, {
+            data: { msg: "Session expired or invalid. Enter new key." }
+          });
+          this.router.navigate([""]);
+        }
+      );
+    }, 10000);
   }
 
   ngAfterViewInit() {
@@ -124,6 +146,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy() {
     this.img.nativeElement.src = "";
+    clearInterval(this.controlKeyInterval);
   }
 
   @HostListener("window:resize", ["$event"])
