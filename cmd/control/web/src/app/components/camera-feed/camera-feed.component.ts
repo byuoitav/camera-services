@@ -119,6 +119,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
           // Handle error response
           console.error("ControlInfo is invalid", error);
           clearInterval(this.controlKeyInterval);
+          this.router.navigate([""]);
           this.dialog.open(ErrorDialog, {
             data: { msg: "Session expired or invalid. Enter new key." }
           });
