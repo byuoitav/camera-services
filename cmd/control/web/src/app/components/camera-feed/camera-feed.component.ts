@@ -29,7 +29,6 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
 export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   rowHeight = "4:.75";
   cols: number = 3;
-
   admin = false;
   rebooting = false;
 
@@ -119,9 +118,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
           // Handle error response
           console.error("ControlInfo is invalid", error);
           clearInterval(this.controlKeyInterval);
-          this.router.navigate(["/login"]);
-          this.dialog.open(ErrorDialog, {
-            data: { msg: "Session expired or invalid. Enter new key." }
+          this.router.navigate(["/login"], { queryParams: {} }).then(() => {
+            this.dialog.open(ErrorDialog, {
+              data: { msg: "Session expired or invalid. Enter new key." }
+            });
           });
         }
       );
@@ -177,6 +177,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
+      
     });
   }
 
@@ -192,6 +196,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -207,6 +214,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -222,6 +232,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -239,6 +252,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
     this.tilting = false
   }
@@ -255,6 +271,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -270,6 +289,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -286,6 +308,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
     this.zooming = false
   }
@@ -301,6 +326,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
