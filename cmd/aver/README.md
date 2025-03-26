@@ -12,6 +12,9 @@ DNS_ADDR=dns_address
 CAM_USERNAME=cam_username
 CAM_PASSWORD=cam_password
 KEY_SERVICE=address_for_key_control_service
+DB_ADDRESS=couch_database_address
+DB_USERNAME=couch_user
+DB_PASSWORD=couch_password
 ```
 
 ## Flags
@@ -24,7 +27,10 @@ KEY_SERVICE=address_for_key_control_service
 | `--dns-addr`       |           | `""`                                  | DNS server to use for reverse IP lookups.                                          |
 | `--cam-username`   |           | `""`                                  | Username of the camera.                                                            |
 | `--cam-password`   |           | `""`                                  | Password of the camera.                                                            |
-| `--key-service`    |           | `control-keys.av.byu.edu`            | Address of the control keys service.                                               |
+| `--key-service`    |           | `control-keys.av.byu.edu`             | Address of the control keys service.                                               |
+| `--db-address`     |           | `""`                                  | Database address.                                                                  |
+| `--db-username`    |           | `""`                                  | Database username.                                                                 |
+| `--db-password`    |           | `""`                                  | Database password.                                                                 |
 
 
 ## Endpoints 
