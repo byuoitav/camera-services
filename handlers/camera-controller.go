@@ -87,10 +87,8 @@ func (h *CameraController) checkControlKey(c *gin.Context, key, address string) 
 	}
 
 	// Check if any IPAddresses contain address string
-	fmt.Println("Checking address: " + address)
 	for _, IP := range IPAddresses {
 		ipStr := fmt.Sprintf("%v", IP) // Convert IP to string
-		fmt.Println(ipStr)
 		if strings.Contains(ipStr, address) {
 			return true
 		}
