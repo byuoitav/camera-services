@@ -8,6 +8,7 @@ type ControlKeyService interface {
 
 type ConfigService interface {
 	Cameras(context.Context, ControlInfo) ([]CameraConfig, error)
+	ControlIP(context.Context, string) ([]string, error)
 }
 
 type CameraConfig struct {

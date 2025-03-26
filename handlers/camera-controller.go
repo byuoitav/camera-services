@@ -20,16 +20,18 @@ type CameraController struct {
 	CreateCamera      cameraservices.NewCameraFunc
 	EventPublisher    cameraservices.EventPublisher
 	ControlKeyService cameraservices.ControlKeyService
+	DatabaseService   cameraservices.ConfigService
 	Logger            *zap.Logger
 
 	streams *sync.Map
 	single  *singleflight.Group
 }
 
-func NewCameraController() *CameraController {
+func NewCameraController(cs cameraservices.ConfigService) *CameraController {
 	return &CameraController{
-		streams: &sync.Map{},
-		single:  &singleflight.Group{},
+		streams:         &sync.Map{},
+		single:          &singleflight.Group{},
+		DatabaseService: cs,
 	}
 }
 
@@ -79,11 +81,20 @@ func (h *CameraController) checkControlKey(c *gin.Context, key, address string) 
 		return false
 	}
 
-	// Check if address starts with room
-	if !strings.HasPrefix(address, room) {
+	IPAddresses, err := h.DatabaseService.ControlIP(c, room)
+	if err != nil {
 		return false
 	}
 
+	// Check if any IPAddresses contain address string
+	fmt.Println("Checking address: " + address)
+	for _, IP := range IPAddresses {
+		ipStr := fmt.Sprintf("%v", IP) // Convert IP to string
+		fmt.Println(ipStr)
+		if strings.Contains(ipStr, address) {
+			return true
+		}
+	}
 	return true
 }
 
