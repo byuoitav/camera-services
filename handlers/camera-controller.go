@@ -17,21 +17,18 @@ import (
 )
 
 type CameraController struct {
-	CreateCamera      cameraservices.NewCameraFunc
-	EventPublisher    cameraservices.EventPublisher
-	ControlKeyService cameraservices.ControlKeyService
-	DatabaseService   cameraservices.ConfigService
-	Logger            *zap.Logger
+	CreateCamera   cameraservices.NewCameraFunc
+	EventPublisher cameraservices.EventPublisher
+	Logger         *zap.Logger
 
 	streams *sync.Map
 	single  *singleflight.Group
 }
 
-func NewCameraController(cs cameraservices.ConfigService) *CameraController {
+func NewCameraController() *CameraController {
 	return &CameraController{
-		streams:         &sync.Map{},
-		single:          &singleflight.Group{},
-		DatabaseService: cs,
+		streams: &sync.Map{},
+		single:  &singleflight.Group{},
 	}
 }
 
@@ -71,53 +68,7 @@ func (h *CameraController) getCameraIP(ctx context.Context, addr string) (net.IP
 	return ip, nil
 }
 
-func (h *CameraController) checkControlKey(c *gin.Context, key, address string) bool {
-	if key == "" {
-		return false
-	}
-
-	room, _, err := h.ControlKeyService.RoomAndControlGroup(c, key)
-	if err != nil {
-		return false
-	}
-
-	IPAddresses, err := h.DatabaseService.ControlIP(c, room)
-	if err != nil {
-		return false
-	}
-
-	// Check if any IPAddresses contain address string
-	for _, IP := range IPAddresses {
-		ipStr := fmt.Sprintf("%v", IP) // Convert IP to string
-		if strings.Contains(ipStr, address) {
-			return true
-		}
-	}
-	return true
-}
-
 func (h *CameraController) CameraMiddleware(c *gin.Context) {
-	ck, err := c.Cookie("control-key")
-	if err != nil {
-		c.String(http.StatusUnauthorized, "no control key")
-		c.Abort()
-		return
-	}
-
-	address := c.Param("address")
-	if address == "" {
-		c.String(http.StatusBadRequest, "must include camera address")
-		c.Abort()
-		return
-	}
-
-	authorized := h.checkControlKey(c, ck, address)
-	if !authorized {
-		c.String(http.StatusForbidden, "Unauthorized Key")
-		c.Abort()
-		return
-	}
-
 	addr := c.Param("address")
 	if addr == "" {
 		c.String(http.StatusBadRequest, "must include camera address")

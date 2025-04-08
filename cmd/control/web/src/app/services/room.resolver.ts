@@ -3,9 +3,8 @@ import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/ro
 import {Observable, of, EMPTY} from "rxjs";
 import {HttpErrorResponse} from "@angular/common/http";
 import {take, mergeMap, catchError} from 'rxjs/operators';
+//import {MatLegacyDialog as MatDialog} from "@angular/material/legacy-dialog";
 import { MatDialog } from '@angular/material/dialog';
-import { CookieService } from 'ngx-cookie-service';
-
 
 import {APIService, Camera} from "./api.service";
 import {ErrorDialog} from "../dialogs/error/error.dialog";
@@ -14,12 +13,7 @@ import {ErrorDialog} from "../dialogs/error/error.dialog";
   providedIn: "root"
 })
 export class RoomResolver  {
-  constructor(
-    private router: Router, 
-    private api: APIService, 
-    private dialog: MatDialog,
-    private cookieService: CookieService,
-  ) {}
+  constructor(private router: Router, private api: APIService, private dialog: MatDialog) {}
 
   resolve(
     route: ActivatedRouteSnapshot,
@@ -27,9 +21,8 @@ export class RoomResolver  {
   ): Observable<Camera[]> | Observable<never> {
     const room = route.paramMap.get("room");
     const cg = route.queryParamMap.get("controlGroup");
-    const controlKey = this.cookieService.get("control-key");
 
-    return this.api.getCameras(room, controlKey, cg).pipe(
+    return this.api.getCameras(room, cg).pipe(
       take(1),
       catchError((err: HttpErrorResponse) => {
         this.router.navigate([""], {});

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/byuoitav/auth/session/cookiestore"
 	cameraservices "github.com/byuoitav/camera-services"
-	"github.com/byuoitav/camera-services/auth/session/cookiestore"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -47,7 +47,7 @@ func (h *ControlHandlers) GetCameras(c *gin.Context) {
 		return
 	}
 
-	if !h.DisableAuth && !h.authorized(c, info.Room, info.ControlKey, info.ControlGroup) {
+	if !h.DisableAuth && !h.authorized(c, info.Room, info.ControlGroup) {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
@@ -109,8 +109,7 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 
 	room, cg, err := h.ControlKeyService.RoomAndControlGroup(ctx, c.Query("key"))
 	if err != nil {
-		c.String(http.StatusInternalServerError, fmt.Sprintf("Unable to Get Room: %s", err))
-		c.Status(http.StatusUnauthorized)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("unable to get room: %s", err))
 		return
 	}
 
@@ -152,13 +151,6 @@ func (h *ControlHandlers) GetControlInfo(c *gin.Context) {
 
 		_ = session.Save(c.Request, c.Writer)
 	}
-
-	// add control-key cookie
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:  "control-key",
-		Value: c.Query("key"),
-		Path:  "/",
-	})
 
 	c.JSON(http.StatusOK, cameraservices.ControlInfo{
 		Room:         room,
@@ -235,36 +227,8 @@ func (h *ControlHandlers) AuthorizeProxy(c *gin.Context) {
 	c.Next()
 }
 
-func (h *ControlHandlers) checkControlKey(c *gin.Context, key, room, controlGroup string) bool {
-	controlInfo := cameraservices.ControlInfo{
-		Room:         room,
-		ControlGroup: controlGroup,
-		ControlKey:   key,
-	}
-
-	if key == "" {
-		return false
-	}
-
-	room, cg, err := h.ControlKeyService.RoomAndControlGroup(c, key)
-	if err != nil {
-		return false
-	}
-
-	if room != controlInfo.Room || cg != controlInfo.ControlGroup {
-		return false
-	}
-
-	return true
-}
-
-func (h *ControlHandlers) authorized(c *gin.Context, room, key, controlGroup string) bool {
+func (h *ControlHandlers) authorized(c *gin.Context, room, controlGroup string) bool {
 	var authorized bool
-
-	// Make sure the key is correct
-	if !h.checkControlKey(c, key, room, controlGroup) {
-		return authorized
-	}
 
 	session, err := h.SessionStore.Get(c.Request, h.SessionName)
 	if err != nil {

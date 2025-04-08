@@ -170,24 +170,3 @@ func (c *configService) ControlGroups(ctx context.Context, room string) ([]strin
 
 	return groups, nil
 }
-
-// Returns a list of the urls for the commands that each contain the IP address or hostname
-func (c *configService) ControlIP(ctx context.Context, room string) ([]string, error) {
-	var config uiConfig
-	var IP []string
-
-	db := c.client.DB(ctx, c.uiConfigDB)
-	if err := db.Get(ctx, room).ScanDoc(&config); err != nil {
-		return IP, fmt.Errorf("unable to get/scan ui config: %w", err)
-	}
-
-	for _, cg := range config.ControlGroups {
-		if len(cg.Cameras) > 0 {
-			for _, cam := range cg.Cameras {
-				IP = append(IP, cam.Stream)
-			}
-		}
-	}
-
-	return IP, nil
-}

@@ -1,5 +1,5 @@
 <div class="presets-container">
-	<mat-grid-list class="presets" cols="2" rowHeight="4:1.5">
+	<mat-grid-list class="presets" cols="2" rowHeight="4:1.75">
 		<mat-grid-tile *ngFor="let preset of data?.presets" class="preset">
 			<button id={{preset?.displayName}} mat-flat-button
 				(click)="setCurPreset(preset)">{{preset?.displayName}}</button>
