@@ -1,8 +1,9 @@
 import {Component, HostListener, ViewChild, ElementRef, OnInit, OnDestroy, AfterViewInit, EventEmitter} from '@angular/core';
+// Removed incorrect import of NodeJS
 import {Router, ActivatedRoute} from "@angular/router";
 import {HttpClient} from '@angular/common/http';
 import {MatTabsModule} from '@angular/material/tabs';
-import {Camera, Preset} from '../../services/api.service';
+import {Camera, Preset, APIService, ControlInfo} from '../../services/api.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PresetsDialog } from 'src/app/dialogs/presets/presets.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -26,8 +27,8 @@ function isCameras(obj: Camera[] | any): obj is Camera[] {
   styleUrls: ['./camera-feed.component.scss']
 })
 export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
-  rowHeight = "4:1.75";
-
+  rowHeight = "4:.75";
+  cols: number = 3;
   admin = false;
   rebooting = false;
 
@@ -41,6 +42,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   reboot: EventEmitter<boolean> = new EventEmitter();
 
   @ViewChild('stream') img: ElementRef;
+  controlKeyInterval: any;
 
   constructor(
     private router: Router,
@@ -48,6 +50,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
     public route: ActivatedRoute,
     private dialog: MatDialog,
     private cookieService: CookieService,
+    private apiService: APIService
   ) {
     this.route.params.subscribe(params => {
       if ("room" in params && typeof params.room === "string") {
@@ -81,6 +84,7 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit() {
     if (window.innerWidth <= 1024) {
       this.rowHeight = "4:1.25";
+      this.cols = 2;
     }
 
     const decoder = new JwtHelperService();
@@ -102,6 +106,26 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
         clearInterval(loadInterval)
       }
     }, 1000);
+
+    // Check getControlInfo every 10 seconds
+    this.controlKeyInterval = setInterval(() => {
+      this.apiService.getControlInfo(this.cookieService.get("control-key")).subscribe(
+        (response: ControlInfo) => {
+          // Handle valid response
+          // console.log("ControlInfo is valid", response);
+        },
+        (error) => {
+          // Handle error response
+          console.error("ControlInfo is invalid", error);
+          clearInterval(this.controlKeyInterval);
+          this.router.navigate(["/login"], { queryParams: {} }).then(() => {
+            this.dialog.open(ErrorDialog, {
+              data: { msg: "Session expired or invalid. Enter new key." }
+            });
+          });
+        }
+      );
+    }, 10000);
   }
 
   ngAfterViewInit() {
@@ -122,14 +146,17 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy() {
     this.img.nativeElement.src = "";
+    clearInterval(this.controlKeyInterval);
   }
 
   @HostListener("window:resize", ["$event"])
   onResize(event) {
-    if (window.innerWidth > 1024) {
-      this.rowHeight = "4:1.75"
+    if (window.innerWidth >= 1024) {
+      this.rowHeight = "4:.8";
+      this.cols = 3;
     } else {
-      this.rowHeight = "4:1.25"
+      this.rowHeight = "4:1.25";
+      this.cols = 2;
     }
   }
 
@@ -150,6 +177,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
+      
     });
   }
 
@@ -165,6 +196,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -180,6 +214,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -195,6 +232,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -212,6 +252,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
     this.tilting = false
   }
@@ -228,6 +271,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -243,6 +289,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -259,6 +308,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
     this.zooming = false
   }
@@ -274,6 +326,9 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log("resp", resp);
     }, err => {
       console.warn("err", err);
+      this.dialog.open(ErrorDialog, {
+            data: { msg: err.error }
+          });
     });
   }
 
@@ -293,9 +348,10 @@ export class CameraFeedComponent implements OnInit, OnDestroy, AfterViewInit {
     if (dialogs.length > 0) {
       return
     }
-
     this.dialog.open(PresetsDialog, {
-      width: "fit-content",
+      width: "500px",
+      height: "auto",
+      maxHeight: "90vh",
       data: {
         presets: cam.presets
       }

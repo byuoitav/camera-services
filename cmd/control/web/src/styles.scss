@@ -1,7 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+$top-bar-color: #001832;
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+$top-bar-hover: #0044b3;
+
+html, body { height: 100%; font-family: 'HCo Ringside Narrow SSm', 'Open Sans', Helvetica, Arial, sans-serif !important;}
+body { margin: 0; }
 
 // Manipulate initial background color
 .mdc-text-field--filled:not(.mdc-text-field--disabled) {
@@ -11,4 +14,41 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // Manipulate background color on hover and focus
 .mat-mdc-form-field-focus-overlay {
     background-color: transparent !important;  
+}
+
+.mdc-tab__text-label {
+    color: white !important;
+
+}
+
+// the active tab color
+.mdc-tab, .mat-mdc-tab-header-pagination-after, .mat-mdc-tab-header-pagination-before, .mat-mdc-tab-header-pagination-disabled {
+    background-color: $top-bar-color !important;
+    --mdc-tab-indicator-active-indicator-color: #0774fa !important;
+    --mat-tab-header-active-focus-label-text-color: #0774fa !important;
+    --mat-tab-header-active-focus-indicator-color: #0774fa !important;
+    --mat-tab-header-active-hover-indicator-color: #0774fa !important;
+    color: white !important;
+    &:hover {
+        background-color: $top-bar-hover !important;
+    }
+}
+
+// the arrow keys for changing tabs
+.mat-mdc-tab-header-pagination-chevron {
+    border-color: white !important; 
+    color: white !important; 
+  }
+  
+// the dialog box settings
+.mat-mdc-dialog-surface {
+    border-radius: 20px !important;
+    background-color: $top-bar-color !important;
+    border-width: 0px !important;
+    color: white !important;
+    .confirm {
+        background-color: $top-bar-hover !important;
+    }
+    padding: 5px !important;
+
 }
