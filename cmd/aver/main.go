@@ -4,16 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/byuoitav/aver"
 	cameraservices "github.com/byuoitav/camera-services"
+	"github.com/byuoitav/camera-services/couch"
 	"github.com/byuoitav/camera-services/event"
 	"github.com/byuoitav/camera-services/handlers"
+	"github.com/byuoitav/camera-services/keys"
 	"github.com/byuoitav/visca"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -27,6 +31,13 @@ func main() {
 		port     int
 		logLevel string
 
+		keyServiceAddr string
+
+		dbAddr     string
+		dbUsername string
+		dbPassword string
+		dbInsecure bool
+
 		eventURL string
 		name     string
 		dnsAddr  string
@@ -34,6 +45,7 @@ func main() {
 		camUsername string
 		camPassword string
 	)
+
 	// List of flags
 	pflag.IntVarP(&port, "port", "P", 8080, "port to run the server on")
 	pflag.StringVarP(&logLevel, "log-level", "L", "", "level to log at. refer to https://godoc.org/go.uber.org/zap/zapcore#Level for options")
@@ -42,12 +54,38 @@ func main() {
 	pflag.StringVar(&dnsAddr, "dns-addr", "", "dns server to use for reverse ip lookups")
 	pflag.StringVar(&camUsername, "cam-username", "", "username of the camera")
 	pflag.StringVar(&camPassword, "cam-password", "", "password of the camera")
+	pflag.StringVar(&keyServiceAddr, "key-service", "control-keys.av.byu.edu", "address of the control keys service")
+	pflag.StringVar(&dbAddr, "db-address", "", "database address")
+	pflag.StringVar(&dbUsername, "db-username", "", "database username")
+	pflag.StringVar(&dbPassword, "db-password", "", "database password")
+	pflag.BoolVar(&dbInsecure, "db-insecure", false, "don't use SSL in database connection")
 	pflag.Parse()
 
 	var level zapcore.Level
 	if err := level.Set(logLevel); err != nil {
 		fmt.Printf("invalid log level: %s\n", err.Error())
 		os.Exit(1)
+	}
+
+	// build the couch config service
+	if dbInsecure {
+		dbAddr = "http://" + dbAddr
+	} else {
+		dbAddr = "https://" + dbAddr
+	}
+
+	var csOpts []couch.Option
+	if dbUsername != "" {
+		csOpts = append(csOpts, couch.WithBasicAuth(dbUsername, dbPassword))
+	}
+
+	// context for setup
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	cs, err := couch.New(ctx, dbAddr, csOpts...)
+	if err != nil {
+		log.Fatal("unable to create config service", zap.Error(err))
 	}
 
 	// build the logger
@@ -103,7 +141,7 @@ func main() {
 	middleware := handlers.Middleware{
 		Logger: log,
 	}
-	handlers := handlers.NewCameraController()
+	handlers := handlers.NewCameraController(cs)
 	handlers.Logger = log
 	handlers.CreateCamera = func(ctx context.Context, addr string) (cameraservices.Camera, error) {
 		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
@@ -133,6 +171,10 @@ func main() {
 		GeneratingSystem: name,
 		URL:              eventURL,
 		Resolver:         resolver,
+	}
+
+	handlers.ControlKeyService = &keys.ControlKeyService{
+		Address: keyServiceAddr,
 	}
 
 	r := gin.New()

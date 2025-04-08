@@ -103,30 +103,30 @@ function Build {
     Set-Item -Path env:GOOS -Value "linux"
     Set-Item -Path env:GOARCH -Value "amd64"
 
-    # Buld AVER for Linux AMD64
+    # Build AVER for Linux AMD64
     Write-Output "Building AVER for Linux AMD64"
     Invoke-Expression "go build -v -o dist/aver-linux-amd64 ./cmd/aver/..."
 
-    # Buld AXIS for Linux AMD64
+    # Build AXIS for Linux AMD64
     Write-Output "Building AXIS for Linux AMD64"
     Invoke-Expression "go build -v -o dist/axis-linux-amd64 ./cmd/axis/..."
 
-    # Buld Control Backend for Linux AMD64
+    # Build Control Backend for Linux AMD64
     Write-Output "Building Control Backend for Linux AMD64"
     Invoke-Expression "go build -v -o dist/control-linux-amd64 ./cmd/control/..."
 
-    # Buld Spyglass Backend for Linux AMD64
+    # Build Spyglass Backend for Linux AMD64
     Write-Output "Building Spyglass Backend for Linux AMD64"
     Invoke-Expression "go build -v -o dist/spyglass-linux-amd64 ./cmd/spyglass/..."
 
 
-    # Buld Control Frontend
+    # Build Control Frontend
     Write-Output "Building Control Frontend"
     Invoke-Expression "npm --prefix ./cmd/control/web run-script build"
     Write-Output "Moving files to  ./dist/control"
     Move-Item "./cmd/control/web/dist/" -Destination "./dist/control"
 
-    # # Buld Spyglass Frontend
+    # # Build Spyglass Frontend
     Write-Output "Building Spyglass Frontend"
     Invoke-Expression "npm --prefix ./cmd/spyglass/web run-script build"
     Write-Output "Moving files to  ./dist/spyglass"

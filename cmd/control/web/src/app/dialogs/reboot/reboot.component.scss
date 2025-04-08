@@ -1,8 +1,16 @@
+.reboot-wrapper {
+    padding: 20px;
+    color: white;
+    background-color: #001832;
+    border-radius: 20px;
+}
+
 .confirm-cancel {
-    margin-top: 15%;
+    margin-top: 10%;
     display: flex;
     height: 5vh;
     justify-content: space-evenly;
+    align-items: center;
     .button-wrapper {
         display: flex;
         justify-content: space-evenly;
@@ -19,6 +27,12 @@
         .cancel {
             background-color: rgb(190, 0, 0);
             color: white;
+            border-radius: 20px;
+        }
+
+        .confirm {
+            background-color: #0044b3;
+            border-radius: 20px;
         }
     }
 }
