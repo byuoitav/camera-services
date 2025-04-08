@@ -36,7 +36,7 @@ func (c *ControlKeyService) RoomAndControlGroup(ctx context.Context, key string)
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
-		return "", "", fmt.Errorf("Invalid Control Key")
+		return "", "", fmt.Errorf("invalid control key")
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)

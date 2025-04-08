@@ -1,28 +1,6 @@
-.error-wrapper {
-  padding: 20px;
-  min-width: 200px;
-  color: white;
-  background-color: #001832;
-  border-radius: 20px;
-  button {
-    background-color: #0044b3;
-    color: white;
-    border-radius: 10px;
-    min-height: 40px;
-    width: 100%;
-    border-width: 0px !important;
-  }
-}
-
-.error-message {
-  color: white;
-  padding: 20px;
-}
-
 .mat-dialog-title {
     text-align: center;
     font-size: 1.8em;
-    color: white !important;
   }
   
   .mat-dialog-content {
@@ -32,10 +10,19 @@
     align-items: center;
     text-align: center;
     height: 8vh;
-    color: white;
     
     // margin: 5vh 0;
   
     font-size: 150%;
+  }
+  
+  .mat-dialog-actions {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  
+    .mat-raised-button {
+      font-size: 1.2em;
+    }
   }
   

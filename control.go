@@ -8,7 +8,6 @@ type ControlKeyService interface {
 
 type ConfigService interface {
 	Cameras(context.Context, ControlInfo) ([]CameraConfig, error)
-	ControlIP(context.Context, string) ([]string, error)
 }
 
 type CameraConfig struct {
@@ -41,5 +40,4 @@ type CameraPreset struct {
 type ControlInfo struct {
 	Room         string `json:"room" form:"room"`
 	ControlGroup string `json:"controlGroup" form:"controlGroup"`
-	ControlKey   string `json:"controlKey" form:"controlKey"`
 }

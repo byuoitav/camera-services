@@ -4,7 +4,6 @@ import {HttpClient} from "@angular/common/http";
 export interface ControlInfo {
   room: string;
   controlGroup: string;
-  controlKey: string;
 }
 
 export interface Camera {
@@ -48,12 +47,11 @@ export class APIService {
     })
   }
 
-  getCameras(room: string, controlKey: string, controlGroup: string) {
+  getCameras(room: string, controlGroup: string) {
     return this.http.get<Camera[]>("/api/v1/cameras", {
       params: {
         room: room,
-        controlGroup: controlGroup,
-        controlKey: controlKey,
+        controlGroup: controlGroup
       }
     })
   }
