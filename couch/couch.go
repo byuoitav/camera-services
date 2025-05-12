@@ -3,6 +3,7 @@ package couch
 import (
 	"context"
 	"fmt"
+	"net"
 	"strings"
 
 	cameraservices "github.com/byuoitav/camera-services"
@@ -190,4 +191,87 @@ func (c *configService) ControlIP(ctx context.Context, room string) ([]string, e
 	}
 
 	return IP, nil
+}
+
+// FindCameraByAddress searches the config database for a camera with the given address
+// and returns its username and password.
+func (c *configService) FindCameraAuthByAddress(ctx context.Context, addr string) (string, string, error) {
+	db := c.client.DB(ctx, c.uiConfigDB)
+
+	query := map[string]interface{}{
+		"selector": map[string]interface{}{
+			"presets": map[string]interface{}{
+				"$elemMatch": map[string]interface{}{
+					"cameras": map[string]interface{}{
+						"$elemMatch": map[string]interface{}{
+							"$or": []map[string]interface{}{
+								{"stream": map[string]interface{}{"$regex": addr}},
+								{"panLeft": map[string]interface{}{"$regex": addr}},
+								{"panRight": map[string]interface{}{"$regex": addr}},
+								{"tiltUp": map[string]interface{}{"$regex": addr}},
+								{"tiltDown": map[string]interface{}{"$regex": addr}},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	rows, err := db.Find(ctx, query)
+	if err != nil {
+		return "", "", fmt.Errorf("unable to query config DB: %w", err)
+	}
+	for rows.Next() {
+		var config uiConfig
+		if err := rows.ScanDoc(&config); err != nil {
+			continue
+		}
+		for _, group := range config.ControlGroups {
+			for _, cam := range group.Cameras {
+				if strings.Contains(cam.Stream, addr) || strings.Contains(cam.PanLeft, addr) ||
+					strings.Contains(cam.PanRight, addr) || strings.Contains(cam.TiltUp, addr) ||
+					strings.Contains(cam.TiltDown, addr) {
+					return cam.UserName, cam.Password, nil
+				}
+			}
+		}
+	}
+	return "", "", fmt.Errorf("camera with address %s not found", addr)
+}
+
+// GetCameraAuth retrieves the camera's username and password from the config database based on the provided address.
+func (c *configService) GetCameraAuth(ctx context.Context, addr string) (string, string, error) {
+	isIP := net.ParseIP(addr) != nil
+	if !isIP {
+		// Tries to get room from hostname in address
+		parts := strings.SplitN(addr, "-", 3)
+		if len(parts) >= 2 {
+			roomID := parts[0] + "-" + parts[1]
+			var config uiConfig
+
+			db := c.client.DB(ctx, c.uiConfigDB)
+			if err := db.Get(ctx, roomID).ScanDoc(&config); err == nil {
+				for _, group := range config.ControlGroups {
+					for _, cam := range group.Cameras {
+						if cameraMatchesAddress(cam, addr) {
+							return cam.UserName, cam.Password, nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// If it fails to get a room from the address, it will try to get the camera from the config database
+	// by searching all the docs for the address
+	return c.FindCameraAuthByAddress(ctx, addr)
+}
+
+func cameraMatchesAddress(cam cameraservices.CameraConfig, addr string) bool {
+	return strings.Contains(cam.Stream, addr) ||
+		strings.Contains(cam.PanLeft, addr) ||
+		strings.Contains(cam.PanRight, addr) ||
+		strings.Contains(cam.TiltUp, addr) ||
+		strings.Contains(cam.TiltDown, addr)
 }
