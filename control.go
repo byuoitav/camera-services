@@ -29,7 +29,9 @@ type CameraConfig struct {
 	Presets []CameraPreset `json:"presets"`
 
 	// admin items
-	Reboot string `json:"reboot"`
+	Reboot   string `json:"reboot"`
+	UserName string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type CameraPreset struct {

@@ -144,6 +144,9 @@ func main() {
 	handlers := handlers.NewCameraController(cs)
 	handlers.Logger = log
 	handlers.CreateCamera = func(ctx context.Context, addr string) (cameraservices.Camera, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
 		// TODO need to make this function better if New() does much of anything (see av-control-api/drivers)
 		if cam, ok := cameras.Load(addr); ok {
 			return cam.(*aver.Pro520), nil
@@ -157,11 +160,31 @@ func main() {
 			}
 		}
 
+		username, password, err := cs.FindCameraAuthByAddress(ctx, addrNoPort)
+		if err != nil {
+			log.Warn("unable to get camera credentials from config service, falling back to flags",
+				zap.String("camera", addrNoPort),
+				zap.Error(err),
+			)
+			username = camUsername
+			password = camPassword
+		}
+
+		if username == "" {
+			log.Debug("no username provided for camera, using default")
+			username = camUsername
+		}
+
+		if password == "" {
+			log.Debug("no password provided for camera, using default")
+			password = camPassword
+		}
+
 		cam := &aver.Pro520{
 			Camera:   visca.New(addr, visca.WithLogger(log.Sugar().Named(addr))),
 			Address:  addrNoPort,
-			Username: camUsername,
-			Password: camPassword,
+			Username: username,
+			Password: password,
 		}
 
 		cameras.Store(addr, cam)
